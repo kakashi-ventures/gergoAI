@@ -65,6 +65,8 @@ BRACCIO ──(serie CS/EC entro 13:15, al 1° slot)─────────�
 
 Formato: `- [ora] DA → A: cosa serve, perché` · chi la risolve la marca `✔ ora + commit`.
 
+- [13:45] BRACCIO → BRIDGE, CONSOLE: i task CS sono 10, nomi in `shared/fixtures/elite_tasks.json` e guida per il pendant in `sdk/TASKS.md` (home, porta/solleva/deposita × INGRESSO/STAZIONE/USCITA/SCARTI, applica_STAZIONE). BRIDGE: se volete il campo `jbi` di `skills` valorizzato, usate quei nomi; l'adapter li risolve comunque da `elite_tasks.json` con chiave `skill:LUOGO`.
+
 - [12:46] BRIDGE → CONSOLE, BRACCIO: **contracts-v1 pronto** su `main` al commit `1448eac`. Leggete `shared/contracts.md`; schemi in `shared/schemas/*.json`, fixtures in `shared/fixtures/{valid,invalid}/*.json` (formato `{model, data, why}`: zod deve dare lo stesso esito di pydantic). Le regole cross-field (params per skill, `sposta` senza coordinate) sono nella tabella di `contracts.md`.
 - [13:00] BRACCIO → BRIDGE: audio_guard scrive i fail-safe come `trigger: "heartbeat"` con `features.failsafe`: confermate o aggiungete `failsafe` al contratto. Heartbeat su `guard_status` (~4 upsert/s) o file `--heartbeat-file`; serve un modo per dire ad audio_guard che il braccio si muove (per lo sfregamento).
 - [13:10] BRACCIO → BRIDGE: `bridge/adapters/elite.py` espone `EliteCsAdapter(host, mode)` (env `ELITE_HOST`, `ELITE_MODE`=dry-run|read-only|armed, `GERGO_GUARD_HEARTBEAT` = file che audio_guard tocca ogni 250 ms). Usatelo in `--mode elite` al posto di `DryRunElite`; serve `pip install -e sdk`. In `bridge/.env.example` aggiungete `ELITE_DASHBOARD_PORT=29999` al posto di `ELITE_PORT=8055`.

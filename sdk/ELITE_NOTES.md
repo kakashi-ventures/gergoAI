@@ -63,3 +63,13 @@ Marker: `[verificato: fonte]` · `[dichiarato: chi]` · `[non verificato]`.
 - Sul pendant c'è un task non salvato con MoveL → "Direction Robot X+" con "Until expression", Wait, Waypoint_1 e
   Waypoint_2: è il modo nativo per i movimenti relativi. I task delle primitive vanno salvati con un nome
   (`.task`) per poterli caricare via Dashboard.
+
+## Collegare il laptop al controller (192.168.1.200)
+
+1. Cavo Ethernet dal laptop alla porta LAN del controller (o allo switch dello staff).
+2. IP statico sul laptop: 192.168.1.50, maschera 255.255.255.0, nessun gateway (deve essere libero: chiedere allo
+   staff). Il Wi‑Fi può restare acceso per internet, se le reti non si sovrappongono (192.168.1.x anche sul Wi‑Fi =
+   conflitto: in quel caso spegnere il Wi‑Fi durante il probe).
+3. `ping 192.168.1.200`, poi le porte: `nc -vz 192.168.1.200 29999`, `30001`, `30004`.
+4. Remote control: si attiva dal pendant (lo fa il tecnico). Senza, il probe legge ma i task non partono.
+5. `python -m gergo_sdk.probe --host 192.168.1.200` (sola lettura).
