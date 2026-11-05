@@ -10,11 +10,11 @@ export function SafetyPanel({ s }: { s: SafetyState }) {
       <ul className="space-y-2 text-sm">
         <li className="flex items-center gap-2">
           <Dot ok={guardOk} /> audio_guard {guardOk ? "vivo" : "MORTO — movimenti bloccati"}
-          <span className="ml-auto font-mono text-xs text-white/50">{s.guard_heartbeat_ms_ago} ms fa</span>
+          <span className="ml-auto font-mono text-xs text-white/50">{Number.isFinite(s.guard_heartbeat_ms_ago) ? `${s.guard_heartbeat_ms_ago} ms fa` : "mai visto"}</span>
         </li>
         <li className="flex items-center gap-2">
-          <Dot ok={bridgeOk} /> bridge
-          <span className="ml-auto font-mono text-xs text-white/50">{(s.bridge_heartbeat_ms_ago / 1000).toFixed(1)} s fa</span>
+          <Dot ok={bridgeOk} /> bridge {bridgeOk ? "vivo" : "assente — niente comandi eseguiti"}
+          <span className="ml-auto font-mono text-xs text-white/50">{Number.isFinite(s.bridge_heartbeat_ms_ago) ? `${(s.bridge_heartbeat_ms_ago / 1000).toFixed(1)} s fa` : "mai visto"}</span>
         </li>
         <li className="flex items-center gap-2 text-white/80">
           ultimo trigger:

@@ -88,7 +88,7 @@ export function Console() {
                 <li key={k.name} className="flex flex-wrap items-center gap-2 py-2 text-sm">
                   <span className="font-semibold">{k.name}</span>
                   <span className={`rounded px-1.5 py-0.5 text-[11px] ${STATUS_STYLE[k.status]}`}>{k.status}</span>
-                  <span className="font-mono text-[11px] text-white/40">{k.jbi ?? "MoveL"}</span>
+                  <span className="font-mono text-[11px] text-white/40">{k.jbi ?? (k.name === "sposta" ? "MoveL" : "task —")}</span>
                   <span className="text-[11px] text-white/50">sim {k.sim_ok ? "✓" : "–"} · real {k.real_ok ? "✓" : "–"}</span>
                   <span className="ml-auto flex gap-1">
                     <button onClick={() => act("conferma_skill", { name: k.name }, `Confermi la skill ${k.name}? In modalità elite potrà muovere il braccio vero.`)} disabled={!k.sim_ok || k.status !== "draft"} className="rounded px-2 py-0.5 text-xs text-emerald-300 hover:bg-emerald-400/10 disabled:opacity-30">Conferma</button>
