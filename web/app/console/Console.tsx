@@ -52,6 +52,7 @@ export function Console() {
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 flex flex-wrap items-center gap-4 border-b border-white/10 bg-[#0b0d10]/95 px-4 py-3 backdrop-blur">
         <h1 className="text-xl font-bold">Gergo <span className="text-sm font-normal text-white/50">postazione etichettatura</span></h1>
+        <a href="/console/report" className="text-xs text-sky-300 underline">report</a>
         <span className="flex items-center gap-2 text-sm"><Dot ok={bridgeOk} /> bridge</span>
         <span className="rounded bg-white/10 px-2 py-0.5 font-mono text-xs">mode {s.mode}</span>
         <span className="rounded bg-white/10 px-2 py-0.5 font-mono text-xs">ontologia v{s.ontology_version}</span>
@@ -91,6 +92,11 @@ export function Console() {
                   <button onClick={() => act("conferma", live.pending?.id ? { command_id: live.pending.id } : {})} className="rounded bg-emerald-600 px-4 py-2 font-semibold hover:bg-emerald-500">Conferma</button>
                   <button onClick={() => act("annulla")} className="rounded border border-white/20 px-4 py-2 hover:bg-white/5">Annulla</button>
                 </div>
+              </>
+            ) : live.awaiting ? (
+              <>
+                <p className="text-lg">Aspetto te: «{live.awaiting}»</p>
+                <button onClick={() => act("fatto")} className="mt-3 rounded bg-emerald-600 px-4 py-2 font-semibold">Fatto</button>
               </>
             ) : (
               <p className="text-sm text-white/40">Nessun comando in attesa.</p>

@@ -14,6 +14,7 @@ export interface LiveData {
   skills: mock.SkillRow[];
   routines: { name: string; version: number; status: string; source_utterance: string | null; diff: string }[];
   pending: { id?: string; skill: string; frase: string } | null;
+  awaiting: string | null;
   events: mock.EventRow[];
   proposal: { id?: string; summary: string; rule: string; before: number | null; after: number | null } | null;
   resoconto: Record<string, number>;
@@ -22,7 +23,7 @@ export interface LiveData {
 }
 
 const MOCK: LiveData = {
-  source: "finti", realtime: false, safety: mock.mockSafety, workspace: mock.mockWorkspace, tcp: mock.mockTcp,
+  source: "finti", realtime: false, awaiting: null, safety: mock.mockSafety, workspace: mock.mockWorkspace, tcp: mock.mockTcp,
   skills: mock.mockSkills, routines: mock.mockRoutines, pending: mock.mockPending, events: mock.mockEvents,
   proposal: mock.mockProposal, resoconto: mock.mockResoconto,
 };
@@ -90,6 +91,16 @@ async function load(s: SupabaseClient): Promise<LiveData> {
     skills,
     routines: routines.map((r) => ({ name: String(r.name), version: Number(r.version), status: String(r.status), source_utterance: (r.source_utterance as string) ?? null, diff: "" })),
     pending: cmds[0] ? { id: String(cmds[0].id), skill: String(cmds[0].skill), frase: String(cmds[0].readback ?? cmds[0].skill) } : null,
+    awaiting: (() => {
+      // l'ultimo feedback {awaiting} non ancora seguito da un {done}
+      for (const e of evs) {
+        const p = (e.payload ?? {}) as Record<string, unknown>;
+        if (e.type === "feedback" && (p.done === true || p.text === "fatto")) return null;
+        if (e.type === "feedback" && p.awaiting === true) return String(p.prompt ?? "dimmi fatto");
+        if (e.type === "stop") return null;
+      }
+      return null;
+    })(),
     events: evs.map((e) => {
       const p = (e.payload ?? {}) as Record<string, unknown>;
       return { id: String(e.id), ts: String(e.ts), type: String(e.type), text: eventText(String(e.type), p), duration_ms: p.duration_ms as number | undefined, ok: p.ok as boolean | undefined, step: e.step as number | undefined, cycle: p.cycle === true };
