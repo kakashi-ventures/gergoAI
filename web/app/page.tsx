@@ -94,9 +94,9 @@ export default function Home() {
         {/* Il video, subito dopo la hero */}
         <section id="video" className="border-y border-[#eceef1] bg-[#f6f7f9]">
           <div className="mx-auto max-w-5xl px-4 py-24 text-center sm:px-6">
-            <div className="flex justify-center"><Eyebrow>Il video · 3 minuti</Eyebrow></div>
-            <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">Gergo in tre minuti.</h2>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-[#4b5563]">Il problema, come funziona, e il braccio vero che si muove: Pavia, 5 novembre 2026.</p>
+            <div className="flex justify-center"><Eyebrow>Il video · 4 minuti</Eyebrow></div>
+            <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">Gergo in quattro minuti.</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-[#4b5563]">Il problema, come funziona, e il braccio vero che si muove e si corregge a voce: Pavia, 5 novembre 2026.</p>
             <video
               className="mx-auto mt-10 aspect-video w-full rounded-2xl border border-[#e5e7eb] bg-[#0f1419] shadow-[0_30px_80px_-40px_rgba(15,20,25,0.45)]"
               src="/gergoai-video.mp4"
