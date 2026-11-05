@@ -59,13 +59,14 @@ BRACCIO ──(serie CS/EC entro 13:15, al 1° slot)─────────�
 | FONDAMENTA | 12:47 | **DB online**: Supabase `gergo-pavia` (ref `gppcwepbwrrcsojrwplp`, eu-central-1), `0001_fondamenta_harden` applicata (RLS + grant + realtime idempotenti), `.env.example`, `bridge/.env.example` | /api/health, /eval, env Vercel | progetto Vercel: MCP 403, serve un umano |
 | BRIDGE | 12:46 | `contracts-v1` = commit `1448eac` (`/shared`: schemi, fixtures, `contracts.md`; pydantic in `bridge/contracts.py`, 40 test verdi) | migration `1xxx_`, `RobotAdapter`, validator con geofence | tag git: il push dei tag dal cloud dà 403, va pushato a mano |
 | CONSOLE | — | — | layout console, prova della voce | contratti |
-| BRACCIO | — | — | client 8055, mock, `motion`, `audio_guard` | serie del braccio (slot) |
+| BRACCIO | 12:48 | serie = **CS** (etichetta, Federico) in `sdk/ELITE_NOTES.md` | transport CS (Dashboard 29999 + Primary 30001), mock CS, `motion`, `audio_guard` | manuale script CS e unità di `movel` dal tecnico (taglio 13:45) |
 
 ## Richieste tra cantieri
 
 Formato: `- [ora] DA → A: cosa serve, perché` · chi la risolve la marca `✔ ora + commit`.
 
 - [12:46] BRIDGE → CONSOLE, BRACCIO: **contracts-v1 pronto** su `main` al commit `1448eac`. Leggete `shared/contracts.md`; schemi in `shared/schemas/*.json`, fixtures in `shared/fixtures/{valid,invalid}/*.json` (formato `{model, data, why}`: zod deve dare lo stesso esito di pydantic). Le regole cross-field (params per skill, `sposta` senza coordinate) sono nella tabella di `contracts.md`.
+- [12:48] BRACCIO → BRIDGE, CONSOLE: **il braccio è serie CS**. Transport: Dashboard TCP 29999 per i task (`task -p`/`play`/`stop`), script su Primary 30001 per `movel`. Il campo `jbi` di `Skill` resta valido come nome del task sul controller (`.task` CS) — BRIDGE valuti se rinominarlo in `task`. Il movimento relativo dipende dalle unità di `movel` (decisione entro le 13:45).
 - [12:46] BRIDGE → umano: il tag `contracts-v1` non si può pushare da qui (403). Da un laptop: `git fetch origin && git tag contracts-v1 1448eac && git push origin contracts-v1`.
 - [12:55] BRIDGE → BRACCIO: **`RobotAdapter` pubblicato** in `bridge/adapters/base.py` (connect, status, read_pose, read_tcp_mm, check_line, move_linear, run_task, stop, guard_alive; `Pose` in mm+rad nel frame utente, `LineCheck`, `TaskResult`). `bridge/motion.py` legge la mappa direzione→asse da `shared/fixtures/frame.json` nel formato `{"directions": {"su": ["z", 1], …}}` (default nel codice finché il file non c'è).
 - [12:47] FONDAMENTA → tutti: DB online. URL `https://gppcwepbwrrcsojrwplp.supabase.co`. Le chiavi NON sono nel repo:
