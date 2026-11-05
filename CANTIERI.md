@@ -56,7 +56,7 @@ BRACCIO ──(serie CS/EC entro 13:15, al 1° slot)─────────�
 
 | Cantiere | Ora | Fatto | Prossimo | Bloccato da |
 |---|---|---|---|---|
-| FONDAMENTA | 13:05 | DB online; migration 1001, 1002, 2001, 2002 applicate e indurite (9001–9004); DB = repo (9/9); advisors security 0; `/api/health`; `/eval`. Vercel: progetto `gergoai` (team KVA) creato, deploy READY ma vuoto (root dir non è `web`) | env + Root Directory `web` dalla dashboard, poi `/api/health` su `gergoai.vercel.app` | MCP Vercel in sola lettura sul team KVA (403 su update e env): impostazioni a mano |
+| FONDAMENTA | 13:22 | DB = repo (9/9), advisors security 0; Vercel `gergoai` builda Next (commit 907a568); `/api/health` in prod: Supabase ok, tabelle ok, nessun segreto NEXT_PUBLIC_; `CLAUDE.md`; README in bozza; `bridge/.env.example` completo | eval B/C reali; README finale; 15:00 freeze | `CONSOLE_PASSPHRASE` assente su Vercel (umano); `XAI_EVAL_MODEL` assente; region funzioni iad1 (meglio fra1) |
 | BRIDGE | 12:54 | `contracts-v1` (`1448eac`), migration `1001`/`1002`, `RobotAdapter`, validator con geofence, `main.py` + SimArm con `sposta`, composer, `deploy_report` (sezione sicurezza); 84 test verdi | check di accettazione sul DB vero dopo le migration (serve `bridge/.env`) | tag `contracts-v1`: push dei tag dal cloud 403, va pushato a mano · tabelle `routines`/`routine_runs` di CONSOLE |
 | CONSOLE | 14:10 | voce nel browser (`lib/voice`: token effimeri, tool solo a enum, `/console/probe` col kill criterion); zod = pydantic su 38 fixture; `motion.ts`/`validator.ts` specchio del Python; `/api/tools/*`: propone_azione, sposta, piu_piano/veloce, conferma (comandi e run), annulla, stop, salva_angolo, conferma/depreca_skill, definisci/salva/esegui_routine, fatto, segnala, resoconto, approva_proposta, mina; pattern miner (5 regole, proposte con before/after); `/console` e `/console/report` sul DB vero (realtime, provati in locale con anon); migration 2001 + 2002 applicate; 77 test verdi | misura della voce (10 frasi) appena Vercel serve `/web`; prova end to end col bridge in sim | Vercel: Root Directory `web` + env dalla dashboard (umano) · scritture non provate: serve la service role su Vercel |
 | BRACCIO | 13:00 | serie **CS**; `gergo_sdk` (Dashboard 29999 whitelist, RTSI 30004, Primary 30001 con solo `movel`, cinematica MDH, mock, probe), `EliteCsAdapter`, `safety/audio_guard.py` (latenze su wav sintetici: botta 13 ms, urlo 93 ms, sfregamento 293 ms); 155 test verdi | slot: probe read-only, TCP, task, taratura, 1 cm su/avanti con ok umano | IP del controller, pendant in remote, modello Vosk italiano sul laptop |
@@ -106,6 +106,13 @@ Formato: `- [ora] DA → A: cosa serve, perché` · chi la risolve la marca `✔
   `v_shift_summary` 200 per anon; INSERT anon su routine_runs rifiutata (401); advisors security 0.
 
 - [14:05] CONSOLE → FONDAMENTA / umano: **il progetto Vercel `gergoai` (team KVA) risponde 404 su tutto**, compresi `/console` e `/api/health`: `framework: null` e Root Directory non impostata, quindi costruisce la root della repo. Da impostare: Root Directory = `web`, Framework = Next.js, Node 22.x (ora è 26.x), poi redeploy. `gergoai.vercel.app` è pubblico (SSO solo sugli URL di deployment): `/console` è comunque dietro `CONSOLE_PASSPHRASE`.
+- [13:22] FONDAMENTA → tutti: **Vercel serve /web** su `https://gergoai.vercel.app` (Next, commit 907a568). `/api/health`:
+  `supabase.ok=true` (465 ms), `bridge_status` e `guard_status` presenti ma vuote (bridge e audio_guard non girano),
+  env presenti tranne `CONSOLE_PASSPHRASE` e `XAI_EVAL_MODEL` → oggi risponde 503 "down" finché manca la passphrase.
+  CONSOLE: la console e `/api/tools` restano 503 fino ad allora (fail-closed, corretto).
+- [13:22] FONDAMENTA → BRACCIO: audio_guard ha `--bridge-id` di default `gergo-1`; il bridge usa `pavia-postazione-1`.
+  In `bridge/.env.example` c'è ora `GERGO_BRIDGE_ID=pavia-postazione-1`: o lo leggete da lì o cambiate il default,
+  altrimenti `guard_status` ha una riga che bridge e /api/health non guardano.
 
 ---
 
