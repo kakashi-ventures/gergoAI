@@ -249,14 +249,34 @@ def make_adapter(mode: str, inject, dry_run: bool, sim_guard: bool) -> RobotAdap
     if mode == "sim":
         from bridge.adapters.sim import SimArm
         return SimArm(inject=inject, guard=sim_guard)
-    if not dry_run:
-        try:
-            from bridge.adapters.elite import EliteAdapter  # di BRACCIO
-            return EliteAdapter.from_env()
-        except ImportError:
-            print("bridge/adapters/elite.py non c'è ancora: uso il dry-run")
-    from bridge.adapters.dryrun import DryRunElite
-    return DryRunElite(guard=sim_guard)
+    if dry_run:
+        from bridge.adapters.dryrun import DryRunElite
+        return DryRunElite(guard=sim_guard)
+    return elite_adapter_from_env()
+
+
+def elite_adapter_from_env(env=None) -> RobotAdapter:
+    """--mode elite senza --dry-run: SEMPRE l'adapter CS di BRACCIO, mai un ripiego silenzioso sul dry-run.
+
+    Se gergo_sdk non è installato o la serie non è CS, il bridge si ferma con un errore leggibile.
+    ELITE_MODE (dry-run | read-only | armed) decide se il controller riceve comandi: il default resta dry-run.
+    """
+    env = os.environ if env is None else env
+    series = (env.get("ELITE_SERIES") or "CS").strip().upper()
+    if series != "CS":
+        raise SystemExit(f"ELITE_SERIES={series}: in sala il braccio è CS (sdk/ELITE_NOTES.md); "
+                         "l'adapter EC non è implementato")
+    try:
+        from bridge.adapters.elite import EliteCsAdapter  # di BRACCIO
+    except ImportError as e:
+        raise SystemExit(f"adapter Elite non importabile ({e}): esegui `pip install -e sdk`") from e
+    ports = {k: int(env[v]) for k, v in (("dashboard_port", "ELITE_DASHBOARD_PORT"),
+                                         ("primary_port", "ELITE_PRIMARY_PORT"),
+                                         ("rtsi_port", "ELITE_RTSI_PORT")) if env.get(v)}
+    adapter = EliteCsAdapter(host=env.get("ELITE_HOST") or None, mode=env.get("ELITE_MODE") or "dry-run",
+                             guard_heartbeat_file=env.get("GERGO_GUARD_HEARTBEAT") or None, **ports)
+    print(f"adapter elite-cs · host {adapter.cs.host} · ELITE_MODE {adapter.cs.mode}")
+    return adapter
 
 
 def main(argv=None) -> int:

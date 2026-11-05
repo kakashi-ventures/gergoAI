@@ -122,3 +122,31 @@ def test_inject_fail():
     b.poll_once()
     assert store.commands[0]["status"] == "failed"
     assert "anomaly" in types(store)
+
+
+# --- make_adapter in mode elite: mai un ripiego silenzioso sul dry-run (richiesta FONDAMENTA 14:22) ------------
+
+def test_elite_mode_uses_cs_adapter_not_dryrun(monkeypatch):
+    from bridge.adapters.dryrun import DryRunElite
+    from bridge.adapters.elite import EliteCsAdapter
+    from bridge.main import make_adapter
+    monkeypatch.setenv("ELITE_HOST", "10.0.0.9")
+    monkeypatch.setenv("ELITE_MODE", "dry-run")
+    monkeypatch.setenv("ELITE_SERIES", "CS")
+    monkeypatch.setenv("ELITE_DASHBOARD_PORT", "29999")
+    a = make_adapter("elite", [], dry_run=False, sim_guard=False)
+    assert isinstance(a, EliteCsAdapter) and not isinstance(a, DryRunElite)
+    assert a.cs.host == "10.0.0.9" and a.cs.mode == "dry-run" and a.cs.ports[0] == 29999
+
+
+def test_elite_mode_explicit_dry_run_flag_keeps_dryrun_adapter():
+    from bridge.adapters.dryrun import DryRunElite
+    from bridge.main import make_adapter
+    assert isinstance(make_adapter("elite", [], dry_run=True, sim_guard=False), DryRunElite)
+
+
+def test_elite_mode_rejects_non_cs_series():
+    import pytest
+    from bridge.main import elite_adapter_from_env
+    with pytest.raises(SystemExit):
+        elite_adapter_from_env({"ELITE_SERIES": "EC"})

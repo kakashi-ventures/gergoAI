@@ -56,7 +56,7 @@ BRACCIO ──(serie CS/EC entro 13:15, al 1° slot)─────────�
 
 | Cantiere | Ora | Fatto | Prossimo | Bloccato da |
 |---|---|---|---|---|
-| FONDAMENTA | 15:01 | **Freeze**: DB = repo (9/9), advisors security 0; INSERT anon 401; `/api/tools` 401 e `/console` → login senza cookie; `/api/health` 200 su prod (commit 3c324f3): env complete, Supabase 363 ms, **bridge sim vivo**, audio_guard assente; storia git (61 commit, tutti i branch) senza segreti né `.env`; eval A nel README | passphrase console ruotata: env su Vercel + redeploy (umano); saldo xAI (umano) | `main.py` elite ricade ancora sul dry-run (richiesta 14:22 a BRIDGE aperta) |
+| FONDAMENTA | 15:10 | Freeze ok (DB = repo 9/9, advisors 0, RLS, /api/health 200 con bridge sim vivo, storia git pulita); **fix fallback elite** del bridge + sanity check di tutte le suite (277 test verdi, build ok) | redeploy con la nuova passphrase (umano); saldo xAI (umano) | — |
 | BRIDGE | 12:54 | `contracts-v1` (`1448eac`), migration `1001`/`1002`, `RobotAdapter`, validator con geofence, `main.py` + SimArm con `sposta`, composer, `deploy_report` (sezione sicurezza); 84 test verdi | check di accettazione sul DB vero dopo le migration (serve `bridge/.env`) | tag `contracts-v1`: push dei tag dal cloud 403, va pushato a mano · tabelle `routines`/`routine_runs` di CONSOLE |
 | CONSOLE | 14:40 | Nuova UX: «Parla al braccio» (sfera voce, rilettura scritta dal codice, Sì/No), **sistema di allerta** (regole in `lib/alerts.ts`, schermo intero per i critici, presa visione nel registro), **Movimenti** (approva nuovi e modificati con confronto per passo; modifica = sempre nuova versione in bozza), registro filtrabile ed esportabile, tempo di ciclo per versione, **modalità demo** (`/console?demo`), **`/console/codice`** (44 parametri di sicurezza letti dai `.py` con file:riga, impronte sha256, storia GitHub con patch), **landing** `/` dal pitch di Control8 con link al deck; 90 test verdi | probe voce dal vivo e prova end to end sull'URL Vercel | `CONSOLE_PASSPHRASE` e `XAI_API_KEY` su Vercel (umano); `GITHUB_TOKEN` consigliato per la storia del codice |
 | BRACCIO | 13:39 | **CS63** (sbraccio 624 mm), IP **192.168.1.200**; orientamento della nostra FK = pendant (verificato); `gergo_sdk` + `EliteCsAdapter` + `audio_guard`; probe con `fk_check`; 155 test verdi | probe read-only dal laptop su 192.168.1.x, TCP, task salvati con nome, posa di partenza piegata | laptop sulla rete del braccio, pendant in remote, nomi dei task |
@@ -129,13 +129,18 @@ Formato: `- [ora] DA → A: cosa serve, perché` · chi la risolve la marca `✔
   presenti, Supabase ok (486 ms), `bridge_status` e `guard_status` vuote. Diventa `ok` quando bridge (`BRIDGE_ID=pavia-postazione-1`)
   e audio_guard (`--bridge-id pavia-postazione-1`) scrivono il loro heartbeat sul DB vero. Console e `/api/tools` ora aperte
   con la passphrase.
-- [14:22] FONDAMENTA → BRIDGE (**bloccante per il braccio**): `bridge/main.py:254` importa `EliteAdapter` con
+- [14:22] ✔ 15:10 FONDAMENTA (su ok di Federico) → BRIDGE (**bloccante per il braccio**): `bridge/main.py:254` importa `EliteAdapter` con
   `EliteAdapter.from_env()`, ma `bridge/adapters/elite.py` definisce solo `EliteCsAdapter` (nessun `from_env`).
   L'ImportError è catturato e `--mode elite` ricade **in silenzio** su `DryRunElite`: al braccio non parte nulla e il
   log non lo dice. Serve l'import giusto più un test che fallisca se in mode elite l'adapter è il dry-run.
 - [14:22] FONDAMENTA → tutti: eval pubblicata con la **sola condizione A** (80% complessiva, 0 esecuzioni senza conferma,
   0 movimenti fuori geofence accettati, 2/2 rifiuti geofence) in `eval/results/summary-20261105-131813.*` e nel README.
   B/C dichiarate non misurate (chiave xAI non disponibile entro le 14:15).
+- [15:10] FONDAMENTA → BRIDGE, BRACCIO: **corretto il fallback elite** (ok di Federico, file di BRIDGE): `make_adapter` in
+  `--mode elite` crea `EliteCsAdapter` da env (`ELITE_HOST`, `ELITE_MODE`, `ELITE_DASHBOARD_PORT`, `ELITE_PRIMARY_PORT`,
+  `ELITE_RTSI_PORT`, `GERGO_GUARD_HEARTBEAT`); se non si importa, `SystemExit` con il motivo; `--dry-run` esplicito resta
+  `DryRunElite`; 3 test nuovi in `bridge/tests/test_main.py`. Sanity: bridge elite read-only collegato al mock CS 2.15 ok;
+  bridge 92, sdk 49, safety+eval 41, web 95 test verdi; `gen_schemas --check` ok; `next build` ok.
 
 ---
 

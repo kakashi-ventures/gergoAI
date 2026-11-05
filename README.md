@@ -85,7 +85,7 @@ Contratti: `bridge/contracts.py` (pydantic v2) è la fonte di verità; `shared/s
   `SUPABASE_SERVICE_ROLE_KEY`, `XAI_API_KEY`, `XAI_VOICE_MODEL` (`grok-voice-3.0`, da `shared/xai-notes.md`),
   `XAI_EVAL_MODEL`, `CONSOLE_PASSPHRASE`, `BRIDGE_ID`.
 - `bridge/.env.example` → `bridge/.env` sul laptop del bridge: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
-  `BRIDGE_ID`, `ELITE_SERIES`, `ELITE_HOST`, `ELITE_PORT`, `ELITE_MODE` (dry-run | read-only | armed).
+  `BRIDGE_ID`, `ELITE_SERIES`, `ELITE_HOST`, `ELITE_MODE` (dry-run | read-only | armed), porte CS.
 - In `bridge/.env.example` anche: `ELITE_DASHBOARD_PORT=29999` (serie CS), `GERGO_BRIDGE_ID` (audio_guard, uguale a
   `BRIDGE_ID`), `AUDIO_GUARD_HEARTBEAT_FILE` / `GERGO_GUARD_HEARTBEAT`, `VOSK_MODEL_PATH`, `VERCEL_DEPLOY_URL`, `XAI_MODEL`.
 - Produzione: https://gergoai.vercel.app · stato: https://gergoai.vercel.app/api/health (presenza delle env, ping a
@@ -121,8 +121,16 @@ python -m bridge.main --mode sim --inject slow:applica    # anomalia iniettata p
 python -m bridge.gen_schemas --check                      # gli schemi in shared/schemas sono aggiornati?
 PYTHONPATH=sdk python -m pytest -q bridge/tests           # (oppure pip install -e sdk)
 ```
-Tasto `s` + Invio = STOP software dal bridge. `--mode elite` **oggi usa ancora il dry-run** (`DryRunElite`): il
-collegamento a `EliteCsAdapter` è aperto (CANTIERI.md Round 2, buco 3).
+Tasto `s` + Invio = STOP software dal bridge. `--mode elite` usa `EliteCsAdapter` (serie CS) con `ELITE_HOST`,
+`ELITE_MODE` (default `dry-run`: nessun socket; `read-only`; `armed` chiede "y" al primo comando) e le porte
+`ELITE_DASHBOARD_PORT`/`ELITE_PRIMARY_PORT`/`ELITE_RTSI_PORT`. Se l'adapter non si importa il bridge si ferma con
+un errore: non ripiega più in silenzio sul dry-run. `--dry-run` esplicito usa `DryRunElite`.
+Prova contro il mock CS, senza robot:
+```bash
+PYTHONPATH=sdk python -m gergo_sdk.mock --dashboard 39999 --primary 39001 --rtsi 39004 &
+PYTHONPATH=sdk:. ELITE_HOST=127.0.0.1 ELITE_MODE=read-only ELITE_DASHBOARD_PORT=39999 ELITE_PRIMARY_PORT=39001 \
+  ELITE_RTSI_PORT=39004 python -m bridge.main --mode elite --memory --once
+```
 
 ### Arresto vocale e acustico (audio_guard)
 ```bash
@@ -228,7 +236,7 @@ bridge e di audio_guard; 503 solo se mancano env o Supabase non risponde) e il r
 - **Braccio: serie CS** `[dichiarato: Federico, etichetta]`; il manuale nella repo (`EC_SDK_SocketManual_Ver3.19.2.pdf`)
   è della serie EC e non si applica. Su CS: unità di `movel` (metri secondo l'SDK CS, da confermare con 1 cm),
   IP, versione del controller, nomi dei task e cinematica MDH contro il controller sono `[non verificato]`.
-- `bridge.main --mode elite` usa ancora il dry-run; nessun `requirements.txt`; audio_guard non sa quando il braccio
+- Nessun `requirements.txt`; audio_guard non sa quando il braccio
   si muove (CANTIERI.md Round 2).
 - Voce: kill criterion di P0 (8 frasi su 10, latenza mediana ≤ 2,5 s) **non ancora misurato** su `/console/probe`.
 - Latenze di audio_guard misurate solo su wav sintetici (botta ~13 ms, urlo ~93 ms, sfregamento ~293 ms); in sala
