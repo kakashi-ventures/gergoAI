@@ -68,9 +68,9 @@ export default function Home() {
             Gergo
           </Link>
           <nav aria-label="Principale" className="hidden gap-5 text-sm text-[#374151] xl:flex">
+            <a href="#video" className="hover:text-[#0f1419]">Video</a>
             <a href="#come-funziona" className="hover:text-[#0f1419]">Come funziona</a>
             <a href="#per-chi" className="hover:text-[#0f1419]">Per chi</a>
-            <a href="#video" className="hover:text-[#0f1419]">Video</a>
             <a href="#fiducia" className="hover:text-[#0f1419]">Sicurezza</a>
             <a href="#security-stack" className="hover:text-[#0f1419]">Security stack</a>
             <a href="#codeless" className="hover:text-[#0f1419]">Codeless</a>
@@ -86,6 +86,26 @@ export default function Home() {
 
       <main id="contenuto">
         <div id="come-funziona"><Story /></div>
+
+        {/* Il video, subito dopo la hero */}
+        <section id="video" className="border-y border-[#eceef1] bg-[#f6f7f9]">
+          <div className="mx-auto max-w-5xl px-4 py-24 text-center sm:px-6">
+            <div className="flex justify-center"><Eyebrow>Il video · 3 minuti</Eyebrow></div>
+            <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">Gergo in tre minuti.</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-[#4b5563]">Il problema, come funziona, e il braccio vero che si muove: Pavia, 5 novembre 2026.</p>
+            <video
+              className="mx-auto mt-10 aspect-video w-full rounded-2xl border border-[#e5e7eb] bg-[#0f1419] shadow-[0_30px_80px_-40px_rgba(15,20,25,0.45)]"
+              src="/gergoai-video.mp4"
+              poster="/gergoai-video-poster.jpg"
+              controls
+              playsInline
+              preload="metadata"
+            >
+              Il tuo browser non riproduce il video: <a href="/gergoai-video.mp4">scaricalo qui</a>.
+            </video>
+          </div>
+        </section>
+
 
         {/* Il problema, in una riga */}
         <section className="border-y border-[#eceef1] bg-[#0f1419] text-white">
@@ -118,25 +138,6 @@ export default function Home() {
                 <p className="mt-3 leading-relaxed text-[#4b5563]">{c.t}</p>
               </article>
             ))}
-          </div>
-        </section>
-
-        {/* Il video, al centro della pagina */}
-        <section id="video" className="border-y border-[#eceef1] bg-[#f6f7f9]">
-          <div className="mx-auto max-w-5xl px-4 py-24 text-center sm:px-6">
-            <div className="flex justify-center"><Eyebrow>Il video · 3 minuti</Eyebrow></div>
-            <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">Gergo in tre minuti.</h2>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-[#4b5563]">Il problema, quanto costa, come funziona e come cambia il lavoro di chi installa e assiste i cobot.</p>
-            <video
-              className="mx-auto mt-10 aspect-video w-full rounded-2xl border border-[#e5e7eb] bg-[#0f1419] shadow-[0_30px_80px_-40px_rgba(15,20,25,0.45)]"
-              src="/gergoai-video.mp4"
-              poster="/gergoai-video-poster.jpg"
-              controls
-              playsInline
-              preload="metadata"
-            >
-              Il tuo browser non riproduce il video: <a href="/gergoai-video.mp4">scaricalo qui</a>.
-            </video>
           </div>
         </section>
 
