@@ -56,7 +56,7 @@ BRACCIO ──(serie CS/EC entro 13:15, al 1° slot)─────────�
 
 | Cantiere | Ora | Fatto | Prossimo | Bloccato da |
 |---|---|---|---|---|
-| FONDAMENTA | 12:47 | **DB online**: Supabase `gergo-pavia` (ref `gppcwepbwrrcsojrwplp`, eu-central-1), `0001_fondamenta_harden` applicata (RLS + grant + realtime idempotenti), `.env.example`, `bridge/.env.example` | /api/health, /eval, env Vercel | progetto Vercel: MCP 403, serve un umano |
+| FONDAMENTA | 12:52 | **DB online** (`gergo-pavia`, ref `gppcwepbwrrcsojrwplp`); `0001_fondamenta_harden`; env example; `/api/health` su main (commit 8c11d58) | applicare migration 1xxx_/2xxx_ appena arrivano; /eval in corso; env Vercel | progetto Vercel `gergo` lo crea l'umano dalla dashboard (MCP 403) |
 | BRIDGE | 12:46 | `contracts-v1` = commit `1448eac` (`/shared`: schemi, fixtures, `contracts.md`; pydantic in `bridge/contracts.py`, 40 test verdi) | migration `1xxx_`, `RobotAdapter`, validator con geofence | tag git: il push dei tag dal cloud dà 403, va pushato a mano |
 | CONSOLE | — | — | layout console, prova della voce | contratti |
 | BRACCIO | 12:48 | serie = **CS** (etichetta, Federico) in `sdk/ELITE_NOTES.md` | transport CS (Dashboard 29999 + Primary 30001), mock CS, `motion`, `audio_guard` | manuale script CS e unità di `movel` dal tecnico (taglio 13:45) |
