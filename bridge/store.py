@@ -27,6 +27,7 @@ class Store:
     def guard_status(self, bridge_id: str) -> Optional[dict]: ...
     def ontology(self) -> dict: ...
     def set_skill_real_ok(self, ontology_version: int, name: str) -> None: ...
+    def set_skill_sim_ok(self, ontology_version: int, name: str) -> None: ...
     # composer
     def pending_runs(self) -> list[dict]: ...
     def routine(self, name: str, version: Optional[int]) -> Optional[dict]: ...
@@ -90,6 +91,11 @@ class MemoryStore(Store):
         for s in self._ontology["skills"]:
             if s["name"] == name:
                 s["real_ok"] = True
+
+    def set_skill_sim_ok(self, ontology_version, name):
+        for s in self._ontology["skills"]:
+            if s["name"] == name:
+                s["sim_ok"] = True
 
     def pending_runs(self):
         return [deepcopy(r) for r in self.routine_runs if r["status"] == "confirmed"]
@@ -210,3 +216,7 @@ class SupabaseStore(Store):
     def set_skill_real_ok(self, ontology_version, name):
         self._req("PATCH", f"/skills?ontology_version=eq.{ontology_version}&name=eq.{name}",
                   {"real_ok": True}, prefer="return=minimal")
+
+    def set_skill_sim_ok(self, ontology_version, name):
+        self._req("PATCH", f"/skills?ontology_version=eq.{ontology_version}&name=eq.{name}&sim_ok=is.false",
+                  {"sim_ok": True}, prefer="return=minimal")

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { RoutineStep, SkillName, SpostaParams } from "@/lib/contracts";
-import { annulla, approvaProposta, conferma, confermaSkill, definisciRoutine, deprecaSkill, eseguiRoutine, fatto, mina, modificaRoutine, passoBase, passoTest, presaVisione, proponi, resoconto, salvaAngolo, salvaRoutine, segnala, stop, type ToolResult } from "@/lib/server/tools";
+import { annulla, approvaProposta, conferma, confermaOntologia, confermaSkill, definisciRoutine, deprecaSkill, eseguiRoutine, fatto, mina, modificaRoutine, passoBase, passoTest, presaVisione, proponi, resoconto, salvaAngolo, salvaRoutine, segnala, stop, type ToolResult } from "@/lib/server/tools";
 import type { Vec3 } from "@/lib/validator";
 import { proposeScript, type TestInput } from "@/lib/server/github";
 
@@ -35,6 +35,7 @@ const Inputs = {
   presa_visione: z.strictObject({ alert_id: z.string().min(1).max(80), livello: z.enum(["critico", "attenzione", "info"]), titolo: z.string().max(200), by: z.string().min(1).max(60).default("operatore") }),
   approva_proposta: z.strictObject({ approva: z.boolean(), by: z.string().max(60).default("operatore") }),
   conferma_skill: z.strictObject({ name: SkillName, by: z.string().min(1).max(60).default("operatore") }),
+  conferma_ontologia: z.strictObject({ by: z.string().min(1).max(60).default("operatore") }),
   depreca_skill: z.strictObject({ name: SkillName, motivo: z.string().min(3).max(300), by: z.string().min(1).max(60).default("operatore") }),
 } as const;
 
@@ -63,6 +64,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ name: s
       case "annulla": r = await annulla(); break;
       case "stop": r = await stop((a.source as string) ?? "console"); break;
       case "conferma_skill": r = await confermaSkill(a.name as string, a.by as string); break;
+      case "conferma_ontologia": r = await confermaOntologia(a.by as string); break;
       case "depreca_skill": r = await deprecaSkill(a.name as string, a.motivo as string, a.by as string); break;
       case "definisci_routine": r = await definisciRoutine(a.name as string, a.steps as never, a.utterance as string | undefined); break;
       case "salva_routine": r = await salvaRoutine(a.name as string); break;

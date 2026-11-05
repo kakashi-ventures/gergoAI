@@ -182,6 +182,21 @@ export async function confermaSkill(name: string, by: string): Promise<ToolResul
   return { ok: true, frase: `Skill ${name} confermata.` };
 }
 
+/** Conferma dell'ontologia attiva dalla console (umano). In elite il validatore (web e bridge) esige ontologia
+ *  confirmed: prima mancava qualsiasi modo di confermarla. Serve almeno una skill confirmed. Scrive un event "approval". */
+export async function confermaOntologia(by: string): Promise<ToolResult> {
+  const s = db();
+  const ont = await must(s.from("ontology_versions").select("version,status").order("version", { ascending: false }).limit(1));
+  const o = ont[0] as { version: number; status: string } | undefined;
+  if (!o) return { ok: false, frase: "Non c'è un'ontologia da confermare." };
+  if (o.status === "confirmed") return { ok: true, frase: `L'ontologia v${o.version} è già confermata.` };
+  const conf = await must(s.from("skills").select("name").eq("ontology_version", o.version).eq("status", "confirmed"));
+  if (!conf.length) return { ok: false, frase: "Prima conferma almeno una skill provata in simulazione." };
+  await must(s.from("ontology_versions").update({ status: "confirmed", confirmed_by: by, confirmed_at: new Date().toISOString() }).eq("version", o.version).eq("status", "draft"));
+  await event("approval", { oggetto: "ontologia", by, ontology_version: o.version, skills_confermate: conf.map((k: { name: string }) => k.name) });
+  return { ok: true, frase: `Ontologia v${o.version} confermata: in modalità elite le skill confermate possono muovere il braccio.` };
+}
+
 export async function deprecaSkill(name: string, motivo: string, by: string): Promise<ToolResult> {
   const s = db();
   const ont = await must(s.from("ontology_versions").select("version").order("version", { ascending: false }).limit(1));

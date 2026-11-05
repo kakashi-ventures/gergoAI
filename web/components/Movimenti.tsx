@@ -126,6 +126,16 @@ export function Movimenti({ live, act }: { live: LiveData; act: Act }) {
             );
           })}
 
+          {live.safety.ontology_status !== "confirmed" && (
+            <article className="flex flex-wrap items-center gap-2 rounded-lg border border-sky-400/40 bg-sky-400/5 p-3 text-sm">
+              <span className="text-[11px] uppercase tracking-wider text-sky-300">Ontologia v{live.safety.ontology_version} · bozza</span>
+              <span className="text-xs text-white/60">In modalità elite il braccio esegue solo skill confermate di un&apos;ontologia confermata.</span>
+              <button onClick={() => act("conferma_ontologia", {}, `Confermi l'ontologia v${live.safety.ontology_version}? Da ora, in elite, le skill confermate possono muovere il braccio vero.`)}
+                disabled={!live.skills.some((k) => k.status === "confirmed")} title="Serve almeno una skill confermata"
+                className="ml-auto rounded bg-sky-700 px-2 py-0.5 text-xs disabled:opacity-30">Conferma ontologia</button>
+            </article>
+          )}
+
           {newSkills.map((k) => (
             <article key={k.name} className="flex flex-wrap items-center gap-2 rounded-lg border border-white/10 p-3 text-sm">
               <span className="text-[11px] uppercase tracking-wider text-white/50">{k.kind === "session" ? "sessione" : k.kind === "motion" ? "movimento a voce" : "primitiva"}</span>

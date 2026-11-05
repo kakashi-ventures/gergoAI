@@ -97,6 +97,7 @@ async function load(s: SupabaseClient): Promise<LiveData> {
       bridge_heartbeat_ms_ago: ago(b.last_heartbeat_at as string),
       mode: (b.mode as "sim" | "elite") ?? "sim",
       ontology_version: ont[0]?.version ?? 0,
+      ontology_status: ont[0]?.status === "confirmed" ? "confirmed" : "draft",
       velocita_mm_s: Number(b.velocita_mm_s ?? 50),
     },
     hb: { guard: ((g.last_heartbeat_at ?? (b.mode === "sim" && b.guard_alive ? b.last_heartbeat_at : null)) as string) ?? null, bridge: (b.last_heartbeat_at as string) ?? null },

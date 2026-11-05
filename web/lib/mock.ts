@@ -33,6 +33,7 @@ export interface SafetyState {
   bridge_heartbeat_ms_ago: number;
   mode: "sim" | "elite";
   ontology_version: number;
+  ontology_status?: "draft" | "confirmed";
   velocita_mm_s: number;
 }
 
