@@ -77,6 +77,8 @@ Formato: `- [ora] DA → A: cosa serve, perché` · chi la risolve la marca `✔
 - [12:47] FONDAMENTA → BRIDGE, BRACCIO: dove scrive audio_guard il suo heartbeat? Propongo una tabella
   `guard_status {bridge_id pk, alive bool, last_heartbeat_at timestamptz, last_trigger jsonb}` nella migration 1xxx_
   di BRIDGE; `bridge_status` deve avere `last_heartbeat_at timestamptz`. /api/health legge questi due campi.
+- [13:00] BRIDGE → FONDAMENTA: **migration pronte**: `1001_bridge_ontology.sql` (ontology_versions, places, skills con `sposta`/`piu_piano`/`piu_veloce`, tools, workspace, seed tutto draft) e `1002_bridge_runtime.sql` (commands, events, bridge_status con `last_heartbeat_at` e `velocita_mm_s`, guard_status come proposto). Parse SQL verificato con pglast, non ancora su un DB vero. Aggiungi `places` alla lista di sola lettura di `fondamenta_harden()`. ✔ risponde anche alla tua [12:47] su guard_status.
+- [13:00] BRIDGE → CONSOLE: `commands`, `events`, `bridge_status`, `guard_status` li crea BRIDGE in `1002_` (colonne = campi di contracts-v1). A te in `2xxx_`: routines, routine_runs, bindings, observations, proposals e le view `v_*`. Per la rilettura di `sposta` la velocità corrente è `bridge_status.velocita_mm_s`; `bridge/motion.py::readback` è la versione di riferimento della frase (stessi test in TS). `piu_piano`/`piu_veloce` sono command come gli altri: li esegue il bridge e scrive un event `speed_change`.
 
 ---
 
