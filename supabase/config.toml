@@ -1,0 +1,6 @@
+# Supabase — progetto remoto del cantiere FONDAMENTA.
+# project ref: gppcwepbwrrcsojrwplp (gergo-pavia, eu-central-1, org KVA)
+# URL: https://gppcwepbwrrcsojrwplp.supabase.co
+# Le migration in supabase/migrations le applica SOLO FONDAMENTA (CANTIERI.md):
+#   0xxx_ / 9xxx_ FONDAMENTA (hardening RLS, grant, realtime) · 1xxx_ BRIDGE · 2xxx_ CONSOLE
+project_id = "gppcwepbwrrcsojrwplp"

@@ -1,0 +1,21 @@
+# segreti
+.env*
+!.env.example
+!**/.env.example
+
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+*.egg-info/
+
+# node / next
+node_modules/
+.next/
+out/
+.vercel/
+
+# runtime
+bridge/logs/
+.DS_Store

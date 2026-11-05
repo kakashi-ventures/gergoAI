@@ -56,7 +56,7 @@ BRACCIO ──(serie CS/EC entro 13:15, al 1° slot)─────────�
 
 | Cantiere | Ora | Fatto | Prossimo | Bloccato da |
 |---|---|---|---|---|
-| FONDAMENTA | — | — | progetto Supabase, migration, env | — |
+| FONDAMENTA | 12:47 | **DB online**: Supabase `gergo-pavia` (ref `gppcwepbwrrcsojrwplp`, eu-central-1), `0001_fondamenta_harden` applicata (RLS + grant + realtime idempotenti), `.env.example`, `bridge/.env.example` | /api/health, /eval, env Vercel | progetto Vercel: MCP 403, serve un umano |
 | BRIDGE | 12:46 | `contracts-v1` = commit `1448eac` (`/shared`: schemi, fixtures, `contracts.md`; pydantic in `bridge/contracts.py`, 40 test verdi) | migration `1xxx_`, `RobotAdapter`, validator con geofence | tag git: il push dei tag dal cloud dà 403, va pushato a mano |
 | CONSOLE | — | — | layout console, prova della voce | contratti |
 | BRACCIO | — | — | client 8055, mock, `motion`, `audio_guard` | serie del braccio (slot) |
@@ -67,6 +67,15 @@ Formato: `- [ora] DA → A: cosa serve, perché` · chi la risolve la marca `✔
 
 - [12:46] BRIDGE → CONSOLE, BRACCIO: **contracts-v1 pronto** su `main` al commit `1448eac`. Leggete `shared/contracts.md`; schemi in `shared/schemas/*.json`, fixtures in `shared/fixtures/{valid,invalid}/*.json` (formato `{model, data, why}`: zod deve dare lo stesso esito di pydantic). Le regole cross-field (params per skill, `sposta` senza coordinate) sono nella tabella di `contracts.md`.
 - [12:46] BRIDGE → umano: il tag `contracts-v1` non si può pushare da qui (403). Da un laptop: `git fetch origin && git tag contracts-v1 1448eac && git push origin contracts-v1`.
+- [12:47] FONDAMENTA → tutti: DB online. URL `https://gppcwepbwrrcsojrwplp.supabase.co`. Le chiavi NON sono nel repo:
+  la publishable/anon va in `NEXT_PUBLIC_SUPABASE_ANON_KEY`, la service role si copia dalla dashboard Supabase.
+  Prefissi migration: `0xxx_`/`9xxx_` FONDAMENTA, `1xxx_` BRIDGE, `2xxx_` CONSOLE. Dopo ogni lotto applico
+  `public.fondamenta_harden()`: RLS su tutto, anon solo SELECT su events, commands, bridge_status, skills, routines,
+  observations, proposals, ontology_versions, tools, workspace, guard_status e view `v_*` (security_invoker);
+  realtime su events, commands, bridge_status, proposals, guard_status. Usate questi nomi di tabella.
+- [12:47] FONDAMENTA → BRIDGE, BRACCIO: dove scrive audio_guard il suo heartbeat? Propongo una tabella
+  `guard_status {bridge_id pk, alive bool, last_heartbeat_at timestamptz, last_trigger jsonb}` nella migration 1xxx_
+  di BRIDGE; `bridge_status` deve avere `last_heartbeat_at timestamptz`. /api/health legge questi due campi.
 
 ---
 
