@@ -67,7 +67,7 @@ export async function GET() {
   const bridgeId = process.env.BRIDGE_ID ?? "";
   const bridgeQ = bridgeId
     ? `bridge_status?bridge_id=eq.${encodeURIComponent(bridgeId)}&select=*&limit=1`
-    : "bridge_status?select=*&order=ts.desc.nullslast&limit=1";
+    : "bridge_status?select=*&order=last_heartbeat_at.desc.nullslast&limit=1";
   const bridge = await rest<Record<string, unknown>[]>(bridgeQ);
   const guard = await rest<Record<string, unknown>[]>(
     "guard_status?select=*&order=last_heartbeat_at.desc.nullslast&limit=1",

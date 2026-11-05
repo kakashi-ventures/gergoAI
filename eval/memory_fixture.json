@@ -1,0 +1,25 @@
+{
+  "_doc": "Memoria data alla condizione C (Grok con memoria): lessico e routine della postazione dopo i 10 comandi di addestramento (split dev). Forma dei contratti di PLAN.md §3 (Binding, Routine).",
+  "bindings": [
+    { "expression": "il carrello", "means": { "place": "USCITA" }, "alpha": 4, "beta": 1, "regime": "CANONICAL", "uses": 4 },
+    { "expression": "il bidone", "means": { "place": "SCARTI" }, "alpha": 3, "beta": 0, "regime": "CANONICAL", "uses": 3 },
+    { "expression": "la pressa", "means": { "place": "STAZIONE" }, "alpha": 2, "beta": 0, "regime": "WORKING", "uses": 2 },
+    { "expression": "il nastro", "means": { "place": "INGRESSO" }, "alpha": 2, "beta": 0, "regime": "WORKING", "uses": 2 },
+    { "expression": "la frontale", "means": { "routine": "frontale" }, "alpha": 3, "beta": 0, "regime": "CANONICAL", "uses": 3 },
+    { "expression": "il giro del retro", "means": { "routine": "retro" }, "alpha": 1, "beta": 0, "regime": "WORKING", "uses": 1 }
+  ],
+  "routines": [
+    { "name": "frontale", "version": 1, "parent_version": null, "status": "active", "taught_by_voice": true,
+      "source_utterance": "ti insegno la frontale: prendi dall'ingresso, portalo in stazione, aspetta l'etichetta, premi, mettilo sul carrello",
+      "steps": [
+        { "skill": "solleva", "place": "INGRESSO" }, { "skill": "porta", "place": "STAZIONE" },
+        { "skill": "attendi_operatore", "prompt": "metti l'etichetta frontale" },
+        { "skill": "applica" }, { "skill": "deposita", "place": "USCITA" } ] },
+    { "name": "retro", "version": 1, "parent_version": null, "status": "active", "taught_by_voice": true,
+      "source_utterance": "il giro del retro è come la frontale ma con l'etichetta sul retro",
+      "steps": [
+        { "skill": "solleva", "place": "INGRESSO" }, { "skill": "porta", "place": "STAZIONE" },
+        { "skill": "attendi_operatore", "prompt": "metti l'etichetta retro" },
+        { "skill": "applica" }, { "skill": "deposita", "place": "USCITA" } ] }
+  ]
+}

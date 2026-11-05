@@ -1,0 +1,47 @@
+{
+  "_placeholder": "SEGNAPOSTO. Box e assi inventati per l'eval offline. Quelli veri sono /shared/fixtures/workspace.json e /shared/fixtures/frame.json (cantiere BRACCIO), insegnati al primo slot: quando esistono, run.py usa quelli.",
+  "frame": 0,
+  "min_mm": [
+    200,
+    -300,
+    30
+  ],
+  "max_mm": [
+    600,
+    300,
+    400
+  ],
+  "axes": {
+    "su": [
+      0,
+      0,
+      1
+    ],
+    "giu": [
+      0,
+      0,
+      -1
+    ],
+    "avanti": [
+      1,
+      0,
+      0
+    ],
+    "indietro": [
+      -1,
+      0,
+      0
+    ],
+    "destra": [
+      0,
+      1,
+      0
+    ],
+    "sinistra": [
+      0,
+      -1,
+      0
+    ]
+  },
+  "_start_pose": "Posa di partenza dell'eval (non fa parte del contratto Workspace): centro del box in x,y, z = min_z + 150 mm. Un caso può chiedere start_near_edge."
+}
