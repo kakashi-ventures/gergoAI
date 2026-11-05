@@ -21,13 +21,20 @@ const post = async (name: string, body: unknown) => {
   return (await r.json().catch(() => ({ ok: false, frase: `errore ${r.status}` }))) as Record<string, unknown>;
 };
 
-export function MovementTest({ live, local, say }: { live: LiveData & { refresh: () => void }; local: MutableRefObject<LocalTools>; say: (t: string) => void }) {
+export interface PlanInfo { name: string; base?: Movement["base"]; start: [number, number, number] | null; prev?: { version: number; steps: MoveStep[] }; next: { version: number; steps: MoveStep[] } }
+
+export function MovementTest({ live, local, say, onPlan }: { live: LiveData & { refresh: () => void }; local: MutableRefObject<LocalTools>; say: (t: string) => void; onPlan?: (p: PlanInfo | null) => void }) {
   const [mov, setMov] = useState<Movement | null>(null);
   const [history, setHistory] = useState<string[]>([]);
   const [phase, setPhase] = useState<Phase>("scegli");
   const [msg, setMsg] = useState("");
   const [ran, setRan] = useState<string[]>([]);
   const [baseId, setBaseId] = useState<string | null>(null);
+  const [prevMov, setPrevMov] = useState<Movement | null>(null);
+  const [start, setStart] = useState<[number, number, number] | null>(null);
+  useEffect(() => {
+    onPlan?.(mov ? { name: mov.name, base: mov.base, start, prev: prevMov ? { version: prevMov.version, steps: prevMov.steps } : undefined, next: { version: mov.version, steps: mov.steps } } : null);
+  }, [mov, prevMov, start]); // eslint-disable-line react-hooks/exhaustive-deps
   const [corr, setCorr] = useState<{ direzione: MoveStep["direzione"]; quantita: number; unita: "cm" | "mm"; passo: number | "" }>({ direzione: "giu", quantita: 1, unita: "cm", passo: "" });
   const events = useRef(live.events);
   useEffect(() => { events.current = live.events; }, [live.events]);
@@ -43,10 +50,10 @@ export function MovementTest({ live, local, say }: { live: LiveData & { refresh:
     return null;
   };
 
-  const choose = (m: Movement) => { setMov(m); setHistory([]); setRan([]); setBaseId(null); setPhase("conferma_prova"); const f = readbackTest(m, speed); setMsg(f); return f; };
+  const choose = (m: Movement) => { setMov(m); setPrevMov(null); setStart(live.tcp); setHistory([]); setRan([]); setBaseId(null); setPhase("conferma_prova"); const f = readbackTest(m, speed); setMsg(f); return f; };
 
   const run = async (m: Movement) => {
-    setPhase("in_esecuzione"); setRan([]); setBaseId(null);
+    setPhase("in_esecuzione"); setRan([]); setBaseId(null); setStart(live.tcp);
     const ids: string[] = [];
     if (m.base) {
       setMsg(`Task di base: ${baseText(m.base)}…`);
@@ -75,7 +82,7 @@ export function MovementTest({ live, local, say }: { live: LiveData & { refresh:
     try {
       const next = correct(mov, c);
       setHistory((h) => [...h, `v${mov.version}→v${next.version}: ${next.note}`]);
-      setMov(next); setPhase("conferma_prova");
+      setPrevMov(mov); setStart(live.tcp); setMov(next); setPhase("conferma_prova");
       void post("segnala", { text: `correzione «${mov.name}» v${mov.version}: ${next.note}` });
       const f = readbackCorrection(next); setMsg(f); return f;
     } catch (e) { const f = `Non posso: ${(e as Error).message}.`; setMsg(f); return f; }

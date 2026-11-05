@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-05T15:37:49.235Z",
-  "source_commit": "caf3d0302f957eb1ff03e7072e369f07ffc7bc11",
+  "generated_at": "2026-11-05T16:05:59.191Z",
+  "source_commit": "c8b7fb3caaff4cd65d689bf48c59b09d81ac214a",
   "unavailable": false,
   "files": [
     {
@@ -173,16 +173,30 @@
     },
     {
       "path": "bridge/store.py",
-      "bytes": 9802,
-      "lines": 227,
-      "sha256": "f9e400569e69bd51f759a2cfff220ab55d88750a6b7374061f29b66e5062dcc0",
+      "bytes": 10499,
+      "lines": 242,
+      "sha256": "7803c2893248ff95424d91427122d3211fe7f63c212ce457906e2297ebfec657",
       "test": false,
       "safety_critical": false,
       "last_commit": {
-        "sha": "2f0476f9a1a3a02ed4402d003ba69fdaa23fc231",
-        "date": "2026-11-05T16:18:30+01:00",
+        "sha": "d45d4defc4e8846e65b49297fa320d388e898b8f",
+        "date": "2026-11-05T16:37:53+01:00",
         "author": "Federico Bottino",
-        "subject": "BRIDGE: read commands with the contract columns only, so console commands pass the validator"
+        "subject": "BRIDGE+SAFETY: persistent HTTPS connection to Supabase; TLS handshakes were timing out on the venue network"
+      }
+    },
+    {
+      "path": "bridge/taught/movimento_demo_su_giu_v2.py",
+      "bytes": 1200,
+      "lines": 36,
+      "sha256": "6e1a6ee95ffc908ee9bfd0bb8fc4d9f819a546d87494f228bb80e06501b83d6a",
+      "test": false,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "3ac9a0222bbc0047f783c801d58b82d6a56e25b8",
+        "date": "2026-11-05T16:45:52+01:00",
+        "author": "Federico Bottino",
+        "subject": "Movimento «Demo su e giù» v2: proposta di Gergo dalla console (#1)"
       }
     },
     {
@@ -481,16 +495,16 @@
     },
     {
       "path": "safety/audio_guard.py",
-      "bytes": 37860,
-      "lines": 842,
-      "sha256": "b537411104d50b6da5d41cdab614e708df71419966066beaa8e52a56810034ec",
+      "bytes": 38698,
+      "lines": 859,
+      "sha256": "6022173da7555e5957ab97c9ce8bb46e3300a0dbbc514ce4b0c1c7880fc92ac2",
       "test": false,
       "safety_critical": true,
       "last_commit": {
-        "sha": "dc175bb92e639d1d6f7cdce5db21fd01f6d4ce61",
-        "date": "2026-11-05T16:25:52+01:00",
+        "sha": "d45d4defc4e8846e65b49297fa320d388e898b8f",
+        "date": "2026-11-05T16:37:53+01:00",
         "author": "Federico Bottino",
-        "subject": "SAFETY: voice-command words in the Vosk grammar as non-triggers; every voice command was stopping the arm"
+        "subject": "BRIDGE+SAFETY: persistent HTTPS connection to Supabase; TLS handshakes were timing out on the venue network"
       }
     },
     {
@@ -906,7 +920,7 @@
       "value": "0.25",
       "source_comment": null,
       "file": "safety/audio_guard.py",
-      "line": 567,
+      "line": 584,
       "category": "arresto acustico",
       "note": "Intervallo del battito della guardia acustica (s)."
     },
@@ -915,7 +929,7 @@
       "value": "0.5",
       "source_comment": null,
       "file": "safety/audio_guard.py",
-      "line": 568,
+      "line": 585,
       "category": "arresto acustico",
       "note": "Senza audio per questo tempo la guardia va in failsafe."
     }

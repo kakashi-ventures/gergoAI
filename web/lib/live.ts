@@ -16,6 +16,7 @@ export interface LiveData {
   safety: mock.SafetyState;
   workspace: mock.Workspace | null;
   tcp: [number, number, number] | null;
+  joints: number[] | null; // bridge_status.joints_deg, quando il bridge lo pubblica
   skills: mock.SkillRow[];
   routines: RoutineRow[];
   cycles: { routine_name: string; routine_version: number; cycles: number; avg_cycle_time_ms: number | null }[];
@@ -30,7 +31,7 @@ export interface LiveData {
 }
 
 const MOCK: LiveData = {
-  source: "finti", realtime: false, awaiting: null, acked: new Set(),
+  source: "finti", realtime: false, awaiting: null, acked: new Set(), joints: null,
   cycles: [{ routine_name: "frontale", routine_version: 1, cycles: 4, avg_cycle_time_ms: 14200 }, { routine_name: "frontale", routine_version: 2, cycles: 2, avg_cycle_time_ms: 11900 }], safety: mock.mockSafety, workspace: mock.mockWorkspace, tcp: mock.mockTcp,
   skills: mock.mockSkills,
   routines: mock.mockRoutines.map((r) => ({ ...r, edited_from_version: r.parent_version, steps: [
@@ -102,6 +103,7 @@ async function load(s: SupabaseClient): Promise<LiveData> {
     },
     hb: { guard: ((g.last_heartbeat_at ?? (b.mode === "sim" && b.guard_alive ? b.last_heartbeat_at : null)) as string) ?? null, bridge: (b.last_heartbeat_at as string) ?? null },
     workspace: ws[0] ?? null,
+    joints: Array.isArray(b.joints_deg) && b.joints_deg.length === 6 ? (b.joints_deg as number[]) : null,
     tcp: Array.isArray(b.pose_mm) && b.pose_mm.length >= 3 ? (b.pose_mm.slice(0, 3) as [number, number, number]) : null,
     skills,
     routines: routines.map((r) => ({

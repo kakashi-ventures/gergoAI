@@ -1,11 +1,14 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AlertCenter } from "@/components/AlertCenter";
 import { CycleCompare } from "@/components/CycleCompare";
 import { Movimenti } from "@/components/Movimenti";
 import { MachineBar, Pendant } from "@/components/Pendant";
-import { type LocalTools, MovementTest } from "@/components/MovementTest";
+import { type LocalTools, MovementTest, type PlanInfo } from "@/components/MovementTest";
+import { pathFrom, trailFromEvents } from "@/lib/arm3d";
+import dynamic from "next/dynamic";
+const Arm3D = dynamic(() => import("@/components/Arm3D").then((m) => m.Arm3D), { ssr: false, loading: () => <div className="h-[460px] rounded-xl border border-white/10 bg-white/[0.03]" /> });
 import { ScriptProposals } from "@/components/ScriptProposals";
 import { Dot, Panel } from "@/components/Panel";
 import { Registro } from "@/components/Registro";
@@ -39,6 +42,7 @@ export function Console() {
   const [demo, setDemo] = useState(false);
   const [step, setStep] = useState(20);
   const localTools = useRef<LocalTools>({} as LocalTools);
+  const [planInfo, setPlanInfo] = useState<PlanInfo | null>(null);
   const say = (text: string) => setAnnounce({ id: Date.now(), text });
   useEffect(() => { setDemo(new URLSearchParams(window.location.search).has("demo")); }, []);
 
@@ -64,6 +68,16 @@ export function Console() {
       .catch(() => {});
   }, [lastCycleId, live]);
 
+  // Dati per la vista 3D, ricalcolati solo quando cambiano davvero (la console si aggiorna ogni 500 ms).
+  const tcpStr = live.tcp ? live.tcp.map((x) => x.toFixed(1)).join(",") : "";
+  const tcpKey = useMemo(() => (tcpStr ? (tcpStr.split(",").map(Number) as [number, number, number]) : null), [tcpStr]);
+  const trailKey = live.events.filter((e) => e.type === "motion_check" || e.type === "step_end").map((e) => e.id).join(",");
+  const trail = useMemo(() => trailFromEvents(live.events), [trailKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  const plan = useMemo(() => {
+    const from = planInfo?.start ?? tcpKey;
+    if (!planInfo || !from) return null;
+    return { name: planInfo.name, prevVersion: planInfo.prev?.version, nextVersion: planInfo.next.version, prev: planInfo.prev ? pathFrom(from, planInfo.prev.steps) : undefined, next: pathFrom(from, planInfo.next.steps) };
+  }, [planInfo, tcpKey]);
   const bridgeOk = s.bridge_heartbeat_ms_ago < 5000;
   const workspace = (
     <Panel title="Area di lavoro · vista dall'alto">
@@ -129,7 +143,10 @@ export function Console() {
               {workspace}
             </div>
           </div>
-          <MovementTest live={live} local={localTools} say={say} />
+          <div className="grid gap-4 xl:grid-cols-[1.15fr_1fr]">
+            <MovementTest live={live} local={localTools} say={say} onPlan={setPlanInfo} />
+            <Arm3D tcp={tcpKey} joints={live.joints} workspace={live.workspace} trail={trail} plan={plan} />
+          </div>
           <div className="grid gap-4 lg:grid-cols-[1.2fr_1.1fr]">
           <div className="space-y-4">
             {live.awaiting && (

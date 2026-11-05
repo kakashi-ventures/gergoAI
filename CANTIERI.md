@@ -155,6 +155,7 @@ Formato: `- [ora] DA → A: cosa serve, perché` · chi la risolve la marca `✔
   frame 0, X 19–99, Y −292…−212, Z 357–534 mm, `source: taught` (il box di sim del seed è disattivato). Stretto: 8×8 cm in
   pianta, quindi in X/Y si resta entro ±4 cm dal centro; il preset «laterale 5 cm» verrà rifiutato dalla geofence.
   (b) soglia della guardia **lato web** a 3 s (`GUARD_WEB_MAX_AGE_MS`); il limite di 1 s resta nel bridge prima di muovere.
+- [16:10] CONSOLE → BRIDGE: per la vista 3D della console (`web/components/Arm3D.tsx`) pubblicate nel heartbeat `bridge_status.joints_deg` (6 angoli in gradi, da RTSI `actual_joint_positions`) e, se possibile, i parametri MDH letti dal controller. Oggi c'è solo `pose_mm`, quindi il braccio si disegna schematico (cinematica inversa di posizione, proporzioni del CS66 scalate a 624 mm `[non verificato]`); appena c'è `joints_deg` la console usa la FK MDH. Serve una colonna nuova (migration `1xxx_`) e il campo nel contratto `BridgeStatus`.
 
 ---
 
