@@ -16,7 +16,9 @@ describe("allerta", () => {
   it("bridge muto da 8 s: critico", () => expect(deriveAlerts(base({ bridge_hb_ms: 8000 }))[0]).toMatchObject({ id: "bridge-muto", level: "critico" }));
   it("audio_guard morto: critico in elite, attenzione in sim", () => {
     expect(deriveAlerts(base({ mode: "elite", guard_alive: false }))[0].level).toBe("critico");
-    expect(deriveAlerts(base({ guard_hb_ms: 2500 }))[0].level).toBe("attenzione");
+    expect(deriveAlerts(base({ guard_hb_ms: 6000 }))[0].level).toBe("attenzione");
+    expect(deriveAlerts(base({ mode: "elite", guard_hb_ms: 1500 }))[0].level).toBe("critico");
+    expect(deriveAlerts(base({ guard_hb_ms: 2500 }))).toEqual([]);
   });
   it("trigger acustico recente: critico con la latenza; sparisce dopo la presa visione", () => {
     const ev = { id: "t1", ts: ts(5), type: "safety_trigger", payload: { trigger: "parola", latency_ms: 142.4 } };

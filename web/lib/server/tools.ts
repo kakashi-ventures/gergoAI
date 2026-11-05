@@ -30,6 +30,9 @@ export async function loadContext(phase: "propose" | "execute"): Promise<Context
   const b = bridge[0] as { velocita_mm_s?: number; station?: { fork_loaded?: boolean; at?: string }; pose_mm?: number[]; mode?: "sim" | "elite" } | undefined;
   const g = guard[0] as { alive?: boolean; last_heartbeat_at?: string } | undefined;
   const guardFresh = !!g?.alive && !!g.last_heartbeat_at && Date.now() - new Date(g.last_heartbeat_at).getTime() < 1000;
+  // In sim la guardia la dà il SimArm del bridge (bridge_status.guard_alive), se il bridge è vivo. In elite conta solo audio_guard.
+  const bb = bridge[0] as { guard_alive?: boolean; last_heartbeat_at?: string } | undefined;
+  const simGuard = b?.mode === "sim" && !!bb?.guard_alive && !!bb.last_heartbeat_at && Date.now() - new Date(bb.last_heartbeat_at).getTime() < 5000;
   return {
     phase,
     mode: b?.mode ?? "sim",
@@ -43,7 +46,7 @@ export async function loadContext(phase: "propose" | "execute"): Promise<Context
     pose: (b?.pose_mm?.length === 3 ? b.pose_mm : null) as Vec3 | null,
     tool_expected_tcp_mm: (tool[0]?.tcp_atteso_mm ?? null) as Vec3 | null,
     tool_actual_tcp_mm: null, // lo legge il bridge dal controller e rifiuta se non coincide
-    guard_alive: guardFresh,
+    guard_alive: guardFresh || simGuard,
   };
 }
 

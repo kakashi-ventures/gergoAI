@@ -3,7 +3,7 @@ import { Dot, Panel } from "./Panel";
 
 // Pannello sicurezza sempre visibile. Nomenclatura: "arresto vocale e acustico", mai "e-stop vocale".
 export function SafetyPanel({ s }: { s: SafetyState }) {
-  const guardOk = s.guard_alive && s.guard_heartbeat_ms_ago < 1000;
+  const guardOk = s.guard_alive && s.guard_heartbeat_ms_ago < 5000;
   const bridgeOk = s.bridge_heartbeat_ms_ago < 5000;
   return (
     <Panel title="Sicurezza · arresto vocale e acustico">

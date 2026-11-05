@@ -24,7 +24,8 @@ export interface AlertInput {
   acked: Set<string>;
 }
 
-const GUARD_MAX_MS = 1000;
+// Reale: 1 s come il bridge. Sim: la guardia arriva col heartbeat del bridge ogni 2 s, quindi 5 s.
+const GUARD_MAX_MS = { elite: 1000, sim: 5000 } as const;
 const BRIDGE_MAX_MS = 5000;
 const RECENT_MS = { trigger: 120_000, stop: 30_000, reject: 60_000 };
 
@@ -51,7 +52,7 @@ export function deriveAlerts(i: AlertInput): Alert[] {
         fare: "Se il braccio si sta muovendo, premi l'e-stop fisico. Poi controlla il laptop del bridge.",
       });
     }
-    if (!i.guard_alive || i.guard_hb_ms > GUARD_MAX_MS) {
+    if (!i.guard_alive || i.guard_hb_ms > GUARD_MAX_MS[i.mode]) {
       out.push({
         id: "guard-morto", level: i.mode === "elite" ? "critico" : "attenzione", titolo: "Arresto vocale e acustico non attivo", ts: null, persistente: true,
         successo: Number.isFinite(i.guard_hb_ms) ? `audio_guard tace da ${(i.guard_hb_ms / 1000).toFixed(1)} s.` : "audio_guard non è mai partito.",

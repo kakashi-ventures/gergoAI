@@ -78,6 +78,11 @@ export const VOICE_TOOLS = [
   { type: "function", name: "fatto", description: "L'operatore dice 'fatto' mentre la routine lo aspetta (es. ha messo l'etichetta).", parameters: { type: "object", properties: {} } },
   { type: "function", name: "segnala", description: "L'operatore segnala un problema sul pezzo o sul ciclo, es. 'è storta', 'l'ha presa male'.", parameters: { type: "object", properties: { text: { type: "string" } }, required: ["text"] } },
   { type: "function", name: "resoconto", description: "L'operatore chiede il resoconto del turno.", parameters: { type: "object", properties: {} } },
+  {
+    type: "function", name: "proponi_script",
+    description: "Solo se l'operatore chiede esplicitamente di salvare negli script un movimento o una routine già provati (es. 'salvalo nello script'). Apre una proposta da rivedere, non cambia niente subito.",
+    parameters: { type: "object", properties: { kind: { type: "string", enum: ["routine", "movimento"] }, name: { type: "string", description: "Nome della routine, solo per kind=routine." } }, required: ["kind"] },
+  },
   { type: "function", name: "approva_proposta", description: "L'operatore risponde sì o no a una proposta di ottimizzazione ('Ho notato che…').", parameters: { type: "object", properties: { approva: { type: "boolean" } }, required: ["approva"] } },
 ] as const;
 

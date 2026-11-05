@@ -11,7 +11,7 @@ const ALLOWED: Record<string, string[]> = {
   sposta: ["direzione", "quantita", "unita", "intensita", "utterance"],
   piu_piano: ["utterance"], piu_veloce: ["utterance"], conferma: [], annulla: [], stop: [],
   definisci_routine: ["name", "steps", "utterance"], salva_routine: ["name"], esegui_routine: ["name", "ripetizioni", "utterance"],
-  fatto: [], segnala: ["text"], resoconto: [], approva_proposta: ["approva"],
+  fatto: [], segnala: ["text"], resoconto: [], approva_proposta: ["approva"], proponi_script: ["kind", "name"],
 };
 
 const LABEL: Record<Activity | "spenta" | "connessione" | "errore", string> = {
