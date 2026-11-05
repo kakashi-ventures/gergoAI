@@ -109,6 +109,74 @@ Formato: `- [ora] DA → A: cosa serve, perché` · chi la risolve la marca `✔
 
 ---
 
+## Round 2 (13:20) — verifica dell'integrazione e cosa manca
+
+Verifica fatta da fuori sui file di `main` al commit `52fc4ef`: Python bridge 89, sdk 48, safety 18, eval 23 test
+verdi; web 77 test verdi e `next build` ok; nessun segreto nella storia git. Ma la demo end to end non gira ancora:
+
+| # | Buco | Effetto | Chi |
+|---|---|---|---|
+| 1 | Vercel: Root Directory non è `web`, mancano le env, Node 26 | l'URL risponde 404; voce e console non si provano online | **umano** (MCP in sola lettura) |
+| 2 | La repo è **privata** | la consegna richiede una repo pubblica | **umano**, entro le 15:30 |
+| 3 | `bridge.main --mode elite` usa ancora `DryRunElite`, non `EliteCsAdapter` (richiesta delle 13:10 aperta) | al braccio non parte niente | BRIDGE |
+| 4 | Nessun `requirements.txt` (manca per esempio `jsonschema`) | sul laptop del bridge i test non partono | BRIDGE |
+| 5 | Nessuno dice ad audio_guard che il braccio si muove (`set_moving`; richiesta delle 13:00 aperta) | lo sfregamento non scatta mai | BRIDGE + BRACCIO |
+| 6 | `eval/results/` è vuota: B e C richiedono la chiave xAI e il nome del modello | niente "risultato contro baseline" | FONDAMENTA |
+| 7 | Mancano `README.md` e `CLAUDE.md` | requisito di consegna | FONDAMENTA |
+| 8 | Al braccio non c'è ancora stato niente: IP, remote, unità di `movel`, cinematica MDH mai confrontata col controller | il movimento relativo su CS non è provato | BRACCIO, allo slot |
+| 9 | Tag `contracts-v1` non pushato (403 dal cloud) | solo tracciabilità | umano, 1 comando |
+
+### Round 2 — compiti
+
+**BRIDGE**
+1. In `--mode elite` usa `EliteCsAdapter(host, mode)` da `bridge/adapters/elite.py`, con env `ELITE_HOST`,
+   `ELITE_MODE` e `GERGO_GUARD_HEARTBEAT`. Test con il mock CS di `gergo_sdk.mock`.
+2. Nella root un `requirements.txt` per bridge, safety ed eval (pydantic, jsonschema, numpy, il client Supabase che
+   usate, vosk, sounddevice) e `pip install -e sdk`. Il comando di setup va in `bridge/README` o in Richieste per il
+   README.
+3. Il segnale "in movimento" ad audio_guard: il bridge tocca un file `GERGO_MOVING` (o scrive su
+   `guard_status.moving`) a ogni step_start e step_end; audio_guard lo legge. Concorda il dettaglio con BRACCIO in
+   Richieste. Chiudi anche la richiesta sul `failsafe` nel contratto.
+4. `bridge/.env.example`: `ELITE_SERIES=CS`, `ELITE_DASHBOARD_PORT=29999`.
+5. Check: con `bridge/.env` sul DB vero, un command creato da `/api/tools` (CONSOLE) viene eseguito in sim e
+   l'event compare in console in meno di 2 s. Riporta l'output.
+
+**CONSOLE**
+1. Appena Vercel serve `/web`: `/console/probe` con 10 frasi dal vivo (kill criterion di P0) e risultati in
+   Richieste e in `/shared/xai-notes.md`.
+2. Prova end to end sull'URL Vercel con il bridge in sim (`--mode sim`, DB vero): insegna "frontale", due cicli, un
+   "è storta", una proposta approvata, il resoconto. Annota cosa si rompe e correggi.
+3. Modalità demo: una vista pulita della console da registrare per il video (font grandi, pannello sicurezza e
+   tempo di ciclo v1 contro v2 ben visibili).
+
+**FONDAMENTA**
+1. Appena l'umano sistema Vercel: `/api/health` verde sull'URL di produzione, risultato in Richieste.
+2. Eval: chiedimi `XAI_API_KEY` (solo in env, mai su file) e il modello; lancia `--split test --conditions
+   A,B,C`, committa `eval/results/*` e passa la tabella in Richieste. Senza chiave entro le 14:15: si pubblica
+   la condizione A più il dry-run, dichiarato come tale.
+3. `README.md` (cos'è; come si esegue da zero: console, bridge in sim, audio_guard, eval; dati; tabella A/B/C;
+   limiti presi da HACK.md e MOTION_SAFETY.md) e `CLAUDE.md` (PLAN.md §5). README in bozza entro le 14:30, finale
+   al freeze delle 15:00.
+4. 15:00: deploy di produzione, segreti nella storia git, saldo xAI.
+
+**BRACCIO** — slot al braccio, in quest'ordine, con l'ok di Federico a ogni movimento:
+1. `python -m gergo_sdk.probe` read-only: versione, robotMode, safety, TCP, MDH.
+2. **Verifica della cinematica:** la FK dei giunti letti con gli MDH del controller deve coincidere con la posa TCP
+   letta da RTSI entro 1 mm e 0,01 rad. Se non coincide, il controllo di linea su CS non vale e il movimento
+   relativo si taglia.
+3. Unità di `movel`: un "su di 1 cm" a 10 mm/s. Lo spostamento misurato fissa metri o millimetri; poi "avanti di
+   1 cm" per `frame.json`. Decisione entro le 13:45.
+4. **Stop durante uno script:** un `movel` lento di 5 cm a 10 mm/s, poi si dice "stop". Verifica che `stop` della
+   Dashboard fermi anche uno script inviato sulla 30001, e misura la latenza dal suono allo stop. Se lo script non si
+   ferma, il movimento relativo si taglia.
+5. Taratura di audio_guard (30 s di sala, 30 s di braccio in moto), nomi dei task in `elite_tasks.json`,
+   `time_tasks` per le durate del SimArm.
+6. Al secondo slot (~14:30): flusso completo per il video (shot list di PLAN.md P6).
+
+### Ordine di taglio aggiornato
+Se alle 13:45 i punti 2–4 di BRACCIO non sono verdi: il movimento relativo resta solo in sim (dichiarato), e al
+braccio vero la demo usa i task insegnati via Dashboard più l'arresto vocale e acustico.
+
 ## Prompt di kick-off
 
 Ogni orchestratore riceve l'intestazione comune più il suo blocco.
