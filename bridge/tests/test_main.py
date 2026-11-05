@@ -175,3 +175,14 @@ def test_sim_failure_does_not_set_sim_ok():
     store.add_command(skill="solleva", params={"place": "INGRESSO"}); b.poll_once()
     assert store.commands[0]["status"] == "failed"
     assert not _flags(store, "solleva").get("sim_ok")
+
+
+def test_sim_start_pose_from_env_inside_taught_box(monkeypatch):
+    """Con il workspace insegnato sul CS63 la sim deve partire dentro il box, se no sposta non ottiene mai sim_ok."""
+    monkeypatch.setenv("GERGO_SIM_START_MM", "59,-252,445")
+    store, arm, b = setup()
+    assert tuple(arm.pose.xyz) == (59, -252, 445)
+    store._ontology["workspace"] = {"frame": 0, "min_mm": [19, -292, 357], "max_mm": [99, -212, 534], "source": "taught"}
+    store.add_command(skill="sposta", params={"direzione": "su", "quantita": 2, "unita": "cm"}); b.poll_once()
+    assert store.commands[0]["status"] == "done", store.events
+    assert _flags(store, "sposta")["sim_ok"] is True

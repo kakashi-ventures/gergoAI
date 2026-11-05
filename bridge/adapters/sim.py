@@ -7,6 +7,7 @@ zona di singolarità configurabile, per provare il percorso di rifiuto.
 from __future__ import annotations
 
 import json
+import os
 import random
 import time
 from pathlib import Path
@@ -15,6 +16,14 @@ from typing import Any, Optional
 from bridge.adapters.base import AdapterStatus, LineCheck, Pose, RobotAdapter, TaskResult
 
 DURATIONS_PATH = Path(__file__).resolve().parents[2] / "shared" / "fixtures" / "elite_durations.json"
+def start_pose_from_env(env=None) -> Optional[Pose]:
+    raw = (os.environ if env is None else env).get("GERGO_SIM_START_MM", "").strip()
+    if not raw:
+        return None
+    x, y, z = (float(v) for v in raw.split(","))
+    return Pose(x, y, z)
+
+
 DEFAULT_S = {"solleva": 3.0, "deposita": 3.0, "porta": 2.5, "applica": 2.0, "home": 2.0}
 PLACE_POSES = {"HOME": Pose(150, 0, 300), "INGRESSO": Pose(250, -200, 150), "STAZIONE": Pose(250, 0, 150),
                "USCITA": Pose(250, 200, 150), "SCARTI": Pose(100, 250, 150)}
@@ -45,7 +54,9 @@ class SimArm(RobotAdapter):
         self.time_scale = time_scale
         self._guard = guard
         self.singular_x_above = singular_x_above
-        self.pose = PLACE_POSES["HOME"]
+        # GERGO_SIM_START_MM="x,y,z": posa iniziale della simulazione (es. il centro del workspace insegnato sul
+        # braccio vero), così "sposta" in sim si prova dentro la stessa geofence che varrà in elite.
+        self.pose = start_pose_from_env() or PLACE_POSES["HOME"]
         self.tcp_mm = (0.0, 0.0, 0.0)
         self._stopped = False
         self.rng = random.Random(seed)
