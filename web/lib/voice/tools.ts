@@ -85,8 +85,8 @@ export const VOICE_TOOLS = [
   },
   {
     type: "function", name: "prova_movimento",
-    description: "L'operatore vuole provare un movimento prestabilito: avvicinamento alla stazione, alzata dal vassoio, spostamento laterale, pressione sull'etichetta.",
-    parameters: { type: "object", properties: { nome: { type: "string", enum: ["avvicinamento", "alzata", "laterale", "pressione"] } }, required: ["nome"] },
+    description: "L'operatore vuole provare un movimento della libreria: un task del pendant (es. 'deposita USCITA', 'solleva INGRESSO', 'applica', 'home') o uno spostamento (avvicinamento, alzata, laterale, pressione).",
+    parameters: { type: "object", properties: { nome: { type: "string", description: "Nome del movimento come lo dice l'operatore, es. 'deposita USCITA' o 'avvicinamento'." } }, required: ["nome"] },
   },
   {
     type: "function", name: "correggi_movimento",

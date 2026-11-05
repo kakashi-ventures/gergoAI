@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { correct, PRESETS, readbackCorrection, readbackTest } from "./movement";
+import { correct, fromPendantTasks, PRESETS, readbackCorrection, readbackTest } from "./movement";
 
 const avv = PRESETS[0];
 describe("prova movimento", () => {
@@ -16,4 +16,12 @@ describe("prova movimento", () => {
   it("direzione nuova = passo in più", () => expect(correct(avv, { direzione: "destra", quantita: 1, unita: "cm" }).steps).toHaveLength(3));
   it("passo esplicito e clamp a 100 mm", () => expect(correct(avv, { direzione: "avanti", quantita: 20, unita: "cm", passo: 2 }).steps[1]).toEqual({ direzione: "avanti", quantita: 10, unita: "cm" }));
   it("passo annullato sparisce", () => expect(correct(avv, { direzione: "indietro", quantita: 3, unita: "cm" }).steps).toHaveLength(1));
+  it("task del pendant come base, correzione dopo il task", () => {
+    const [m] = fromPendantTasks({ "deposita:USCITA": "deposita_USCITA.task" });
+    expect(m.base).toEqual({ skill: "deposita", place: "USCITA", task: "deposita_USCITA.task" });
+    expect(readbackTest(m, 50)).toBe("Provo «deposita USCITA» versione 1: deposito in uscita (task deposita_USCITA.task), a 50 millimetri al secondo. Confermi?");
+    const v2 = correct(m, { direzione: "giu", quantita: 1, unita: "cm" });
+    expect(v2.steps).toEqual([{ direzione: "giu", quantita: 1, unita: "cm" }]);
+    expect(readbackCorrection(v2)).toMatch(/deposito in uscita \(task deposita_USCITA\.task\), poi scendo di 1 centimetro/);
+  });
 });

@@ -62,7 +62,7 @@ function readbackPrimitive(skill: string, params: Record<string, unknown>): stri
 }
 
 /** Crea un command "queued" dopo il validatore (fase propose). Torna la rilettura da far dire a Grok. */
-export async function proponi(skill: z.infer<typeof SkillName>, params: Record<string, unknown>, utterance?: string): Promise<ToolResult> {
+export async function proponi(skill: z.infer<typeof SkillName>, params: Record<string, unknown>, utterance?: string, origine = "voce"): Promise<ToolResult> {
   if (skill === "stop") return stop("voce");
   const ctx = await loadContext("propose");
   const draft = { id: "proposta", skill, params, status: "queued" as const };
@@ -90,7 +90,7 @@ export async function proponi(skill: z.infer<typeof SkillName>, params: Record<s
   await must(s.from("commands").update({ status: "cancelled" }).eq("status", "queued"));
   const [row] = await must(s.from("commands").insert({ skill, params, status: "queued", readback }).select("id"));
   if (utterance) await event("utterance", { text: utterance }, row.id);
-  await event("interpretation", { skill, params, readback }, row.id);
+  await event("interpretation", { skill, params, readback, origine }, row.id);
   return { ok: true, frase: readback, command_id: row.id };
 }
 
@@ -387,5 +387,20 @@ export async function passoTest(p: { direzione: string; quantita: number; unita:
   const s = db();
   const [row] = await must(s.from("commands").insert({ skill: "sposta", params, status: "confirmed", confirmed_at, readback: `${test} · passo ${passo}/${totale}: ${d.readback ?? ""}` }).select("id"));
   await event("confirmation", { text: "sì", test, passo, totale }, row.id);
+  return { ok: true, frase: "", command_id: row.id };
+}
+
+/** Il task del pendant all'inizio della prova di un movimento della libreria (dopo il sì alla rilettura). */
+export async function passoBase(skill: string, place: string | null, test: string): Promise<ToolResult> {
+  const ctx = await loadContext("execute");
+  const confirmed_at = new Date().toISOString();
+  const params = place ? { place } : {};
+  const d = validate({ id: "test", skill, params, status: "confirmed", confirmed_at }, ctx);
+  if (!d.ok) {
+    await event("anomaly", { origine: "web", code: d.code, reason: d.reason, test, passo: 0 });
+    return { ok: false, frase: `Non eseguo il task: ${d.reason}.`, code: d.code };
+  }
+  const [row] = await must(db().from("commands").insert({ skill, params, status: "confirmed", confirmed_at, readback: `${test} · task di base` }).select("id"));
+  await event("confirmation", { text: "sì", test, passo: 0 }, row.id);
   return { ok: true, frase: "", command_id: row.id };
 }

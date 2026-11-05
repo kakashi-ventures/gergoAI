@@ -17,7 +17,7 @@ export function WorkspaceBox({ ws, tcp, onSaveCorner }: { ws: Workspace; tcp: [n
         <text x={sx(tcp[0]) + 9} y={sy(tcp[1]) + 3} fill="#e2e8f0" fontSize="9">TCP</text>
       </svg>
       <div className="mt-2 grid grid-cols-3 gap-2 font-mono text-xs text-white/70">
-        <span>x {tcp[0]} mm</span><span>y {tcp[1]} mm</span><span>z {tcp[2]} mm</span>
+        <span>x {tcp[0].toFixed(1)} mm</span><span>y {tcp[1].toFixed(1)} mm</span><span>z {tcp[2].toFixed(1)} mm</span>
       </div>
       <div className="mt-1 font-mono text-[11px] text-white/40">
         box [{ws.min_mm.join(", ")}] → [{ws.max_mm.join(", ")}] · z_min = tavolo + 30

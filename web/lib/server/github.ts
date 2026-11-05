@@ -43,6 +43,14 @@ export async function buildProposal(kind: "routine" | "movimento" | "test", name
     // Il server non si fida del client: ogni passo deve esistere nel registro, eseguito con esito ok, con gli stessi parametri.
     const ids = test.command_ids;
     if (ids.length !== test.steps.length) return { error: "Il numero dei passi eseguiti non coincide con il movimento." };
+    if (!ids.length && !test.base) return { error: "Il movimento non ha passi." };
+    if (test.base) {
+      if (!test.base_command_id) return { error: "Manca l'esecuzione del task di base." };
+      const [bc] = await must(s.from("commands").select("id,skill,params,status").eq("id", test.base_command_id).limit(1));
+      const bend = await must(s.from("events").select("id,payload").eq("type", "step_end").eq("command_id", test.base_command_id));
+      if (!bc || bc.status !== "done" || bc.skill !== test.base.skill || (bc.params?.place ?? null) !== (test.base.place ?? null) || !bend.some((e: { payload: Record<string, unknown> }) => e.payload?.ok === true))
+        return { error: "Il task di base non risulta eseguito con esito positivo." };
+    }
     const cmds = await must(s.from("commands").select("id,params,status,finished_at").in("id", ids));
     const ends = await must(s.from("events").select("id,command_id,payload").eq("type", "step_end").in("command_id", ids));
     for (let i = 0; i < ids.length; i++) {
@@ -52,8 +60,8 @@ export async function buildProposal(kind: "routine" | "movimento" | "test", name
       if (c.params?.direzione !== st.direzione || Number(c.params?.quantita) !== st.quantita || c.params?.unita !== st.unita) return { error: `Il passo ${i + 1} eseguito non coincide con quello proposto.` };
       if (!ends.some((e: { command_id: string; payload: Record<string, unknown> }) => e.command_id === ids[i] && e.payload?.ok === true)) return { error: `Il passo ${i + 1} non ha un esito positivo nel registro.` };
     }
-    const evidence = [...ids, ...ends.map((e: { id: string }) => e.id)];
-    const data = { id: test.id, name: test.name, version: test.version, steps: test.steps, history: test.history ?? [], esito: "corretto secondo l'operatore", command_ids: ids };
+    const evidence = [...(test.base_command_id ? [test.base_command_id] : []), ...ids, ...ends.map((e: { id: string }) => e.id)];
+    const data = { id: test.id, name: test.name, version: test.version, base: test.base ?? null, steps: test.steps, history: test.history ?? [], esito: "corretto secondo l'operatore", command_ids: ids };
     const content = header(`Movimento «${test.name}» v${test.version}`, now, evidence, `${ids.length} passi eseguiti con esito ok; l'operatore ha detto che è corretto`) + `MOVIMENTO = ${py(data)}\n`;
     return {
       path: `bridge/taught/movimento_${slug(test.id)}_v${test.version}.py`, content, evidence,
@@ -106,7 +114,7 @@ Il bridge rivalida tutto con bridge/validator.py prima di eseguire; questo file 
 `;
 }
 
-export interface TestInput { id: string; name: string; version: number; steps: { direzione: string; quantita: number; unita: string }[]; history?: string[]; command_ids: string[] }
+export interface TestInput { id: string; name: string; version: number; steps: { direzione: string; quantita: number; unita: string }[]; history?: string[]; command_ids: string[]; base?: { skill: string; place?: string | null; task: string }; base_command_id?: string }
 
 export async function proposeScript(kind: "routine" | "movimento" | "test", name: string | undefined, by: string, test?: TestInput): Promise<ScriptProposal> {
   const p = await buildProposal(kind, name, test);

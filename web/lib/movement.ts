@@ -4,7 +4,25 @@ import { amountMm, fmtNum, VERBI } from "./motion";
 import type { SpostaParams } from "./contracts";
 
 export interface MoveStep { direzione: SpostaParams["direzione"]; quantita: number; unita: "mm" | "cm" }
-export interface Movement { id: string; name: string; version: number; steps: MoveStep[]; note?: string }
+export interface BaseTask { skill: "solleva" | "porta" | "deposita" | "applica" | "home"; place?: string | null; task: string }
+export interface Movement { id: string; name: string; version: number; steps: MoveStep[]; note?: string; base?: BaseTask }
+
+const PLACE_TXT: Record<string, string> = { INGRESSO: "dall'ingresso", STAZIONE: "in stazione", USCITA: "in uscita", SCARTI: "negli scarti" };
+export function baseText(b: BaseTask): string {
+  const verb = { solleva: "sollevo", porta: "porto", deposita: "deposito", applica: "applico", home: "torno a casa" }[b.skill];
+  return `${verb}${b.place ? ` ${PLACE_TXT[b.place] ?? b.place}` : ""} (task ${b.task})`;
+}
+
+/** I task del pendant come movimenti della libreria: il task è la base, le correzioni a voce si eseguono dopo. */
+export function fromPendantTasks(tasks: Record<string, string>): Movement[] {
+  return Object.entries(tasks).map(([k, task]) => {
+    const [skill, place] = k.split(":") as [BaseTask["skill"], string | undefined];
+    const id = k.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+    const b: BaseTask = { skill, place: place ?? (skill === "applica" ? "STAZIONE" : null), task };
+    if (skill === "applica") b.place = null;
+    return { id, name: `${skill}${place ? ` ${place}` : ""}`, version: 1, steps: [], base: b };
+  });
+}
 
 export const PRESETS: Movement[] = [
   { id: "avvicinamento", name: "Avvicinamento alla stazione", version: 1, steps: [{ direzione: "giu", quantita: 5, unita: "cm" }, { direzione: "avanti", quantita: 3, unita: "cm" }] },
@@ -15,14 +33,16 @@ export const PRESETS: Movement[] = [
 
 const OPP: Record<MoveStep["direzione"], MoveStep["direzione"]> = { su: "giu", giu: "su", avanti: "indietro", indietro: "avanti", destra: "sinistra", sinistra: "destra" };
 const mm = (s: MoveStep) => amountMm({ direzione: s.direzione, quantita: s.quantita, unita: s.unita, intensita: null }).mm;
-const qty = (v: number) => (v % 10 === 0 ? `${fmtNum(v / 10)} centimetri` : `${fmtNum(v)} millimetri`);
+const qty = (v: number) => (v % 10 === 0 ? `${fmtNum(v / 10)} ${v === 10 ? "centimetro" : "centimetri"}` : `${fmtNum(v)} ${v === 1 ? "millimetro" : "millimetri"}`);
 
 export function stepPhrase(s: MoveStep): string {
   return `${VERBI[s.direzione].toLowerCase()} di ${qty(mm(s))}`;
 }
 
+const parts = (m: Movement) => [...(m.base ? [baseText(m.base)] : []), ...m.steps.map(stepPhrase)];
+
 export function readbackTest(m: Movement, speed: number): string {
-  return `Provo «${m.name}» versione ${m.version}: ${m.steps.map(stepPhrase).join(", poi ")}, a ${fmtNum(speed)} millimetri al secondo. Confermi?`;
+  return `Provo «${m.name}» versione ${m.version}: ${parts(m).join(", poi ")}, a ${fmtNum(speed)} millimetri al secondo. Confermi?`;
 }
 
 /**
@@ -48,10 +68,10 @@ export function correct(m: Movement, c: { direzione: MoveStep["direzione"]; quan
       steps[idx] = a % 10 === 0 ? { direzione: dir, quantita: a / 10, unita: "cm" } : { direzione: dir, quantita: a, unita: "mm" };
     }
   }
-  if (!steps.length) throw new Error("con questa correzione il movimento non fa più niente");
+  if (!steps.length && !m.base) throw new Error("con questa correzione il movimento non fa più niente");
   return { ...m, version: m.version + 1, steps, note: `corretto: ${stepPhrase({ direzione: c.direzione, quantita: c.quantita, unita: c.unita })}` };
 }
 
 export function readbackCorrection(m: Movement): string {
-  return `Versione ${m.version} di «${m.name}»: ${m.steps.map(stepPhrase).join(", poi ")}. La provo?`;
+  return `Versione ${m.version} di «${m.name}»: ${parts(m).join(", poi ")}. La provo?`;
 }

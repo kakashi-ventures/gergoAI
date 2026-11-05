@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-05T14:16:02.920Z",
-  "source_commit": "d6ef8dd75849b1e2c5cefb1846408fe4a4e72861",
+  "generated_at": "2026-11-05T14:53:08.441Z",
+  "source_commit": "b3128e9374ae52f1b26c336a853ca8dfe0b29041",
   "unavailable": false,
   "files": [
     {
@@ -61,16 +61,16 @@
     },
     {
       "path": "bridge/adapters/elite.py",
-      "bytes": 5265,
-      "lines": 108,
-      "sha256": "13e54bc5f62ae77dcae5da2edf466112f117e4d335b40c3cd5ea5bd0919ba84e",
+      "bytes": 5957,
+      "lines": 121,
+      "sha256": "6be67c11ed074eafb4249ea3d09ae3fb0d0e3eb8495a5a7e8557915d1ace9f40",
       "test": false,
       "safety_critical": true,
       "last_commit": {
-        "sha": "73252742cea5153946198f7454d1079f726f5aef",
-        "date": "2026-11-05T11:57:39+00:00",
-        "author": "Claude",
-        "subject": "BRACCIO: audio_guard (voice and acoustic software stop), guard heartbeat in CS adapter"
+        "sha": "f8ac86138820689bf6d774bef4247581e9a19d47",
+        "date": "2026-11-05T15:44:21+01:00",
+        "author": "Federico Bottino",
+        "subject": "BRACCIO: CS63 orientation is RPY, not rotvec; audio_guard watchdog starts after the mic opens"
       }
     },
     {
@@ -145,16 +145,16 @@
     },
     {
       "path": "bridge/main.py",
-      "bytes": 13372,
-      "lines": 320,
-      "sha256": "fd876512090af99f781e30fd30afaebec17a76229a4bd0cc238d233b3e1eecac",
+      "bytes": 14634,
+      "lines": 340,
+      "sha256": "99b9fbbe7c78719ad014d5a751bc59eb3b26dd48a474951e15f33e915f98c6dd",
       "test": false,
       "safety_critical": true,
       "last_commit": {
-        "sha": "7d079013ab90f59e7b11b2ca3be2f98f6fc1777c",
-        "date": "2026-11-05T11:51:51+00:00",
+        "sha": "f868fc22063d6149c4eaf8fddcb9186c73f30d52",
+        "date": "2026-11-05T14:13:00+00:00",
         "author": "Claude",
-        "subject": "BRIDGE: composer for routine runs (one command at a time, attendi_operatore, cycle_time_ms, stop)"
+        "subject": "Bridge: --mode elite builds EliteCsAdapter from env, no silent dry-run fallback; sanity check"
       }
     },
     {
@@ -243,30 +243,30 @@
     },
     {
       "path": "bridge/tests/test_elite_adapter.py",
-      "bytes": 1581,
-      "lines": 56,
-      "sha256": "31a9f79089f1dc34d90ce5300fa71c13dbda4cf76b37eed482ca017bad609072",
+      "bytes": 3321,
+      "lines": 102,
+      "sha256": "27b7b054b9accef0f36494276c4ffd923f15fa00b951c1b29b215b39772c7f48",
       "test": true,
       "safety_critical": false,
       "last_commit": {
-        "sha": "73252742cea5153946198f7454d1079f726f5aef",
-        "date": "2026-11-05T11:57:39+00:00",
-        "author": "Claude",
-        "subject": "BRACCIO: audio_guard (voice and acoustic software stop), guard heartbeat in CS adapter"
+        "sha": "b88979ad828f52d15e68a9cc7df74ac6f4b88887",
+        "date": "2026-11-05T15:18:07+01:00",
+        "author": "Federico Bottino",
+        "subject": "BRACCIO: read-only bridge runs without the Primary port, refuses motion with the reason"
       }
     },
     {
       "path": "bridge/tests/test_main.py",
-      "bytes": 4709,
-      "lines": 124,
-      "sha256": "6ad0a04006ecf2f8f6dd00cd989c473d1ace98c743e1bd2502818bc70b730196",
+      "bytes": 5921,
+      "lines": 152,
+      "sha256": "d4fd44e78cf18679c07b238942e77173a3b452d1d8396e9a0639a00ebfb13d2f",
       "test": true,
       "safety_critical": false,
       "last_commit": {
-        "sha": "54753c328d73771ec9b88d012700b129e2e57f5f",
-        "date": "2026-11-05T11:50:08+00:00",
+        "sha": "f868fc22063d6149c4eaf8fddcb9186c73f30d52",
+        "date": "2026-11-05T14:13:00+00:00",
         "author": "Claude",
-        "subject": "BRIDGE: main loop, SimArm with poses and sposta, dry-run elite, PostgREST store, guard gating"
+        "subject": "Bridge: --mode elite builds EliteCsAdapter from env, no silent dry-run fallback; sanity check"
       }
     },
     {
@@ -313,16 +313,16 @@
     },
     {
       "path": "sdk/gergo_sdk/cs.py",
-      "bytes": 9572,
-      "lines": 206,
-      "sha256": "8da347d53848eaca599c590e9f31627eb1bf1144c69efa85385df1ba86cb4a8c",
+      "bytes": 10478,
+      "lines": 222,
+      "sha256": "3d72fca62a1a0a397eece230849b98d3c992aba5108aab65fccb1a5ad41df925",
       "test": false,
       "safety_critical": true,
       "last_commit": {
-        "sha": "54e9f85978b1bf99e14a7cfc1e8741a137199632",
-        "date": "2026-11-05T11:56:19+00:00",
-        "author": "Claude",
-        "subject": "BRACCIO: gergo_sdk for Elite CS (dashboard, RTSI, primary, mock, probe, motion), CS adapter"
+        "sha": "b88979ad828f52d15e68a9cc7df74ac6f4b88887",
+        "date": "2026-11-05T15:18:07+01:00",
+        "author": "Federico Bottino",
+        "subject": "BRACCIO: read-only bridge runs without the Primary port, refuses motion with the reason"
       }
     },
     {
@@ -341,30 +341,30 @@
     },
     {
       "path": "sdk/gergo_sdk/kinematics.py",
-      "bytes": 10968,
-      "lines": 283,
-      "sha256": "df312f1a966c6c7fab9058a72f994c2a7e5fa7cbf2de0ad1455a3de1f1906169",
+      "bytes": 12166,
+      "lines": 310,
+      "sha256": "11e3e8519b380381c94a22a00a07d1fc5912ce851e7996f724f4fc6aafb38bff",
       "test": false,
       "safety_critical": true,
       "last_commit": {
-        "sha": "54e9f85978b1bf99e14a7cfc1e8741a137199632",
-        "date": "2026-11-05T11:56:19+00:00",
-        "author": "Claude",
-        "subject": "BRACCIO: gergo_sdk for Elite CS (dashboard, RTSI, primary, mock, probe, motion), CS adapter"
+        "sha": "f8ac86138820689bf6d774bef4247581e9a19d47",
+        "date": "2026-11-05T15:44:21+01:00",
+        "author": "Federico Bottino",
+        "subject": "BRACCIO: CS63 orientation is RPY, not rotvec; audio_guard watchdog starts after the mic opens"
       }
     },
     {
       "path": "sdk/gergo_sdk/mock.py",
-      "bytes": 13137,
-      "lines": 312,
-      "sha256": "fdf03d75b0e68921fd9370b50fa638e2f9eef8d5a627a05a45ff67373cdaa31d",
+      "bytes": 13261,
+      "lines": 313,
+      "sha256": "d9c707d14317b67106635e983b0a85236d8baea63e685d448e3d3a588eaba2e2",
       "test": false,
       "safety_critical": false,
       "last_commit": {
-        "sha": "3c324f39dabe8058136dbfefd0c98fc8268a0773",
-        "date": "2026-11-05T14:58:22+01:00",
+        "sha": "f8ac86138820689bf6d774bef4247581e9a19d47",
+        "date": "2026-11-05T15:44:21+01:00",
         "author": "Federico Bottino",
-        "subject": "BRACCIO: Dashboard replies aligned with the real CS63 (4-line banner, multi-line version)"
+        "subject": "BRACCIO: CS63 orientation is RPY, not rotvec; audio_guard watchdog starts after the mic opens"
       }
     },
     {
@@ -397,16 +397,16 @@
     },
     {
       "path": "sdk/gergo_sdk/probe.py",
-      "bytes": 3487,
+      "bytes": 3506,
       "lines": 83,
-      "sha256": "c8732f9d25e571be865b82c647e8c2a3d0e50b8c176d1ce28b60d2cd234b44aa",
+      "sha256": "6eb4b57251a8edde8b0e932f102673f308537e27b1ec4a7e55671af52edf7253",
       "test": false,
       "safety_critical": false,
       "last_commit": {
-        "sha": "3c324f39dabe8058136dbfefd0c98fc8268a0773",
-        "date": "2026-11-05T14:58:22+01:00",
+        "sha": "f8ac86138820689bf6d774bef4247581e9a19d47",
+        "date": "2026-11-05T15:44:21+01:00",
         "author": "Federico Bottino",
-        "subject": "BRACCIO: Dashboard replies aligned with the real CS63 (4-line banner, multi-line version)"
+        "subject": "BRACCIO: CS63 orientation is RPY, not rotvec; audio_guard watchdog starts after the mic opens"
       }
     },
     {
@@ -439,16 +439,16 @@
     },
     {
       "path": "sdk/tests/test_kinematics.py",
-      "bytes": 3477,
-      "lines": 95,
-      "sha256": "82ba52c9efc329a820a1025086726fd1ef202fe424270def629e03680a4887f7",
+      "bytes": 3974,
+      "lines": 106,
+      "sha256": "c682d4e2e98c7b614b1a3c5fbd2d5dbcb3fda56dcd2969d032af3c29794ffe74",
       "test": true,
       "safety_critical": false,
       "last_commit": {
-        "sha": "54e9f85978b1bf99e14a7cfc1e8741a137199632",
-        "date": "2026-11-05T11:56:19+00:00",
-        "author": "Claude",
-        "subject": "BRACCIO: gergo_sdk for Elite CS (dashboard, RTSI, primary, mock, probe, motion), CS adapter"
+        "sha": "f8ac86138820689bf6d774bef4247581e9a19d47",
+        "date": "2026-11-05T15:44:21+01:00",
+        "author": "Federico Bottino",
+        "subject": "BRACCIO: CS63 orientation is RPY, not rotvec; audio_guard watchdog starts after the mic opens"
       }
     },
     {
@@ -481,16 +481,16 @@
     },
     {
       "path": "safety/audio_guard.py",
-      "bytes": 34107,
-      "lines": 783,
-      "sha256": "cf9cbb1a539f0ed96ea6b2b8196356ead097bf56faf04e9aa655026cafe1d1b7",
+      "bytes": 34308,
+      "lines": 785,
+      "sha256": "34237dfd2d757550cd275f7486cde9515971b4bfc17da6014bead80d7232196b",
       "test": false,
       "safety_critical": true,
       "last_commit": {
-        "sha": "73252742cea5153946198f7454d1079f726f5aef",
-        "date": "2026-11-05T11:57:39+00:00",
-        "author": "Claude",
-        "subject": "BRACCIO: audio_guard (voice and acoustic software stop), guard heartbeat in CS adapter"
+        "sha": "f8ac86138820689bf6d774bef4247581e9a19d47",
+        "date": "2026-11-05T15:44:21+01:00",
+        "author": "Federico Bottino",
+        "subject": "BRACCIO: CS63 orientation is RPY, not rotvec; audio_guard watchdog starts after the mic opens"
       }
     },
     {
