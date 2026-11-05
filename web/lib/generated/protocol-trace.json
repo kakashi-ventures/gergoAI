@@ -1,0 +1,442 @@
+{
+  "generated_at": "2026-11-05T12:55:43+00:00",
+  "source_commit": "4ed55c6",
+  "dirty": false,
+  "elite_tasks": {
+    "_doc": "Mappa skill(+luogo) → task CS sul controller (caricato con 'task -p <nome>'). I 10 task si insegnano sul pendant seguendo sdk/TASKS.md. Nessun altro task è accettato dall'adapter. verified=true solo dopo il probe che li trova sul controller. Lo scrive BRACCIO.",
+    "verified": false,
+    "tasks": {
+      "home": "home.task",
+      "porta:INGRESSO": "porta_INGRESSO.task",
+      "solleva:INGRESSO": "solleva_INGRESSO.task",
+      "porta:STAZIONE": "porta_STAZIONE.task",
+      "deposita:STAZIONE": "deposita_STAZIONE.task",
+      "applica": "applica_STAZIONE.task",
+      "solleva:STAZIONE": "solleva_STAZIONE.task",
+      "porta:USCITA": "porta_USCITA.task",
+      "deposita:USCITA": "deposita_USCITA.task",
+      "deposita:SCARTI": "deposita_SCARTI.task"
+    }
+  },
+  "examples": [
+    {
+      "frase": "scendi di 2 centimetri",
+      "tool_call": {
+        "name": "sposta",
+        "arguments": {
+          "direzione": "giu",
+          "quantita": 2,
+          "unita": "cm",
+          "intensita": null
+        }
+      },
+      "command": {
+        "skill": "sposta",
+        "params": {
+          "direzione": "giu",
+          "quantita": 2,
+          "unita": "cm",
+          "intensita": null
+        }
+      },
+      "readback": "Scendo di 2 centimetri a 50 millimetri al secondo. Confermi?",
+      "pose_iniziale_mm": [
+        400.0,
+        -50.0,
+        300.0
+      ],
+      "validator": {
+        "ok": true,
+        "code": null,
+        "reason": null
+      },
+      "motion_check": {
+        "delta_mm": [
+          0.0,
+          0.0,
+          -20.0
+        ],
+        "pose_mm": [
+          400.0,
+          -50.0,
+          300.0
+        ],
+        "target_mm": [
+          400.0,
+          -50.0,
+          280.0
+        ],
+        "geofence_ok": true,
+        "fuori_di_mm": null,
+        "velocita_mm_s": 50.0
+      },
+      "kinematics": {
+        "ok": true,
+        "reason": null
+      },
+      "esito": {
+        "ok": true,
+        "error": null,
+        "duration_ms": 640,
+        "error_mm": 0.0
+      },
+      "wire": {
+        "dashboard_29999": [],
+        "dashboard_letture": [
+          "remoteControl -s",
+          "robotMode",
+          "safety -s",
+          "task -s"
+        ],
+        "primary_30001": [
+          "def gergo_sposta():\n\tmovel([0.400000, -0.050000, 0.280000, -2.221429, -2.221429, 0.000000], a=0.300000, v=0.050000)\nend"
+        ]
+      }
+    },
+    {
+      "frase": "un po' più a destra",
+      "tool_call": {
+        "name": "sposta",
+        "arguments": {
+          "direzione": "destra",
+          "quantita": null,
+          "unita": null,
+          "intensita": "un_po"
+        }
+      },
+      "command": {
+        "skill": "sposta",
+        "params": {
+          "direzione": "destra",
+          "quantita": null,
+          "unita": null,
+          "intensita": "un_po"
+        }
+      },
+      "readback": "Vado a destra di 2 centimetri a 50 millimetri al secondo. Confermi?",
+      "pose_iniziale_mm": [
+        400.0,
+        -50.0,
+        300.0
+      ],
+      "validator": {
+        "ok": true,
+        "code": null,
+        "reason": null
+      },
+      "motion_check": {
+        "delta_mm": [
+          0.0,
+          -20.0,
+          0.0
+        ],
+        "pose_mm": [
+          400.0,
+          -50.0,
+          300.0
+        ],
+        "target_mm": [
+          400.0,
+          -70.0,
+          300.0
+        ],
+        "geofence_ok": true,
+        "fuori_di_mm": null,
+        "velocita_mm_s": 50.0
+      },
+      "kinematics": {
+        "ok": true,
+        "reason": null
+      },
+      "esito": {
+        "ok": true,
+        "error": null,
+        "duration_ms": 649,
+        "error_mm": 0.0
+      },
+      "wire": {
+        "dashboard_29999": [],
+        "dashboard_letture": [
+          "remoteControl -s",
+          "robotMode",
+          "safety -s",
+          "task -s"
+        ],
+        "primary_30001": [
+          "def gergo_sposta():\n\tmovel([0.400000, -0.070000, 0.300000, -2.221429, -2.221429, 0.000000], a=0.300000, v=0.050000)\nend"
+        ]
+      }
+    },
+    {
+      "frase": "sali di 30 centimetri",
+      "tool_call": {
+        "name": "sposta",
+        "arguments": {
+          "direzione": "su",
+          "quantita": 30,
+          "unita": "cm",
+          "intensita": null
+        }
+      },
+      "command": {
+        "skill": "sposta",
+        "params": {
+          "direzione": "su",
+          "quantita": 30,
+          "unita": "cm",
+          "intensita": null
+        }
+      },
+      "readback": "Salgo di 10 centimetri (massimo 10 centimetri per comando) a 50 millimetri al secondo. Confermi?",
+      "pose_iniziale_mm": [
+        400.0,
+        -50.0,
+        300.0
+      ],
+      "validator": {
+        "ok": true,
+        "code": null,
+        "reason": null
+      },
+      "motion_check": {
+        "delta_mm": [
+          0.0,
+          0.0,
+          100.0
+        ],
+        "pose_mm": [
+          400.0,
+          -50.0,
+          300.0
+        ],
+        "target_mm": [
+          400.0,
+          -50.0,
+          400.0
+        ],
+        "geofence_ok": true,
+        "fuori_di_mm": null,
+        "velocita_mm_s": 50.0
+      },
+      "kinematics": {
+        "ok": true,
+        "reason": null
+      },
+      "esito": {
+        "ok": true,
+        "error": null,
+        "duration_ms": 2268,
+        "error_mm": 0.0
+      },
+      "wire": {
+        "dashboard_29999": [],
+        "dashboard_letture": [
+          "remoteControl -s",
+          "robotMode",
+          "safety -s",
+          "task -s"
+        ],
+        "primary_30001": [
+          "def gergo_sposta():\n\tmovel([0.400000, -0.050000, 0.400000, -2.221429, -2.221429, 0.000000], a=0.300000, v=0.050000)\nend"
+        ]
+      }
+    },
+    {
+      "frase": "prendi il vassoio all'ingresso",
+      "tool_call": {
+        "name": "propone_azione",
+        "arguments": {
+          "skill": "solleva",
+          "params": {
+            "place": "INGRESSO"
+          }
+        }
+      },
+      "command": {
+        "skill": "solleva",
+        "params": {
+          "place": "INGRESSO"
+        }
+      },
+      "readback": null,
+      "pose_iniziale_mm": [
+        400.0,
+        -50.0,
+        300.0
+      ],
+      "validator": {
+        "ok": true,
+        "code": null,
+        "reason": null
+      },
+      "esito": {
+        "ok": true,
+        "error": null,
+        "duration_ms": 314,
+        "task": "solleva_INGRESSO.task"
+      },
+      "wire": {
+        "dashboard_29999": [
+          "task -p solleva_INGRESSO.task",
+          "play"
+        ],
+        "dashboard_letture": [
+          "remoteControl -s",
+          "robotMode",
+          "safety -s",
+          "task -s"
+        ],
+        "primary_30001": []
+      }
+    },
+    {
+      "frase": "portalo agli scarti",
+      "tool_call": {
+        "name": "propone_azione",
+        "arguments": {
+          "skill": "porta",
+          "params": {
+            "place": "SCARTI"
+          }
+        }
+      },
+      "command": {
+        "skill": "porta",
+        "params": {
+          "place": "SCARTI"
+        }
+      },
+      "readback": null,
+      "pose_iniziale_mm": [
+        400.0,
+        -50.0,
+        300.0
+      ],
+      "validator": {
+        "ok": true,
+        "code": null,
+        "reason": null
+      },
+      "esito": {
+        "ok": false,
+        "error": "Nessun task sul controller per porta:SCARTI.",
+        "duration_ms": 0,
+        "task": null
+      },
+      "wire": {
+        "dashboard_29999": [],
+        "dashboard_letture": [],
+        "primary_30001": []
+      }
+    },
+    {
+      "frase": "torna a casa",
+      "tool_call": {
+        "name": "propone_azione",
+        "arguments": {
+          "skill": "home",
+          "params": {}
+        }
+      },
+      "command": {
+        "skill": "home",
+        "params": {}
+      },
+      "readback": null,
+      "pose_iniziale_mm": [
+        400.0,
+        -50.0,
+        300.0
+      ],
+      "validator": {
+        "ok": true,
+        "code": null,
+        "reason": null
+      },
+      "esito": {
+        "ok": true,
+        "error": null,
+        "duration_ms": 315,
+        "task": "home.task"
+      },
+      "wire": {
+        "dashboard_29999": [
+          "task -p home.task",
+          "play"
+        ],
+        "dashboard_letture": [
+          "remoteControl -s",
+          "robotMode",
+          "safety -s",
+          "task -s"
+        ],
+        "primary_30001": []
+      }
+    },
+    {
+      "frase": "più piano",
+      "tool_call": {
+        "name": "piu_piano",
+        "arguments": {}
+      },
+      "command": {
+        "skill": "piu_piano",
+        "params": {}
+      },
+      "readback": null,
+      "pose_iniziale_mm": [
+        400.0,
+        -50.0,
+        300.0
+      ],
+      "validator": {
+        "ok": true,
+        "code": null,
+        "reason": null
+      },
+      "esito": {
+        "ok": true,
+        "error": null,
+        "note": "cambia solo la velocità della sessione nel DB"
+      },
+      "wire": {
+        "dashboard_29999": [],
+        "dashboard_letture": [],
+        "primary_30001": []
+      }
+    },
+    {
+      "frase": "fermo!",
+      "tool_call": {
+        "name": "stop",
+        "arguments": {}
+      },
+      "command": {
+        "skill": "stop",
+        "params": {}
+      },
+      "readback": null,
+      "pose_iniziale_mm": [
+        400.0,
+        -50.0,
+        300.0
+      ],
+      "validator": {
+        "ok": true,
+        "code": null,
+        "reason": null
+      },
+      "esito": {
+        "ok": true,
+        "error": null
+      },
+      "wire": {
+        "dashboard_29999": [
+          "stop"
+        ],
+        "dashboard_letture": [],
+        "primary_30001": []
+      }
+    }
+  ]
+}

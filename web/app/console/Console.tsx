@@ -23,6 +23,7 @@ const NAV = [
   { href: "/console", label: "Postazione" },
   { href: "/console/report", label: "Report" },
   { href: "/console/codice", label: "Registro del codice" },
+  { href: "/console/protocollo", label: "Come parla col braccio" },
   { href: "/console/probe", label: "Prova voce" },
 ];
 
