@@ -170,6 +170,9 @@ storico delle sue ottimizzazioni misurate. Oggi questo è un piano, non un fatto
 ## Limiti noti (da tenere aggiornati)
 
 - Le primitive di movimento sono pre-insegnate sul pendant: a voce si allenano nomi, routine e varianti, non le traiettorie.
+- Gli spostamenti a voce sono solo traslazioni in linea retta (MoveL), al massimo 10 cm per comando, dentro un box di
+  lavoro e dopo un controllo di cinematica. Niente rotazioni né jog continuo a voce.
+- L'arresto vocale e acustico è uno stop software rapido, non un arresto di emergenza: l'e-stop resta fisico e cablato.
 - "Applicare" è una pressione con lo spintore; l'etichetta la posa l'operatore.
 - In demo le anomalie del pattern miner sono iniettate in simulazione, oltre al feedback vocale reale.
 - Check set e memoria sono provati su una sola postazione e per poche ore.
@@ -183,3 +186,9 @@ storico delle sue ottimizzazioni misurate. Oggi questo è un piano, non un fatto
   l'allenamento a voce più la memoria di anomalie e pattern per l'ottimizzazione ricorsiva.
 - 12:00 — consegna allargata: oltre all'MVP, un video di 3 minuti e un pitch deck (PLAN.md sezioni 10–12),
   preparati in parallelo da S4; upload entro le 15:45.
+- 12:40 — dopo la spiegazione del tecnico: **override della decisione 2 di PLAN.md**. Oltre ai task insegnati, il
+  braccio si sposta a voce in centimetri ("più in basso di 10 cm", "più piano"). Grok emette solo intenti a enum,
+  il codice calcola i Δ in mm e li controlla con geofence e cinematica inversa del controller. In più arresto
+  vocale e acustico locale (parola, botta, urlo, sfregamento). Specifica in MOTION_SAFETY.md; 4 cantieri in
+  CANTIERI.md (revisione 2).
+- 12:40 — da verificare all'etichetta: la procedura del tecnico è quella della serie CS, il manuale nella repo è EC.

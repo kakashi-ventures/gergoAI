@@ -25,7 +25,8 @@ dà un nome, lo fa ripetere, segnala i problemi ("è storta") e a fine turno chi
 1. **Track 04.** Copriamo il nucleo della traccia (3–5 skill, conferma, stop, rendiconto) e i suoi due stretch:
    sequenze di skill e nuova skill registrata a voce. La seconda è proprio il nostro "allenamento".
 2. **Le primitive di movimento sono insegnate sul pendant** con lo staff, una per luogo. A voce si allena tutto
-   il resto: nomi, routine, varianti, ordine dei passi. Nessuna coordinata esce dal software.
+   il resto: nomi, routine, varianti, ordine dei passi. *Rivista alle 12:40 (MOTION_SAFETY.md):* in più, spostamenti
+   a voce in centimetri, calcolati dal codice con geofence e controllo di cinematica. Grok non emette coordinate.
 3. **"Applicare" significa premere con lo spintore** in stazione. L'etichetta la posa l'operatore quando il
    sistema glielo chiede: senza pinza il braccio non preleva dal foglio. Da confermare con lo staff al primo slot.
 4. **Ottimizzazione ricorsiva con un umano nel loop.** Si osserva, si propone, l'operatore approva, si misura,
@@ -143,7 +144,7 @@ CLAUDE.md  HACK.md  PLAN.md  README.md  .env.example  .gitignore
 **Loop:** osservazione → proposta detta a voce ("Ho notato che… Vuoi che…?") → approvazione → nuova versione →
 si misura su `cycle_time_ms` e sulle correzioni per ciclo → se peggiora, il sistema propone di tornare indietro.
 
-**Sicurezza:** Grok non emette coordinate · ogni comando passa dal validatore · un solo comando alla volta con
+**Sicurezza** (estesa in MOTION_SAFETY.md §3 con l'arresto vocale e acustico locale): Grok non emette coordinate · ogni comando passa dal validatore · un solo comando alla volta con
 timeout · qualsiasi parlato durante un movimento (inizio parlato del VAD) manda STOP · l'e-stop fisico resta
 allo staff: la voce non è una funzione di sicurezza.
 
