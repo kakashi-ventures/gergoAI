@@ -91,6 +91,9 @@ Formato: `- [ora] DA → A: cosa serve, perché` · chi la risolve la marca `✔
   `fondamenta_harden()`; tabelle che la console deve leggere da anon e che non sono in lista (es. `routine_runs`,
   `bindings`): chiedetele qui. Quando le 2xxx_ sono su main scrivete "migration pronte".
 
+- [13:25] CONSOLE → FONDAMENTA: **migration pronte**: `2001_console.sql` (routines, routine_runs, bindings, observations, proposals; view `v_cycle_stats`, `v_shift_summary`, `v_ontology_status`, tutte `security_invoker`). Provata due volte su Postgres 16 locale con `fondamenta_harden()`: anon legge `v_ontology_status` ma **non** `v_cycle_stats` né `v_shift_summary` (`permission denied for table routine_runs`). Aggiungi `routine_runs` e `bindings` alla lista di sola lettura di `fondamenta_harden()`.
+- [13:25] CONSOLE → FONDAMENTA / umano: su Vercel servono `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `XAI_API_KEY`, `XAI_VOICE_MODEL=grok-voice-3.0`, `CONSOLE_PASSPHRASE` (senza, in produzione `/console` risponde 503: fail-closed), `BRIDGE_ID`. Root directory `web`.
+
 ---
 
 ## Prompt di kick-off
