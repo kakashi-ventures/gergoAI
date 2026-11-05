@@ -135,6 +135,11 @@ def default_ontology() -> dict:
     }
 
 
+# Only the columns of the Command contract: the table also has started_at/finished_at (written by the bridge),
+# and Command forbids extra fields, so `select=*` made the validator reject every command from the console.
+COMMAND_COLUMNS = "id,skill,params,routine_run_id,step,status,created_at,confirmed_at,readback"
+
+
 class SupabaseStore(Store):
     def __init__(self, url: Optional[str] = None, key: Optional[str] = None, timeout: float = 5.0):
         self.url = (url or os.environ["SUPABASE_URL"]).rstrip("/") + "/rest/v1"
@@ -155,7 +160,7 @@ class SupabaseStore(Store):
             raise RuntimeError(f"supabase {method} {path}: {e.code} {e.read()[:300]!r}") from None
 
     def confirmed_commands(self):
-        return self._req("GET", "/commands?status=eq.confirmed&order=confirmed_at.asc&limit=20") or []
+        return self._req("GET", f"/commands?select={COMMAND_COLUMNS}&status=eq.confirmed&order=confirmed_at.asc&limit=20") or []
 
     def update_command(self, cid, fields):
         self._req("PATCH", f"/commands?id=eq.{cid}", fields, prefer="return=minimal")
@@ -206,7 +211,7 @@ class SupabaseStore(Store):
         return rows[0]
 
     def command(self, cid):
-        rows = self._req("GET", f"/commands?id=eq.{cid}") or []
+        rows = self._req("GET", f"/commands?select={COMMAND_COLUMNS}&id=eq.{cid}") or []
         return rows[0] if rows else None
 
     def events_after(self, ts, routine_run_id, type_):
