@@ -58,7 +58,7 @@ BRACCIO ──(serie CS/EC entro 13:15, al 1° slot)─────────�
 |---|---|---|---|---|
 | FONDAMENTA | 13:00 | DB online; migration 1001, 1002, 2001 applicate e indurite (9001–9003); DB = repo (7/7); INSERT anon rifiutata su commands, events, proposals, routines; view v_* leggibili da anon; advisors security 0; `/api/health` (build Next verde); `/eval` (23 test, dry-run ok) | env Vercel + preview `/api/health`; eval B/C reali | progetto Vercel `gergo` lo crea l'umano; chiavi xAI e service role dall'umano |
 | BRIDGE | 12:54 | `contracts-v1` (`1448eac`), migration `1001`/`1002`, `RobotAdapter`, validator con geofence, `main.py` + SimArm con `sposta`, composer, `deploy_report` (sezione sicurezza); 84 test verdi | check di accettazione sul DB vero dopo le migration (serve `bridge/.env`) | tag `contracts-v1`: push dei tag dal cloud 403, va pushato a mano · tabelle `routines`/`routine_runs` di CONSOLE |
-| CONSOLE | 13:05 | `/web` su main (Next 15, `/console` con dati finti, STOP, pannello sicurezza, box di lavoro, passphrase); `shared/xai-notes.md`: **voce nel browser** con token effimeri, `XAI_VOICE_MODEL=grok-voice-3.0`; `lib/sposta.ts` + 14 test | zod da contracts-v1, `validator.ts`, migration `2xxx_`, `/console/probe` per il kill criterion della voce | XAI_API_KEY su Vercel per misurare la voce |
+| CONSOLE | 13:50 | voce nel browser (`lib/voice`, token effimeri, tool solo a enum, `/console/probe` col kill criterion); zod = pydantic su 38 fixture; `motion.ts`/`validator.ts` specchio del Python (stesse frasi); `/api/tools/*` (propone_azione, sposta, piu_piano/veloce, conferma, annulla, stop, salva_angolo, conferma/depreca_skill); console sul DB vero con realtime (provata in locale con anon); migration 2001 + **2002 pronta**; 68 test verdi | definisci/esegui_routine, approva_proposta, resoconto, `/console/report`; misura della voce su Vercel | progetto Vercel ed env (XAI_API_KEY, service role, CONSOLE_PASSPHRASE): umano |
 | BRACCIO | 13:00 | serie **CS**; `gergo_sdk` (Dashboard 29999 whitelist, RTSI 30004, Primary 30001 con solo `movel`, cinematica MDH, mock, probe), `EliteCsAdapter`, `safety/audio_guard.py` (latenze su wav sintetici: botta 13 ms, urlo 93 ms, sfregamento 293 ms); 155 test verdi | slot: probe read-only, TCP, task, taratura, 1 cm su/avanti con ok umano | IP del controller, pendant in remote, modello Vosk italiano sul laptop |
 
 ## Richieste tra cantieri
@@ -99,6 +99,9 @@ Formato: `- [ora] DA → A: cosa serve, perché` · chi la risolve la marca `✔
   con security_invoker usano). `list_migrations` = repo (7/7). Anon: `v_cycle_stats`, `v_shift_summary`, `v_ontology_status`
   rispondono 200; INSERT su proposals/routines rifiutata (401). Realtime: bridge_status, commands, events, guard_status,
   proposals. Advisors security: 0.
+
+- [13:50] CONSOLE → FONDAMENTA: **migration pronte**: `2002_console_runs_align.sql` (routine_runs come chiede il composer: `routine_version` null, stato `confirmed`, `finished_at`, `current_step`, `current_repetition`; `v_cycle_stats` e `v_shift_summary` contano i cicli dagli event `step_end {cycle: true}`). Provata due volte su Postgres 16 dopo 0001…9003 nell'ordine del DB. Stesse colonne nelle view.
+- [13:50] CONSOLE → BRIDGE: ✔ alla tua [12:53] con la `2002_` (appena FONDAMENTA la applica). `ended_at` diventa `finished_at`.
 
 ---
 
