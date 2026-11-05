@@ -57,7 +57,7 @@ dà un nome, lo fa ripetere, segnala i problemi ("è storta") e a fine turno chi
           │ (subscribe / poll)
           ▼
  Bridge locale (Python) ── --mode sim   simulatore della postazione, durate reali misurate al 1° slot
-                        └─ --mode elite avvia i task pre-insegnati (load/start), STOP da tastiera
+                        └─ --mode elite avvia i JBI pre-insegnati (runJbi, JSON-RPC :8055), STOP da tastiera
 ```
 
 **Postazione di etichettatura (ontologia):** luoghi `INGRESSO`, `STAZIONE`, `USCITA`, `SCARTI`, `HOME` · oggetti:
@@ -71,7 +71,7 @@ con la forchetta occupata, non si applica fuori da STAZIONE, e così via.
 
 ## 2. Layout della repo
 
-Nome proposto: `kakashi-ventures/grok-pavia-gergo` (pubblica, come richiede la consegna).
+Repo: `kakashi-ventures/gergoAI` (pubblica, come richiede la consegna).
 
 ```
 /web            Next.js App Router + TypeScript + Tailwind (Vercel, root directory = web)
@@ -152,7 +152,7 @@ allo staff: la voce non è una funzione di sicurezza.
 ## 5. CLAUDE.md (P0 lo scrive nella root)
 
 ```markdown
-# Regole per Claude Code — grok-pavia-gergo
+# Regole per Claude Code — gergoAI
 Contesto: hackathon, consegna alle 16:00 del 05/11/2026. Una cosa funzionante end to end batte cinque a metà.
 Prodotto: allenare un braccio a voce nella sua postazione, con memoria di lessico, routine, anomalie e pattern.
 - Stack: Next.js App Router + TS su Vercel (/web), Supabase (DB, Realtime), bridge Python (/bridge).
@@ -176,7 +176,7 @@ Prodotto: allenare un braccio a voce nella sua postazione, con memoria di lessic
 ### P0 · 12:00–12:20 · Setup e prova della voce (una sessione)
 
 **Prompt:**
-> Leggi PLAN.md e HACK.md. Crea la repo pubblica `kakashi-ventures/grok-pavia-gergo` con `gh`, il layout della
+> Leggi PLAN.md e HACK.md. Lavora nella repo `kakashi-ventures/gergoAI` (già esistente, va resa pubblica), crea il layout della
 > sezione 2 e il CLAUDE.md della sezione 5. Scrivi i contratti della sezione 3 in /shared (schemas, fixtures,
 > contracts.md), gli schemi zod in /web/lib/contracts.ts e i modelli pydantic in /bridge/contracts.py, con un test
 > per lato che valida le fixtures. Crea l'app Next.js in /web e collegala a un progetto Vercel con root directory
@@ -239,10 +239,9 @@ uscita), la si esegue due volte in sim, e "portalo al carrello" funziona dopo un
 
 ### P3 · primo slot braccio (~13:00–13:30) · S2 con lo staff
 
-> Siamo al braccio con lo staff. Aiutami a collegare adapters/elite.py: cerca la documentazione ufficiale Elite Robots
-> CS per la modalità remota e per caricare e avviare un task dal Dashboard (il driver ROS2 ufficiale espone
-> load/start/stop; porte e comandi esatti vanno verificati con lo staff). Implementa solo trigger di task già insegnati,
-> uno per primitiva e luogo. Prima di ogni invio reale mostrami il comando e aspetta il mio ok.
+> Usa il prompt 4 di DEPLOY.md (SDK sul manuale EC_SDK_SocketManual_Ver3.19.2.pdf: JSON-RPC sulla 8055, un JBI
+> per primitiva e luogo, runJbi / getJbiState / stop solo in modalità remote). Al braccio con lo staff: probe
+> read-only, poi un JBI in armed. Prima di ogni invio reale mostrami il comando e aspetta il mio ok.
 
 **Lavoro umano nello slot:** insegnare sul pendant i task delle primitive (circa 8) · decidere cosa fa `applica` ·
 cronometrare ogni task: le durate vere vanno nel SimArm.

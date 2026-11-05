@@ -1,10 +1,11 @@
 # DEPLOY.md — piano di deploy e 4 prompt per Claude Code · Gergo
 
 Hackathon Pavia · Track 04 · scritto alle ~12:05 del 05/11/2026 · consegna 16:00
-Repo: `kakashi-ventures/gergoAI` (non `grok-pavia-gergo` come in PLAN.md: si usa questa).
+Repo: `kakashi-ventures/gergoAI` (pubblica per la consegna).
 
 > Marker come in HACK.md: `[verificato]` · `[dichiarato]` · `[non verificato]`. I dettagli dei protocolli Elite
-> sono `[non verificato]` finché il prompt 4 non li conferma sulla documentazione ufficiale e con lo staff.
+> del controller EC sono `[verificato: EC_SDK_SocketManual_Ver3.19.2.pdf]`, che è nella repo. IP, versione del
+> controller e nomi dei JBI restano `[non verificato]` finché non li conferma lo staff.
 
 ---
 
@@ -28,7 +29,7 @@ Il risultato funzionale è lo stesso che chiedevi; il rischio no.
 ```
 12:05  Prompt 3  env Vercel + Supabase            (una sessione, 15 min — sblocca tutto il resto)
 12:20  Prompt 1  base Python + bridge + composer  ‖  Prompt 2  web app voice control
-13:00  Prompt 4  SDK verso il controller Elite     (al primo slot braccio, con lo staff)
+13:00  Prompt 4  SDK verso il controller Elite EC  (subito contro il mock; al 1° slot si collega al robot)
 15:00  Freeze → `python -m bridge.deploy_report`  → report allegato alla consegna
 ```
 
@@ -49,7 +50,7 @@ runtime: tutto ciò che cambia dal web sono righe versionate su Supabase.
 1) Contratti in /shared (sono la verità): schemas/*.json per Place, Skill, OntologyVersion, Binding, Routine,
    Command, Event, Observation, Proposal (sezione 3 di PLAN.md) più:
    - Skill: { name, kind: "primitive"|"composite", params_schema, preconditions[], effects[],
-     elite_task: "solleva_INGRESSO.task" | null, status: "draft"|"confirmed"|"deprecated",
+     jbi: "solleva_INGRESSO" | null  (nome del file JBI sul controller EC), status: "draft"|"confirmed"|"deprecated",
      confirmed_by, confirmed_at, sim_ok: bool, real_ok: bool }
    - OntologyVersion: { version, places[], skills[], status: "draft"|"confirmed", confirmed_by, confirmed_at }
    - Routine: aggiungi status "draft"|"active"|"deprecated" e "edited_from_version".
@@ -125,7 +126,7 @@ bindings, observations, proposals, bridge_status (se non esistono già).
 4) /console, una pagina a colonne, aggiornata in realtime (Supabase Realtime, fallback polling 1 s):
    - Header fisso: stato bridge (heartbeat < 5 s = verde), mode sim/elite, versione ontologia, pulsante STOP
      grande sempre visibile (anche da tastiera: barra spaziatrice).
-   - Lista comandi: le skill della postazione con stato draft/confirmed/deprecated, precondizioni, task Elite
+   - Lista comandi: le skill della postazione con stato draft/confirmed/deprecated, precondizioni, JBI Elite
      associato, sim_ok/real_ok. Azioni: Conferma (solo se sim_ok), Modifica (apre gli steps/parametri, salva come
      nuova versione), Depreca (con motivo). Ogni azione chiede una seconda conferma e scrive un event.
    - Routine: versioni con diff tra versioni, stato, chi le ha insegnate (source_utterance).
@@ -181,7 +182,8 @@ Vercel
    - BRIDGE_ID                          "pavia-postazione-1"
    Controlla che nessuna variabile segreta abbia il prefisso NEXT_PUBLIC_.
 8) .env.example nella root con tutti i nomi e nessun valore; .gitignore con .env* tranne .env.example;
-   /bridge/.env.example con SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, BRIDGE_ID, ELITE_HOST, ELITE_MODE=dry-run.
+   /bridge/.env.example con SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, BRIDGE_ID, ELITE_HOST,
+   ELITE_PORT=8055, ELITE_MODE=dry-run.
 9) Deploy di preview, poi apri /api/health (creala se manca: risponde con presenza delle env, non i valori, e
    ping a Supabase). Riporta l'URL e l'output.
 
@@ -196,57 +198,120 @@ Check: advisors senza errori critici, INSERT anon rifiutata, /api/health verde s
 
 ---
 
-## Prompt 4 — SDK tra composer e il software che controlla il cobot Elite
+## Prompt 4 — SDK tra composer e il software che controlla il cobot Elite (serie EC)
 
-Cartelle: `/sdk` (pacchetto Python `gergo_sdk`) e `/bridge/adapters/elite.py`. Da lanciare al primo slot braccio,
-con lo staff accanto.
+Cartelle: `/sdk` (pacchetto Python `gergo_sdk`) e `/bridge/adapters/elite.py`. Si scrive **subito contro il mock**;
+al primo slot braccio si collega al robot, con lo staff accanto.
+
+### Cosa dice il manuale
+
+Fonte primaria: `EC_SDK_SocketManual_Ver3.19.2.pdf` nella repo ("ELITE ROBOTS EC Series · SDK-Socket Script
+Manual", Ver3.19.2, 15/01/2025). Si applica al software del controller Ver3.19.2; il JSON-RPC funziona dalla 2.13.0
+in su. Pagine citate tra parentesi.
+
+- `[verificato: manuale EC]` **Porte** (p. 1): **8055** è l'interfaccia di controllo (JSON-RPC 2.0); **8056** è il
+  monitor, binario a pacchetti da 1024 byte, connessione lunga che va letta entro 8 ms o si riempie il buffer. La 8056
+  non ci serve: lo stato si legge in polling sulla 8055.
+- `[verificato: manuale EC]` **Formato** (p. 2–3): si invia `{"jsonrpc":"2.0","method":"<nome>","params":{…}|[],"id":n}`
+  terminato da `\n`, e anche la risposta termina con `\n`. Risposta `{"jsonrpc":"2.0","result":"<stringa JSON>","id":n}`:
+  `result` è a sua volta una stringa da decodificare con `json.loads`. Errori: `-32601` metodo non trovato
+  (nome sbagliato o versione che non lo supporta), `-32693` parametri o condizioni non soddisfatti. L'esempio
+  ufficiale fa `recv(1024)`: noi leggiamo fino al `\n`.
+- `[verificato: manuale EC]` **I task sono file JBI** creati sul pendant: è il nostro "una primitiva = un task insegnato".
+
+| Uso | Metodo | Ritorno | Note |
+|---|---|---|---|
+| modalità | `getRobotMode` | 0 teach · 1 play · **2 remote** | p. 8 |
+| stato | `getRobotState` | 0 stop · 1 pausa · 2 e-stop · 3 running · 4 allarme · 5 collisione | lo stato e-stop dura poco e diventa subito "allarme" (p. 7) |
+| e-stop | `get_estop_status` | 1 / 0 | p. 41 |
+| collisione | `getCollisionState` | 1 / 0 | p. 19 |
+| servo | `getServoStatus` · `getMotorStatus` | bool · bool (encoder sincronizzati) | p. 5–7 |
+| potenza | `get_robot_power_status` | 0 spento · 1 in accensione · 2 acceso | dalla V3.12.2 |
+| versione | `getSoftVersion` | stringa | p. 113 |
+| esiste il task | `checkJbiExist {filename}` | 0 / 1 | p. 78 |
+| **esegui il task** | `runJbi {filename}` | bool | **solo in remote**; il robot deve essere fermo, altrimenti prima `stop` e attesa (p. 78) |
+| stato del task | `getJbiState` | `jbiName`, `runState` 0 stop · 1 pausa · 2 e-stop · 3 running · 4 errore | p. 79 |
+| **ferma** | `stop` | bool | solo in remote (p. 76) |
+| pausa / riprendi | `pause` · `run` | bool | solo in remote (p. 77) |
+| velocità | `getSpeed` · `setSpeed {value}` [0.05, 100] | | `setSpeed` solo in remote |
+
+- **Esclusi apposta** (li fa una persona dal pendant, oppure sono movimenti liberi): `moveByJoint`, `moveByLine`,
+  `moveByArc`, `moveByRotate`, `addPathPoint`, `moveByPath`, `jog`, `moveBySpeedj`/`moveBySpeedl`, il
+  transparent transmission (servo), `set_servo_status`, `set_robot_power_status`, `clearAlarm`,
+  `resetCollisionState`, `syncMotorStatus`, `setSysVar*` e la scrittura di variabili, payload, TCP, sistemi di
+  coordinate, parametri di sicurezza, `setSpeed`.
+- `[non verificato]` Da chiedere allo staff: versione del controller (`getSoftVersion` la legge anche il probe),
+  IP del robot e se la rete del laptop lo raggiunge, chi mette il pendant in **remote** (si fa dal pendant, non da
+  software), i nomi dei JBI da creare per le primitive, e se c'è un'unica velocità di sicurezza già impostata.
+- Ripiego se il braccio in sala fosse della **serie CS**: la CS non usa questo protocollo ma la Dashboard Shell
+  testuale su TCP 29999 (`task -p`, `play`, `stop`, `task -s`) dell'SDK ufficiale C++
+  [Elite_Robots_CS_SDK](https://github.com/Elite-Robots/Elite_Robots_CS_SDK) v1.5.0, CS Controller ≥ 2.15.0
+  `[verificato: SDK CS]`. Stessa interfaccia RobotAdapter, un transport diverso.
+
+### Il prompt
 
 ```text
-Leggi DEPLOY.md e /bridge (interfaccia RobotAdapter, composer, validator). Scrivi /sdk come pacchetto Python
-installabile (`pip install -e sdk`) chiamato gergo_sdk, che fa da unico punto di contatto tra il composer
-(che riceve i trigger dal voice control via Supabase) e il controller del cobot Elite.
+Leggi DEPLOY.md (sezione "Cosa dice il manuale" del prompt 4) ed EC_SDK_SocketManual_Ver3.19.2.pdf nella root
+(pdftotext -layout): è la fonte, cita le pagine nei docstring. Leggi /bridge (interfaccia RobotAdapter, composer,
+validator). Scrivi /sdk come pacchetto Python installabile (`pip install -e sdk`), chiamato gergo_sdk: solo
+standard library più pydantic. È l'unico punto di contatto tra il composer, che riceve i trigger del voice control
+via Supabase, e il controller del cobot Elite EC.
 
-0) Verifica prima di scrivere codice, e scrivi i risultati in /sdk/ELITE_NOTES.md con fonte e data:
-   - Su https://www.eliterobots.com/download e sul GitHub ufficiale Elite Robots: quale serie è il braccio in
-     sala (CS o EC — chiedimelo, lo leggo dall'etichetta o dal pendant) e quale SDK/protocollo ufficiale
-     corrisponde. [non verificato, da confermare]: la serie CS espone un'interfaccia Dashboard su TCP per
-     caricare/avviare/fermare task e un SDK ufficiale (Elite_Robots_CS_SDK) con interfaccia real-time; la serie
-     EC espone un'interfaccia JSON-RPC su TCP con un SDK Python. Porte, nomi dei comandi e versione firmware
-     li confermi tu sulla documentazione e io con lo staff.
-   - Come si abilita la modalità remota sul pendant e se il caricamento di un task da remoto richiede che
-     il robot sia in una modalità specifica.
-   Se la documentazione non chiarisce un punto, scrivilo come domanda aperta e non indovinare.
+0) Prima del codice chiedimi: serie (EC, confermata dall'etichetta o dal pendant), IP, nomi dei JBI delle
+   primitive. Scrivi le risposte in /sdk/ELITE_NOTES.md con fonte e ora. Se la serie è CS, fermati: vale il
+   ripiego in DEPLOY.md.
 
-1) gergo_sdk.protocol: dataclass/pydantic per PrimitiveRequest {command_id, skill, params, elite_task,
-   timeout_s} e PrimitiveResult {command_id, ok, duration_ms, error, controller_state}. Solo primitive della
-   whitelist in /shared: niente coordinate, niente script URP/Lua costruiti a runtime, niente movimenti liberi.
+1) gergo_sdk.jsonrpc.EcClient: socket TCP sulla 8055. call(method, params=None) invia
+   {"jsonrpc":"2.0","method":…,"params":params or [],"id":n} + "\n" con id crescente, legge fino al "\n", verifica
+   che l'id coincida, decodifica result con json.loads e su "error" solleva EcError(code, message): -32601
+   MethodNotFound, -32693 ConditionNotMet. Timeout di connessione 3 s, di risposta 2 s, un solo comando in volo
+   (lock), reconnect con backoff. Ogni riga inviata e ricevuta finisce in /bridge/logs/elite-<data>.log.
+   Whitelist dei metodi in un frozenset: getRobotMode, getRobotState, get_estop_status, getCollisionState,
+   getServoStatus, getMotorStatus, get_robot_power_status, getSoftVersion, getSpeed, checkJbiExist, runJbi,
+   getJbiState, stop, pause, run. call() rifiuta qualsiasi altro nome prima di aprire il socket, e c'è un test
+   che lo prova con moveByJoint, setSpeed e set_servo_status.
 
-2) gergo_sdk.transport: client TCP del protocollo verificato al punto 0 (Dashboard testuale o JSON-RPC), con
-   timeout di connessione e di risposta, reconnect con backoff, e un log grezzo di ogni messaggio inviato e
-   ricevuto in /bridge/logs/elite-<data>.log.
+2) gergo_sdk.protocol: PrimitiveRequest {command_id, skill, params, jbi, timeout_s} e PrimitiveResult
+   {command_id, ok, duration_ms, error, robot_mode, robot_state, jbi_state}. jbi deve stare nella mappa
+   skill+luogo → nome JBI in /shared/fixtures/elite_jbi.json, che compiliamo con lo staff; nessun altro
+   nome è accettato.
 
-3) gergo_sdk.elite.EliteController: connect(), load_task(name), play(), pause(), stop(), state(),
-   wait_until_idle(timeout). run_primitive(req) = verifica che req.elite_task sia nella mappa skill→task
-   confermata → load → play → attende fine o timeout → stop su timeout → PrimitiveResult.
-   Modalità: "dry-run" (default, stampa i messaggi e non apre socket), "armed" (reale). In armed, prima del
-   PRIMO comando reale della sessione mostra il messaggio esatto e aspetta "y" da tastiera; stop() non chiede
-   mai conferma e funziona anche con un comando in corso.
+3) gergo_sdk.elite.EliteController.run_primitive(req):
+   preflight: getRobotMode == 2 (remote) · getRobotState == 0 (stop) · get_estop_status == 0 ·
+   getCollisionState == 0 · getServoStatus == true · getMotorStatus == true · checkJbiExist(jbi) == 1.
+   Se un controllo fallisce: nessun runJbi, PrimitiveResult ok=false col motivo leggibile in italiano.
+   Poi runJbi(jbi) → polling ogni 100 ms di getJbiState e getRobotState: fine = runState 0 con jbiName == jbi
+   dopo aver visto almeno un 3; errore = runState 2 o 4, oppure robotState 2, 4 o 5; timeout = timeout_s.
+   Su errore o timeout: stop, poi ok=false. stop() chiama "stop" subito, senza preflight né conferme, anche
+   durante un runJbi, con una connessione propria se quella principale è occupata. Non chiama mai clearAlarm né
+   resetCollisionState: un allarme lo risolve una persona dal pendant.
+   Modalità: "dry-run" (default: stampa le righe JSON e non apre il socket), "read-only" (solo i metodi get* e
+   checkJbiExist) e "armed". In armed, prima del PRIMO runJbi della sessione mostra la sequenza esatta e aspetta
+   "y" da tastiera.
 
-4) gergo_sdk.mock: un finto controller TCP che parla lo stesso protocollo (risposte registrate al punto 0),
-   con ritardi realistici. Tutti i test girano contro il mock; nessun test tocca il robot.
+4) gergo_sdk.mock: finto server JSON-RPC sulla 8055 (porta configurabile) che risponde con i formati del manuale:
+   result come stringa JSON, errori -32601/-32693, runJbi che passa runState 0 → 3 → 0 dopo la durata letta da
+   /shared/fixtures/elite_durations.json (default 2 s). Scenari iniettabili: robotMode 1 (non remote), collisione a
+   metà task, e-stop a metà task, JBI inesistente, task che non finisce. Tutti i test girano contro il mock; nessun
+   test tocca il robot.
 
-5) /bridge/adapters/elite.py implementa RobotAdapter usando EliteController. Dopo ogni step_end ok in armed,
-   il bridge imposta real_ok = true sulla skill (che resta da confermare a mano in console).
+5) /bridge/adapters/elite.py implementa RobotAdapter con EliteController. Dopo ogni step_end ok in armed il bridge
+   imposta real_ok = true sulla skill (che resta da confermare a mano in console). Ogni ok=false scrive un event
+   "anomaly" con robot_mode, robot_state e jbi_state.
 
-6) Tool di slot: `python -m gergo_sdk.probe --host $ELITE_HOST` (sola lettura: versione, modalità, stato,
-   lista task se disponibile) e `python -m gergo_sdk.time_tasks` che cronometra ogni task primitiva 3 volte e
-   scrive le durate in /shared/fixtures/elite_durations.json, che il SimArm usa da quel momento.
+6) Tool per lo slot:
+   - `python -m gergo_sdk.probe --host $ELITE_HOST`: solo read-only. Stampa getSoftVersion, getRobotMode,
+     getRobotState, get_estop_status, getServoStatus, getMotorStatus, get_robot_power_status, getSpeed e
+     checkJbiExist per ogni JBI della mappa.
+   - `python -m gergo_sdk.time_tasks --host $ELITE_HOST`: in armed, con conferma per ogni JBI, lo esegue 3 volte e
+     scrive le mediane in /shared/fixtures/elite_durations.json, che il SimArm usa da quel momento.
 
-Prima di ogni invio reale al robot: mostrami il comando, aspetta il mio ok. Lo stop di sicurezza è l'e-stop
-fisico dello staff, non questo software.
+Prima di ogni invio reale al robot mostrami il comando e aspetta il mio ok. Lo stop di sicurezza è l'e-stop
+fisico dello staff, non questo software: il metodo "stop" ferma il programma e non è una funzione di sicurezza.
 
-Check (riporta l'output): pytest verde contro il mock; probe in sola lettura sul robot vero; una primitiva
-avviata dal laptop in armed con step_end ok: true nel registro; elite_durations.json scritto. Commit e push.
+Check (riporta l'output): pytest verde contro il mock, compresi gli scenari iniettati e il rifiuto dei metodi fuori
+whitelist; probe read-only sul robot vero; un JBI avviato dal laptop in armed con step_end ok: true nel registro;
+elite_durations.json scritto. Commit e push.
 ```
 
 ---
