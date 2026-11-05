@@ -30,12 +30,12 @@ export default function Home() {
 
       <header className="mx-auto flex max-w-5xl items-center justify-between px-4 py-5 sm:px-6">
         <span className="text-sm font-semibold tracking-wide">Gergo</span>
-        <nav aria-label="Principale" className="flex gap-4 text-sm text-[#9aa1a9]">
+        <nav aria-label="Principale" className="flex items-center gap-4 text-sm text-[#9aa1a9]">
           <a href={DECK_URL} target="_blank" rel="noopener noreferrer" className={`hover:text-[#e6e8eb] ${focusRing} rounded`}>
-            Deck
+            Pitch deck
           </a>
-          <Link href={CONSOLE_URL} className={`hover:text-[#e6e8eb] ${focusRing} rounded`}>
-            Console
+          <Link href={CONSOLE_URL} prefetch={false} className={`rounded-lg bg-sky-400 px-3 py-1.5 font-semibold text-[#0b0d10] hover:bg-sky-300 ${focusRing}`}>
+            Demo
           </Link>
         </nav>
       </header>
@@ -58,13 +58,14 @@ export default function Home() {
             l&apos;operatore approva.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a href={DECK_URL} target="_blank" rel="noopener noreferrer" className={btnPrimary}>
+            <Link href={CONSOLE_URL} prefetch={false} className={btnPrimary}>
+              Prova la demo
+            </Link>
+            <a href={DECK_URL} target="_blank" rel="noopener noreferrer" className={btnSecondary}>
               Guarda il pitch deck
             </a>
-            <Link href={CONSOLE_URL} className={btnSecondary}>
-              Apri la console
-            </Link>
           </div>
+          <p className="mt-3 text-xs text-[#9aa1a9]">La demo è la console della postazione, protetta da una passphrase.</p>
         </section>
 
         {/* PROBLEMA */}
@@ -192,7 +193,7 @@ export default function Home() {
                 <li>Ogni modifica è una nuova versione: approvata da una persona, misurata, reversibile.</li>
                 <li>
                   Ogni cambio del codice è nel{" "}
-                  <Link href={LEDGER_URL} className={link}>
+                  <Link href={LEDGER_URL} prefetch={false} className={link}>
                     registro del codice
                   </Link>
                   .
@@ -372,10 +373,10 @@ export default function Home() {
                 <a href={DECK_URL} target="_blank" rel="noopener noreferrer" className={link}>Pitch deck</a>
               </li>
               <li>
-                <Link href={CONSOLE_URL} className={link}>Console</Link>
+                <Link href={CONSOLE_URL} prefetch={false} className={link}>Demo</Link>
               </li>
               <li>
-                <Link href={LEDGER_URL} className={link}>Registro del codice</Link>
+                <Link href={LEDGER_URL} prefetch={false} className={link}>Registro del codice</Link>
               </li>
               <li>
                 <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className={link}>Repo GitHub</a>

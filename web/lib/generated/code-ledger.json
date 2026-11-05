@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-05T12:36:41.804Z",
-  "source_commit": "a4022021cb6ca9b65d1b5ff8138a189338716158",
+  "generated_at": "2026-11-05T12:40:34.378Z",
+  "source_commit": "d87a2d9d966af7d770626b841d86820e321fba04",
   "unavailable": false,
   "files": [
     {
@@ -397,16 +397,16 @@
     },
     {
       "path": "sdk/gergo_sdk/probe.py",
-      "bytes": 2684,
-      "lines": 70,
-      "sha256": "d0f58aea4ea7e78c552656bcd585e107be2a432bd148d6dbbdb9430ae2850c2f",
+      "bytes": 3457,
+      "lines": 83,
+      "sha256": "763b8cb16573fd4a41fd36311f141031d06f171c35e57fe26893e39ef0ed37fe",
       "test": false,
       "safety_critical": false,
       "last_commit": {
-        "sha": "54e9f85978b1bf99e14a7cfc1e8741a137199632",
-        "date": "2026-11-05T11:56:19+00:00",
+        "sha": "d87a2d9d966af7d770626b841d86820e321fba04",
+        "date": "2026-11-05T12:39:11+00:00",
         "author": "Claude",
-        "subject": "BRACCIO: gergo_sdk for Elite CS (dashboard, RTSI, primary, mock, probe, motion), CS adapter"
+        "subject": "BRACCIO: CS63 facts from label and pendant, FK check in probe, workspace sized for 624 mm reach"
       }
     },
     {
