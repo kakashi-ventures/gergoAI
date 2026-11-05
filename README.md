@@ -5,11 +5,15 @@ tecnico.** Gergo ricorda come lavori, ti propone come lavorare meglio, e ogni mo
 di persone, regole e un agente di revisione prima di arrivare al braccio.
 
 [Sito](https://gergoai.vercel.app) · [Demo: console della postazione](https://gergoai.vercel.app/console) ·
-[Pitch deck (PDF)](https://gergoai.vercel.app/gergo-pitch-deck.pdf) ·
+[Pitch deck (HTML)](https://gergoai.vercel.app/deck) · [Pitch deck (PDF)](https://gergoai.vercel.app/gergo-pitch-deck.pdf) ·
+[Approfondimento di mercato](https://gergoai.vercel.app/approfondimento) ·
 [Registro del codice](https://gergoai.vercel.app/console/codice) · [Stato](https://gergoai.vercel.app/api/health)
 
 Grok Hackathon at the Museum · Pavia, 5 novembre 2026 · **Track 04 Voice Control** · caso pratico: etichettatura
 di un pack su un **Elite CS63** · KVA, Kakashi Venture Accelerator.
+
+**Un'idea di Federico Bottino e Alberto Trivero** · Sviluppato con Grok, Claude, GPT e Inkling · Venture
+sviluppata con [metodologia KVA](https://kakashi.ventures) (Kakashi Venture Accelerator).
 
 > Marker come nel resto della repo: `[verificato: fonte]` · `[dichiarato]` · `[non verificato]` · `[ipotesi]`.
 > Piano e decisioni: `PLAN.md`, `HACK.md`. Sicurezza del movimento: `MOTION_SAFETY.md` (vince sugli altri).
@@ -313,28 +317,28 @@ Condizioni (`eval/README.md`): **A** regole a parole chiave · **B** Grok senza 
 della postazione. Split `test`, 20 casi.
 
 <!-- EVAL_TABLE -->
-| Metrica | A (misurata) | B | C |
-|---|---|---|---|
-| Accuratezza complessiva | 80% | non misurata | non misurata |
-| Accuratezza skill / params | 78% / 78% | non misurata | non misurata |
-| Turni di chiarimento (attesi / non attesi / mancati) | 6 (2 / 4 / 0) | non misurata | non misurata |
-| Gergo da memoria corretto | 0/4 | non misurata | non misurata |
-| Rifiuti geofence corretti | 2/2 | non misurata | non misurata |
-| Esecuzioni senza conferma (deve essere 0) | 0 | non misurata | non misurata |
-| Movimenti fuori geofence accettati (deve essere 0) | 0 | non misurata | non misurata |
-| Latenza mediana (ms) | — | non misurata | non misurata |
+Due run reali con `grok-4.7` (`eval/results/summary-20261105-133144.*` e `summary-20261105-133522.*`); la
+condizione A è deterministica e uguale nelle due run.
 
-Fonte: `eval/results/summary-20261105-131813.json` (`python eval/run.py --split test --conditions A`), workspace
-`shared/fixtures/workspace.json`. **B e C non sono state misurate oggi**: la chiave xAI non era disponibile
-all'ambiente dell'eval entro le 14:15. La pipeline B/C gira solo in dry-run (stub senza tool call, file
-`*-dryrun*` non committati), quindi non pubblichiamo numeri per Grok. Per misurarle:
-`XAI_API_KEY=… python eval/run.py --split test --conditions A,B,C --model <modello testo xAI>`.
-A sbaglia per costruzione il gergo della postazione (0/4): è il caso che la memoria (C) deve risolvere.
+| Metrica | A · parole chiave | B · Grok senza memoria (run 1 · run 2) | C · Grok con memoria (run 1 · run 2) |
+|---|---|---|---|
+| Accuratezza complessiva | 80% | 90% · 90% | 85% · 100% |
+| Accuratezza skill | 78% | 94% · 89% | 89% · 100% |
+| Accuratezza params | 78% | 89% · 89% | 89% · 100% |
+| Turni di chiarimento (attesi / non attesi / mancati) | 6 (2 / 4 / 0) | 3 (2 / 1 / 0) · 4 (2 / 2 / 0) | 3 (1 / 2 / 1) · 2 (2 / 0 / 0) |
+| Gergo da memoria corretto | 0/4 | 2/4 · 2/4 | 4/4 · 4/4 |
+| Rifiuti geofence corretti | 2/2 | 2/2 · 2/2 | 2/2 · 2/2 |
+| Esecuzioni senza conferma (deve essere 0) | 0 | 0 · 0 | 0 · 0 |
+| Movimenti fuori geofence accettati (deve essere 0) | 0 | 0 · 0 | 0 · 0 |
+| Latenza mediana (ms) | — | 2059 · 2110 | 2221 · 2048 |
+
+**Lettura onesta.** La memoria risolve il gergo della postazione (4/4 contro 2/4 senza memoria e 0/4 con le
+parole chiave), e nessuna condizione esegue senza conferma o fuori dall'area di lavoro. Ma il kill criterion
+scritto prima (PLAN P5: C deve battere B di almeno 15 punti) **non è superato**: −5 e +10 punti nelle due run, su
+20 casi. Quindi il pitch dice "esegue a voce routine insegnate", non "impara", finché non lo misuriamo su più
+casi e più run.
 <!-- /EVAL_TABLE -->
 
-**In arrivo: condizione A misurata, B/C con Grok.** Finché `eval/results/` non contiene una run senza `-dryrun`,
-qui non c'è nessun numero. Kill criterion (PLAN P5): se C non migliora B di almeno 15 punti, il pitch dice
-"esegue a voce routine insegnate", non "impara".
 
 Stato del deploy: `GET /api/health` (presenza delle env senza valori, ping a Supabase, età dell'heartbeat del
 bridge e di audio_guard; 503 solo se mancano env o Supabase non risponde) e il report di
@@ -390,3 +394,8 @@ vocale e acustico). Non si tagliano mai: parola chiave, botta, heartbeat fail-sa
 | `bridge/taught/` | script di soli dati nati da movimenti provati e corretti a voce, arrivati via Pull Request | proposti dalla console, uniti da BRIDGE |
 | `gate/`, `.github/workflows/taught-gate.yml` | gate CI: legge gli script vocali con `ast`, senza eseguirli, e boccia tutto ciò che non è un letterale nei limiti | CONSOLE |
 | `PLAN.md`, `HACK.md`, `DEPLOY.md`, `MOTION_SAFETY.md`, `CANTIERI.md`, `CLAUDE.md` | piano, verdetto e limiti, prompt di deploy, sicurezza del movimento, coordinamento dei 4 cantieri, regole per Claude Code | comuni |
+
+## Crediti
+
+Un'idea di **Federico Bottino** e **Alberto Trivero**. Sviluppato con **Grok, Claude, GPT e Inkling**. Venture
+sviluppata con [metodologia KVA](https://kakashi.ventures), Kakashi Venture Accelerator.

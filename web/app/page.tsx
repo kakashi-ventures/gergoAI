@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CONSOLE_URL, DECK_URL, LEDGER_URL, REPO_URL } from "@/components/landing/links";
+import { CONSOLE_URL, DECK_HTML_URL, DECK_URL, LEDGER_URL, MARKET_URL, REPO_URL } from "@/components/landing/links";
+import { Credits, CreditsLine } from "@/components/landing/Credits";
+import { DeckViewer } from "@/components/deck/DeckViewer";
 import { Story } from "@/components/landing/Story";
 
 export const metadata: Metadata = {
@@ -69,6 +71,7 @@ export default function Home() {
           </Link>
           <nav aria-label="Principale" className="hidden gap-5 text-sm text-[#374151] xl:flex">
             <a href="#video" className="hover:text-[#0f1419]">Video</a>
+            <a href="#deck" className="hover:text-[#0f1419]">Pitch deck</a>
             <a href="#come-funziona" className="hover:text-[#0f1419]">Come funziona</a>
             <a href="#per-chi" className="hover:text-[#0f1419]">Per chi</a>
             <a href="#fiducia" className="hover:text-[#0f1419]">Sicurezza</a>
@@ -76,9 +79,10 @@ export default function Home() {
             <a href="#codeless" className="hover:text-[#0f1419]">Codeless</a>
             <a href="#numeri" className="hover:text-[#0f1419]">Numeri</a>
             <a href="#pilota" className="hover:text-[#0f1419]">Pilota</a>
+            <Link href={MARKET_URL} prefetch={false} className="hover:text-[#0f1419]">Mercato</Link>
           </nav>
           <div className="ml-auto flex items-center gap-2">
-            <a href={DECK_URL} download className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-[#374151] hover:bg-[#f3f4f6] sm:inline-flex">Pitch deck <span className="ml-1 font-mono text-[10px] text-[#6b7280]">PDF</span></a>
+            <a href="#deck" className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-[#374151] hover:bg-[#f3f4f6] sm:inline-flex">Pitch deck</a>
             <Link href={CONSOLE_URL} prefetch={false} className="rounded-lg bg-[#1d3fd6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1733b0]">Prova la demo →</Link>
           </div>
         </div>
@@ -106,6 +110,24 @@ export default function Home() {
           </div>
         </section>
 
+
+        {/* Il pitch deck, sfogliabile nella pagina */}
+        <section id="deck" className="scroll-mt-16">
+          <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-end">
+              <div>
+                <Eyebrow>Il pitch deck · 15 slide</Eyebrow>
+                <h2 className="mt-4 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">Il progetto in quindici slide.</h2>
+                <p className="mt-4 max-w-2xl text-lg text-[#4b5563]">Problema, soluzione, risultati misurati oggi, economia dei tecnici, mercato e prossimo passo. Sfoglialo qui con le frecce o scaricalo.</p>
+              </div>
+              <div className="flex shrink-0 gap-2 sm:ml-auto">
+                <Link href={DECK_HTML_URL} prefetch={false} className={secondary}>Tutte le slide</Link>
+                <a href={DECK_URL} download="Gergo-pitch-deck.pdf" className={primary}>Scarica <span className="font-mono text-xs opacity-80">PDF</span></a>
+              </div>
+            </div>
+            <div className="mt-10"><DeckViewer /></div>
+          </div>
+        </section>
 
         {/* Il problema, in una riga */}
         <section className="border-y border-[#eceef1] bg-[#0f1419] text-white">
@@ -301,22 +323,40 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Approfondimento di mercato e paternità */}
+        <section id="mercato" className="mx-auto max-w-7xl px-4 py-24 sm:px-6">
+          <div className="grid gap-8 rounded-2xl bg-[#0f1419] p-8 text-white sm:p-12 lg:grid-cols-[1.3fr_1fr] lg:items-center">
+            <div>
+              <p className="font-mono text-xs uppercase tracking-[0.22em] text-[#ff9a4d]">Approfondimento di mercato</p>
+              <h2 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">Quanto crescerà il mercato, chi c&apos;è già e dove si colloca Gergo.</h2>
+              <p className="mt-4 text-white/70">Numeri IFR e stime degli analisti con le loro fonti, il landscape da CoboVox a Trener Robotics, la mappa di posizionamento e i rischi detti prima.</p>
+            </div>
+            <Link href={MARKET_URL} prefetch={false} className="inline-flex items-center justify-center rounded-lg bg-white px-6 py-3.5 font-semibold text-[#0f1419] hover:bg-[#f3f4f6] lg:justify-self-end">Leggi il dossier →</Link>
+          </div>
+          <div className="mt-8"><Credits /></div>
+        </section>
+
         {/* Chiusura */}
         <section className="mx-auto max-w-7xl px-4 py-24 text-center sm:px-6">
           <h2 className="mx-auto max-w-3xl text-4xl font-semibold tracking-tight sm:text-6xl">Prova a parlargli.</h2>
           <p className="mx-auto mt-5 max-w-xl text-lg text-[#4b5563]">La console della postazione: voce, approvazioni, registro e allerta, collegata al braccio in simulazione o al vero.</p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <Link href={CONSOLE_URL} prefetch={false} className={primary}>Prova la demo →</Link>
-            <a href={DECK_URL} download className={secondary}>Scarica il pitch deck <span className="font-mono text-xs text-[#6b7280]">PDF</span></a>
+            <a href={DECK_URL} download="Gergo-pitch-deck.pdf" className={secondary}>Scarica il pitch deck <span className="font-mono text-xs text-[#6b7280]">PDF</span></a>
           </div>
         </section>
       </main>
 
       <footer className="border-t border-[#eceef1]">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-10 text-sm text-[#6b7280] sm:flex-row sm:items-center sm:px-6">
-          <p>Gergo · KVA, Kakashi Venture Accelerator · Grok Hackathon at the Museum, Pavia, 5 novembre 2026</p>
+          <div className="space-y-1">
+            <p>Gergo · Grok Hackathon at the Museum, Pavia, 5 novembre 2026</p>
+            <CreditsLine />
+          </div>
           <nav aria-label="Link utili" className="flex flex-wrap gap-5 sm:ml-auto">
-            <a href={DECK_URL} download className="hover:text-[#0f1419]">Pitch deck (PDF)</a>
+            <a href="#deck" className="hover:text-[#0f1419]">Pitch deck</a>
+            <a href={DECK_URL} download="Gergo-pitch-deck.pdf" className="hover:text-[#0f1419]">Scarica PDF</a>
+            <Link href={MARKET_URL} prefetch={false} className="hover:text-[#0f1419]">Approfondimento di mercato</Link>
             <Link href={CONSOLE_URL} prefetch={false} className="hover:text-[#0f1419]">Demo</Link>
             <Link href={LEDGER_URL} prefetch={false} className="hover:text-[#0f1419]">Registro del codice</Link>
             <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className="hover:text-[#0f1419]">GitHub</a>
