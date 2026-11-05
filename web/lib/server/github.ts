@@ -1,6 +1,8 @@
 import "server-only";
 import { createHash } from "node:crypto";
 import { db, must } from "./db";
+import { checkTaughtFile, type GateCheck } from "../scriptGate";
+import { aiReview, type AiReview } from "./review";
 
 // Proposta di modifica agli script Python dopo un test riuscito e la conferma dell'operatore.
 // Regole: si apre SEMPRE una Pull Request su un ramo nuovo, mai un push su main; il file generato contiene solo
@@ -9,7 +11,7 @@ import { db, must } from "./db";
 const REPO = "kakashi-ventures/gergoAI";
 const API = "https://api.github.com";
 
-export interface ScriptProposal { ok: boolean; frase: string; pr_url?: string; path?: string; content?: string; sha256?: string; needs_token?: boolean }
+export interface ScriptProposal { ok: boolean; frase: string; pr_url?: string; path?: string; content?: string; sha256?: string; needs_token?: boolean; gate?: GateCheck[]; ai?: AiReview }
 
 function py(v: unknown, ind = 0): string {
   const pad = "    ".repeat(ind + 1), end = "    ".repeat(ind);
@@ -121,15 +123,25 @@ export async function proposeScript(kind: "routine" | "movimento" | "test", name
   if ("error" in p) return { ok: false, frase: p.error };
   const sha256 = createHash("sha256").update(p.content).digest("hex");
   const s = db();
-  if (!process.env.GITHUB_TOKEN) {
-    await must(s.from("events").insert({ type: "proposal", payload: { oggetto: "script", stato: "senza_token", path: p.path, sha256, by, evidence: p.evidence } }));
-    return { ok: false, needs_token: true, path: p.path, content: p.content, sha256, frase: "Proposta pronta ma non inviata: manca GITHUB_TOKEN su Vercel. Puoi scaricare il file." };
+  // Security stack degli script: 1) gate umano già passato (prova + "è giusto" + sì); 2) gate del codice; 3) gate agente AI;
+  // 4) revisione umana della PR; 5) CI (gate/check_taught.py) sulla PR; 6) a runtime il bridge rivalida tutto.
+  const g = checkTaughtFile(p.path, p.content);
+  const ai = g.ok ? await aiReview(p.path, p.content, g.checks) : { status: "respinge" as const, model: null, findings: g.checks.filter((c) => !c.ok).map((c) => `${c.id}: ${c.detail}`), summary: "Bloccato dal gate del codice: l'agente non è stato interpellato." };
+  const record = { oggetto: "script", path: p.path, sha256, by, evidence: p.evidence, gate: g.checks, gate_ok: g.ok, ai, content: p.content };
+  if (!g.ok || ai.status === "respinge") {
+    await must(s.from("events").insert({ type: "proposal", payload: { ...record, stato: g.ok ? "respinta_ai" : "respinta_gate" } }));
+    return { ok: false, gate: g.checks, ai, path: p.path, sha256, frase: g.ok ? `L'agente di revisione ha respinto la proposta: ${ai.summary}` : `Il controllo del codice ha bloccato la proposta: ${g.checks.filter((c) => !c.ok).map((c) => c.detail).join("; ")}.` };
   }
+  if (!process.env.GITHUB_TOKEN) {
+    await must(s.from("events").insert({ type: "proposal", payload: { ...record, stato: "senza_token" } }));
+    return { ok: false, needs_token: true, gate: g.checks, ai, path: p.path, content: p.content, sha256, frase: "Controlli superati, ma la proposta non è stata inviata: manca GITHUB_TOKEN su Vercel. Puoi scaricare il file." };
+  }
+  const gateMd = `### Security stack\n\n| Gate | Esito |\n|---|---|\n| 1 · Umano: prova e «è giusto» | ✅ in console (${by}) |\n| 2 · Codice (deterministico) | ${g.ok ? "✅" : "❌"} ${g.checks.length} controlli |\n| 3 · Agente AI (${ai.model ?? "non configurato"}) | ${ai.status === "approva" ? "✅ approva" : ai.status === "da_rivedere" ? "⚠️ da rivedere" : "⏸ non eseguito"} — ${ai.summary} |\n| 4 · Umano: revisione di questa PR | ⏳ |\n| 5 · CI \`gate/check_taught.py\` | ⏳ |\n\n${g.checks.map((c) => `- ${c.ok ? "✅" : "❌"} **${c.id}** — ${c.detail}`).join("\n")}\n${ai.findings.length ? `\nNote dell'agente:\n${ai.findings.map((f) => `- ${f}`).join("\n")}\n` : ""}`;
   const ref = (await gh(`/repos/${REPO}/git/ref/heads/main`)) as { object: { sha: string } };
   const branch = `gergo/${p.path.split("/").pop()!.replace(".py", "")}-${Date.now().toString(36)}`;
   await gh(`/repos/${REPO}/git/refs`, { method: "POST", body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: ref.object.sha }) });
   await gh(`/repos/${REPO}/contents/${p.path}`, { method: "PUT", body: JSON.stringify({ message: p.title, content: Buffer.from(p.content).toString("base64"), branch }) });
-  const pr = (await gh(`/repos/${REPO}/pulls`, { method: "POST", body: JSON.stringify({ title: p.title, head: branch, base: "main", body: `${p.body}\n\nsha256 del file: \`${sha256}\` · proposta da: ${by}` }) })) as { html_url: string; number: number };
-  await must(s.from("events").insert({ type: "proposal", payload: { oggetto: "script", stato: "pr_aperta", pr_url: pr.html_url, pr: pr.number, branch, path: p.path, sha256, by, evidence: p.evidence } }));
-  return { ok: true, pr_url: pr.html_url, path: p.path, sha256, frase: `Ho aperto la proposta di modifica: ${p.path}. Va rivista e unita da una persona.` };
+  const pr = (await gh(`/repos/${REPO}/pulls`, { method: "POST", body: JSON.stringify({ title: p.title, head: branch, base: "main", body: `${p.body}\n\n${gateMd}\nsha256 del file: \`${sha256}\` · proposta da: ${by}` }) })) as { html_url: string; number: number };
+  await must(s.from("events").insert({ type: "proposal", payload: { ...record, stato: "pr_aperta", pr_url: pr.html_url, pr: pr.number, branch } }));
+  return { ok: true, gate: g.checks, ai, pr_url: pr.html_url, path: p.path, sha256, frase: `Controlli superati. Ho aperto la proposta: ${p.path}. Ora la rivede una persona.` };
 }

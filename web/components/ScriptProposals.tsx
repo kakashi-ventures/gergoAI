@@ -32,9 +32,16 @@ export function ScriptProposals({ live, refresh }: { live: LiveData; refresh: ()
     <section className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
       <div className="mb-2 flex items-center gap-2">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-white/50">Proposte di modifica agli script</h2>
-        <a href="/console/codice" className="ml-auto text-[11px] text-sky-300 underline">registro del codice</a>
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- è un download, non una pagina */}
+        <a href="/api/tools/dataset" download className="ml-auto text-[11px] text-sky-300 underline">dataset (JSONL)</a>
+        <a href="/console/codice" className="text-[11px] text-sky-300 underline">registro del codice</a>
       </div>
-      <p className="text-xs text-white/50">Funziona così: comando a voce → test → il tuo sì → proposta come Pull Request su GitHub. Il file contiene solo dati; lo rivede e lo unisce una persona.</p>
+      <ol className="flex flex-wrap gap-1 text-[10px]">
+        {["1 umano · prova e «è giusto»", "2 codice · solo dati, limiti", "3 agente AI · checklist sicurezza", "4 umano · revisione PR", "5 CI · check_taught.py", "6 bridge · rivalida a runtime"].map((t) => (
+          <li key={t} className="rounded-full bg-white/10 px-2 py-0.5 text-white/75">{t}</li>
+        ))}
+      </ol>
+      <p className="mt-2 text-xs text-white/50">Ogni proposta passa da tutti i gate; basta un no per fermarla. Il file contiene solo dati.</p>
       <div className="mt-3 flex flex-wrap gap-2">
         <button onClick={() => propose("movimento")} className="rounded border border-sky-400/40 px-3 py-1.5 text-sm text-sky-300 hover:bg-sky-400/10">Ultimo movimento testato</button>
         {active.map((r) => (
@@ -54,7 +61,9 @@ export function ScriptProposals({ live, refresh }: { live: LiveData; refresh: ()
           <li key={e.id} className="flex gap-2">
             <span className="font-mono text-white/40">{new Date(e.ts).toLocaleTimeString("it-IT")}</span>
             <span className="font-mono text-white/80">{String(e.payload?.path ?? "")}</span>
-            {e.payload?.pr_url ? <a href={String(e.payload.pr_url)} target="_blank" rel="noreferrer" className="text-emerald-300 underline">PR #{String(e.payload.pr)}</a> : <span className="text-amber-300">non inviata</span>}
+            <span className={e.payload?.gate_ok === false ? "text-red-300" : "text-emerald-300"}>codice {e.payload?.gate_ok === false ? "✗" : "✓"}</span>
+            <span className={String((e.payload?.ai as { status?: string })?.status) === "approva" ? "text-emerald-300" : String((e.payload?.ai as { status?: string })?.status) === "respinge" ? "text-red-300" : "text-amber-300"}>AI {String((e.payload?.ai as { status?: string })?.status ?? "—")}</span>
+            {e.payload?.pr_url ? <a href={String(e.payload.pr_url)} target="_blank" rel="noreferrer" className="text-emerald-300 underline">PR #{String(e.payload.pr)}</a> : <span className="text-amber-300">{String(e.payload?.stato ?? "non inviata")}</span>}
           </li>
         ))}
       </ol>
