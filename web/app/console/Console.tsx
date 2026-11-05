@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { Dot, Panel } from "@/components/Panel";
 import { SafetyPanel } from "@/components/SafetyPanel";
 import { StopButton } from "@/components/StopButton";
+import { VoicePanel } from "@/components/VoicePanel";
 import { WorkspaceBox } from "@/components/WorkspaceBox";
 import {
   mockEvents, mockPending, mockProposal, mockResoconto, mockRoutines, mockSafety, mockSkills, mockTcp, mockWorkspace,
@@ -43,6 +44,7 @@ export function Console() {
         </div>
 
         <div className="space-y-4">
+          <VoicePanel />
           <Panel title="Comando in attesa" className="border-amber-400/40">
             <p className="text-lg">{mockPending.frase}</p>
             <div className="mt-3 flex gap-2">
