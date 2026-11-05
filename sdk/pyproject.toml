@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gergo_sdk"
+version = "0.1.0"
+description = "Gergo: SDK verso i controller Elite serie CS (Dashboard 29999, Primary 30001, RTSI 30004)"
+requires-python = ">=3.10"
+dependencies = []
+
+[tool.setuptools]
+packages = ["gergo_sdk"]

@@ -1,0 +1,9 @@
+{
+  "_doc": "Mappa skill+luogo → task CS (file .task sul controller, caricato con 'task -p'). Si compila con lo staff al primo slot. Nessun altro task è accettato. Lo scrive BRACCIO.",
+  "verified": false,
+  "tasks": {
+    "solleva:INGRESSO": "solleva_INGRESSO.task",
+    "deposita:USCITA": "deposita_USCITA.task",
+    "home": "home.task"
+  }
+}

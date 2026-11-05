@@ -1,0 +1,7 @@
+{
+  "_doc": "Box di lavoro nel frame utente (frame.json), mm. Da insegnare al primo slot con 'salva angolo' su due angoli opposti; z_min = piano del tavolo + 30 mm. Valori di default [non verificato]. Lo scrive BRACCIO.",
+  "frame": 0,
+  "min_mm": [200, -300, 100],
+  "max_mm": [600, 300, 500],
+  "verified": false
+}

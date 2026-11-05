@@ -1,0 +1,10 @@
+{
+  "_doc": "Frame utente di Gergo per la serie CS: posa del frame del tavolo nel frame base del robot (origin in mm, rotvec in rad) e mappa direzione→asse nel frame utente. Valori di default [non verificato]: da verificare al primo slot con 'su di 1 cm' e 'avanti di 1 cm' (MOTION_SAFETY.md §2.2). Lo scrive BRACCIO.",
+  "user_frame_in_base": {"origin_mm": [0, 0, 0], "rotvec_rad": [0, 0, 0]},
+  "verified": false,
+  "directions": {
+    "su": ["z", 1], "giu": ["z", -1],
+    "avanti": ["x", 1], "indietro": ["x", -1],
+    "destra": ["y", -1], "sinistra": ["y", 1]
+  }
+}
