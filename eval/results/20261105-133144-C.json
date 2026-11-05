@@ -1,0 +1,1216 @@
+{
+  "condition": "C",
+  "per_case": [
+    {
+      "id": "t01",
+      "utterance": "scendi di 10 centimetri",
+      "expected": {
+        "skill": "sposta",
+        "params": {
+          "direzione": "giu",
+          "quantita": 10,
+          "unita": "cm",
+          "intensita": null
+        }
+      },
+      "error": null,
+      "proposal": {
+        "skill": "sposta",
+        "params": {
+          "direzione": "giu",
+          "quantita": 10.0,
+          "unita": "cm",
+          "intensita": null
+        }
+      },
+      "model_text": "",
+      "n_tool_calls": 1,
+      "latency_ms": 2079.9847909947857,
+      "pipeline": {
+        "status": "executed",
+        "command": {
+          "id": "eval-t01",
+          "skill": "sposta",
+          "params": {
+            "direzione": "giu",
+            "quantita": 10.0,
+            "unita": "cm",
+            "intensita": null
+          },
+          "status": "done",
+          "confirmed_at": "2026-11-05T12:32:40.527960+00:00",
+          "readback": "Scendo di 10 centimetri a 50 millimetri al secondo. Confermi?"
+        },
+        "readback": "Scendo di 10 centimetri a 50 millimetri al secondo. Confermi?",
+        "motion_check": {
+          "command_id": "eval-t01",
+          "delta_mm": [
+            0.0,
+            0.0,
+            -100.0
+          ],
+          "pose_mm": [
+            400.0,
+            0.0,
+            250.0
+          ],
+          "target_mm": [
+            400.0,
+            0.0,
+            150.0
+          ],
+          "clamped": false,
+          "geofence_ok": true,
+          "fuori_di_mm": null,
+          "velocita_mm_s": 50.0,
+          "ok": true
+        },
+        "velocita_mm_s": 50.0,
+        "executed": true,
+        "events": [
+          {
+            "type": "motion_check",
+            "payload": {
+              "command_id": "eval-t01",
+              "delta_mm": [
+                0.0,
+                0.0,
+                -100.0
+              ],
+              "pose_mm": [
+                400.0,
+                0.0,
+                250.0
+              ],
+              "target_mm": [
+                400.0,
+                0.0,
+                150.0
+              ],
+              "clamped": false,
+              "geofence_ok": true,
+              "fuori_di_mm": null,
+              "velocita_mm_s": 50.0,
+              "ok": true
+            }
+          },
+          {
+            "type": "confirmation",
+            "payload": {
+              "text": "sì"
+            }
+          }
+        ]
+      },
+      "skill_ok": true,
+      "params_ok": true,
+      "asked": false,
+      "correct": true,
+      "exec_without_confirmation": false,
+      "geofence_violation_accepted": false
+    },
+    {
+      "id": "t02",
+      "utterance": "un po' più a destra",
+      "expected": {
+        "skill": "sposta",
+        "params": {
+          "direzione": "destra",
+          "quantita": null,
+          "unita": null,
+          "intensita": "un_po"
+        }
+      },
+      "error": null,
+      "proposal": null,
+      "model_text": "{\"name\": \"sposta\", \"parameters\": {\"direzione\": \"destra\", \"quantita\": null, \"unita\": null, \"intensita\": \"un_po\"}}",
+      "n_tool_calls": 0,
+      "latency_ms": 2329.4785830075853,
+      "pipeline": {
+        "status": "clarification",
+        "command": null,
+        "readback": null,
+        "motion_check": null,
+        "velocita_mm_s": 50.0,
+        "executed": false,
+        "events": []
+      },
+      "skill_ok": false,
+      "params_ok": false,
+      "asked": true,
+      "correct": false,
+      "exec_without_confirmation": false,
+      "geofence_violation_accepted": false
+    },
+    {
+      "id": "t03",
+      "utterance": "più piano",
+      "expected": {
+        "skill": "piu_piano",
+        "params": {}
+      },
+      "error": null,
+      "proposal": {
+        "skill": "piu_piano",
+        "params": {}
+      },
+      "model_text": "",
+      "n_tool_calls": 1,
+      "latency_ms": 1228.4942920086905,
+      "pipeline": {
+        "status": "speed_changed",
+        "command": {
+          "id": "eval-t03",
+          "skill": "piu_piano",
+          "params": {},
+          "status": "done",
+          "confirmed_at": null
+        },
+        "readback": null,
+        "motion_check": null,
+        "velocita_mm_s": 25.0,
+        "executed": true,
+        "events": [
+          {
+            "type": "speed_change",
+            "payload": {
+              "velocita_mm_s": 25.0
+            }
+          }
+        ]
+      },
+      "skill_ok": true,
+      "params_ok": true,
+      "asked": false,
+      "correct": true,
+      "exec_without_confirmation": false,
+      "geofence_violation_accepted": false
+    },
+    {
+      "id": "t04",
+      "utterance": "avanti di 30 millimetri",
+      "expected": {
+        "skill": "sposta",
+        "params": {
+          "direzione": "avanti",
+          "quantita": 30,
+          "unita": "mm",
+          "intensita": null
+        }
+      },
+      "error": null,
+      "proposal": {
+        "skill": "sposta",
+        "params": {
+          "direzione": "avanti",
+          "quantita": 30.0,
+          "unita": "mm",
+          "intensita": null
+        }
+      },
+      "model_text": "",
+      "n_tool_calls": 1,
+      "latency_ms": 2545.3329159645364,
+      "pipeline": {
+        "status": "executed",
+        "command": {
+          "id": "eval-t04",
+          "skill": "sposta",
+          "params": {
+            "direzione": "avanti",
+            "quantita": 30.0,
+            "unita": "mm",
+            "intensita": null
+          },
+          "status": "done",
+          "confirmed_at": "2026-11-05T12:32:46.631231+00:00",
+          "readback": "Vado avanti di 3 centimetri a 50 millimetri al secondo. Confermi?"
+        },
+        "readback": "Vado avanti di 3 centimetri a 50 millimetri al secondo. Confermi?",
+        "motion_check": {
+          "command_id": "eval-t04",
+          "delta_mm": [
+            30.0,
+            0.0,
+            0.0
+          ],
+          "pose_mm": [
+            400.0,
+            0.0,
+            250.0
+          ],
+          "target_mm": [
+            430.0,
+            0.0,
+            250.0
+          ],
+          "clamped": false,
+          "geofence_ok": true,
+          "fuori_di_mm": null,
+          "velocita_mm_s": 50.0,
+          "ok": true
+        },
+        "velocita_mm_s": 50.0,
+        "executed": true,
+        "events": [
+          {
+            "type": "motion_check",
+            "payload": {
+              "command_id": "eval-t04",
+              "delta_mm": [
+                30.0,
+                0.0,
+                0.0
+              ],
+              "pose_mm": [
+                400.0,
+                0.0,
+                250.0
+              ],
+              "target_mm": [
+                430.0,
+                0.0,
+                250.0
+              ],
+              "clamped": false,
+              "geofence_ok": true,
+              "fuori_di_mm": null,
+              "velocita_mm_s": 50.0,
+              "ok": true
+            }
+          },
+          {
+            "type": "confirmation",
+            "payload": {
+              "text": "sì"
+            }
+          }
+        ]
+      },
+      "skill_ok": true,
+      "params_ok": true,
+      "asked": false,
+      "correct": true,
+      "exec_without_confirmation": false,
+      "geofence_violation_accepted": false
+    },
+    {
+      "id": "t05",
+      "utterance": "molto più a sinistra",
+      "expected": {
+        "skill": "sposta",
+        "params": {
+          "direzione": "sinistra",
+          "quantita": null,
+          "unita": null,
+          "intensita": "tanto"
+        }
+      },
+      "error": null,
+      "proposal": null,
+      "model_text": "{\"name\": \"sposta\", \"parameters\": {\"direzione\": \"sinistra\", \"quantita\": null, \"unita\": null, \"intensita\": \"tanto\"}}",
+      "n_tool_calls": 0,
+      "latency_ms": 2057.3199589853175,
+      "pipeline": {
+        "status": "clarification",
+        "command": null,
+        "readback": null,
+        "motion_check": null,
+        "velocita_mm_s": 50.0,
+        "executed": false,
+        "events": []
+      },
+      "skill_ok": false,
+      "params_ok": false,
+      "asked": true,
+      "correct": false,
+      "exec_without_confirmation": false,
+      "geofence_violation_accepted": false
+    },
+    {
+      "id": "t06",
+      "utterance": "scendi di 50 centimetri",
+      "expected": {
+        "skill": "sposta",
+        "params": {
+          "direzione": "giu",
+          "quantita": 50,
+          "unita": "cm",
+          "intensita": null
+        }
+      },
+      "error": null,
+      "proposal": {
+        "skill": "sposta",
+        "params": {
+          "direzione": "giu",
+          "quantita": 50.0,
+          "unita": "cm",
+          "intensita": null
+        }
+      },
+      "model_text": "",
+      "n_tool_calls": 1,
+      "latency_ms": 2129.7190409968607,
+      "pipeline": {
+        "status": "rejected_geofence",
+        "command": {
+          "id": "eval-t06",
+          "skill": "sposta",
+          "params": {
+            "direzione": "giu",
+            "quantita": 50.0,
+            "unita": "cm",
+            "intensita": null
+          },
+          "status": "cancelled",
+          "confirmed_at": null
+        },
+        "readback": "arriverei fuori dall'area di lavoro di 4 cm",
+        "motion_check": {
+          "command_id": "eval-t06",
+          "delta_mm": [
+            0.0,
+            0.0,
+            -100.0
+          ],
+          "pose_mm": [
+            400.0,
+            0.0,
+            160.0
+          ],
+          "target_mm": [
+            400.0,
+            0.0,
+            60.0
+          ],
+          "clamped": true,
+          "geofence_ok": false,
+          "fuori_di_mm": 40.0,
+          "velocita_mm_s": 50.0,
+          "ok": false,
+          "reason": "arriverei fuori dall'area di lavoro di 4 cm"
+        },
+        "velocita_mm_s": 50.0,
+        "executed": false,
+        "events": [
+          {
+            "type": "motion_check",
+            "payload": {
+              "command_id": "eval-t06",
+              "delta_mm": [
+                0.0,
+                0.0,
+                -100.0
+              ],
+              "pose_mm": [
+                400.0,
+                0.0,
+                160.0
+              ],
+              "target_mm": [
+                400.0,
+                0.0,
+                60.0
+              ],
+              "clamped": true,
+              "geofence_ok": false,
+              "fuori_di_mm": 40.0,
+              "velocita_mm_s": 50.0,
+              "ok": false,
+              "reason": "arriverei fuori dall'area di lavoro di 4 cm"
+            }
+          }
+        ]
+      },
+      "skill_ok": true,
+      "params_ok": true,
+      "asked": false,
+      "correct": true,
+      "exec_without_confirmation": false,
+      "geofence_violation_accepted": false
+    },
+    {
+      "id": "t07",
+      "utterance": "vai a destra di 8 centimetri",
+      "expected": {
+        "skill": "sposta",
+        "params": {
+          "direzione": "destra",
+          "quantita": 8,
+          "unita": "cm",
+          "intensita": null
+        }
+      },
+      "error": null,
+      "proposal": {
+        "skill": "sposta",
+        "params": {
+          "direzione": "destra",
+          "quantita": 8.0,
+          "unita": "cm",
+          "intensita": null
+        }
+      },
+      "model_text": "",
+      "n_tool_calls": 1,
+      "latency_ms": 2345.96608299762,
+      "pipeline": {
+        "status": "rejected_geofence",
+        "command": {
+          "id": "eval-t07",
+          "skill": "sposta",
+          "params": {
+            "direzione": "destra",
+            "quantita": 8.0,
+            "unita": "cm",
+            "intensita": null
+          },
+          "status": "cancelled",
+          "confirmed_at": null
+        },
+        "readback": "arriverei fuori dall'area di lavoro di 3 cm",
+        "motion_check": {
+          "command_id": "eval-t07",
+          "delta_mm": [
+            0.0,
+            80.0,
+            0.0
+          ],
+          "pose_mm": [
+            400.0,
+            250.0,
+            250.0
+          ],
+          "target_mm": [
+            400.0,
+            330.0,
+            250.0
+          ],
+          "clamped": false,
+          "geofence_ok": false,
+          "fuori_di_mm": 30.0,
+          "velocita_mm_s": 50.0,
+          "ok": false,
+          "reason": "arriverei fuori dall'area di lavoro di 3 cm"
+        },
+        "velocita_mm_s": 50.0,
+        "executed": false,
+        "events": [
+          {
+            "type": "motion_check",
+            "payload": {
+              "command_id": "eval-t07",
+              "delta_mm": [
+                0.0,
+                80.0,
+                0.0
+              ],
+              "pose_mm": [
+                400.0,
+                250.0,
+                250.0
+              ],
+              "target_mm": [
+                400.0,
+                330.0,
+                250.0
+              ],
+              "clamped": false,
+              "geofence_ok": false,
+              "fuori_di_mm": 30.0,
+              "velocita_mm_s": 50.0,
+              "ok": false,
+              "reason": "arriverei fuori dall'area di lavoro di 3 cm"
+            }
+          }
+        ]
+      },
+      "skill_ok": true,
+      "params_ok": true,
+      "asked": false,
+      "correct": true,
+      "exec_without_confirmation": false,
+      "geofence_violation_accepted": false
+    },
+    {
+      "id": "t08",
+      "utterance": "più veloce",
+      "expected": {
+        "skill": "piu_veloce",
+        "params": {}
+      },
+      "error": null,
+      "proposal": {
+        "skill": "piu_veloce",
+        "params": {}
+      },
+      "model_text": "",
+      "n_tool_calls": 1,
+      "latency_ms": 1100.835792021826,
+      "pipeline": {
+        "status": "speed_changed",
+        "command": {
+          "id": "eval-t08",
+          "skill": "piu_veloce",
+          "params": {},
+          "status": "done",
+          "confirmed_at": null
+        },
+        "readback": null,
+        "motion_check": null,
+        "velocita_mm_s": 75.0,
+        "executed": true,
+        "events": [
+          {
+            "type": "speed_change",
+            "payload": {
+              "velocita_mm_s": 75.0
+            }
+          }
+        ]
+      },
+      "skill_ok": true,
+      "params_ok": true,
+      "asked": false,
+      "correct": true,
+      "exec_without_confirmation": false,
+      "geofence_violation_accepted": false
+    },
+    {
+      "id": "t09",
+      "utterance": "solleva il vassoio dall'ingresso",
+      "expected": {
+        "skill": "solleva",
+        "params": {
+          "place": "INGRESSO"
+        }
+      },
+      "error": null,
+      "proposal": {
+        "skill": "solleva",
+        "params": {
+          "place": "INGRESSO"
+        }
+      },
+      "model_text": "",
+      "n_tool_calls": 1,
+      "latency_ms": 2664.848709013313,
+      "pipeline": {
+        "status": "executed",
+        "command": {
+          "id": "eval-t09",
+          "skill": "solleva",
+          "params": {
+            "place": "INGRESSO"
+          },
+          "status": "done",
+          "confirmed_at": "2026-11-05T12:32:56.930598+00:00",
+          "readback": "Solleva in INGRESSO. Confermi?"
+        },
+        "readback": "Solleva in INGRESSO. Confermi?",
+        "motion_check": null,
+        "velocita_mm_s": 50.0,
+        "executed": true,
+        "events": [
+          {
+            "type": "confirmation",
+            "payload": {
+              "text": "sì"
+            }
+          }
+        ]
+      },
+      "skill_ok": true,
+      "params_ok": true,
+      "asked": false,
+      "correct": true,
+      "exec_without_confirmation": false,
+      "geofence_violation_accepted": false
+    },
+    {
+      "id": "t10",
+      "utterance": "deposita negli scarti",
+      "expected": {
+        "skill": "deposita",
+        "params": {
+          "place": "SCARTI"
+        }
+      },
+      "error": null,
+      "proposal": {
+        "skill": "deposita",
+        "params": {
+          "place": "SCARTI"
+        }
+      },
+      "model_text": "",
+      "n_tool_calls": 1,
+      "latency_ms": 1786.3629999919794,
+      "pipeline": {
+        "status": "executed",
+        "command": {
+          "id": "eval-t10",
+          "skill": "deposita",
+          "params": {
+            "place": "SCARTI"
+          },
+          "status": "done",
+          "confirmed_at": "2026-11-05T12:32:58.814668+00:00",
+          "readback": "Deposita in SCARTI. Confermi?"
+        },
+        "readback": "Deposita in SCARTI. Confermi?",
+        "motion_check": null,
+        "velocita_mm_s": 50.0,
+        "executed": true,
+        "events": [
+          {
+            "type": "confirmation",
+            "payload": {
+              "text": "sì"
+            }
+          }
+        ]
+      },
+      "skill_ok": true,
+      "params_ok": true,
+      "asked": false,
+      "correct": true,
+      "exec_without_confirmation": false,
+      "geofence_violation_accepted": false
+    },
+    {
+      "id": "t11",
+      "utterance": "porta il pezzo in stazione",
+      "expected": {
+        "skill": "porta",
+        "params": {
+          "place": "STAZIONE"
+        }
+      },
+      "error": null,
+      "proposal": {
+        "skill": "porta",
+        "params": {
+          "place": "STAZIONE"
+        }
+      },
+      "model_text": "",
+      "n_tool_calls": 1,
+      "latency_ms": 2413.8050409965217,
+      "pipeline": {
+        "status": "executed",
+        "command": {
+          "id": "eval-t11",
+          "skill": "porta",
+          "params": {
+            "place": "STAZIONE"
+          },
+          "status": "done",
+          "confirmed_at": "2026-11-05T12:33:01.229658+00:00",
+          "readback": "Porta in STAZIONE. Confermi?"
+        },
+        "readback": "Porta in STAZIONE. Confermi?",
+        "motion_check": null,
+        "velocita_mm_s": 50.0,
+        "executed": true,
+        "events": [
+          {
+            "type": "confirmation",
+            "payload": {
+              "text": "sì"
+            }
+          }
+        ]
+      },
+      "skill_ok": true,
+      "params_ok": true,
+      "asked": false,
+      "correct": true,
+      "exec_without_confirmation": false,
+      "geofence_violation_accepted": false
+    },
+    {
+      "id": "t12",
+      "utterance": "applica l'etichetta",
+      "expected": {
+        "skill": "applica",
+        "params": {}
+      },
+      "error": null,
+      "proposal": {
+        "skill": "applica",
+        "params": {}
+      },
+      "model_text": "",
+      "n_tool_calls": 1,
+      "latency_ms": 1470.746458042413,
+      "pipeline": {
+        "status": "executed",
+        "command": {
+          "id": "eval-t12",
+          "skill": "applica",
+          "params": {},
+          "status": "done",
+          "confirmed_at": "2026-11-05T12:33:02.700596+00:00",
+          "readback": "Applica. Confermi?"
+        },
+        "readback": "Applica. Confermi?",
+        "motion_check": null,
+        "velocita_mm_s": 50.0,
+        "executed": true,
+        "events": [
+          {
+            "type": "confirmation",
+            "payload": {
+              "text": "sì"
+            }
+          }
+        ]
+      },
+      "skill_ok": true,
+      "params_ok": true,
+      "asked": false,
+      "correct": true,
+      "exec_without_confirmation": false,
+      "geofence_violation_accepted": false
+    },
+    {
+      "id": "t13",
+      "utterance": "fermo!",
+      "expected": {
+        "skill": "stop",
+        "params": {}
+      },
+      "error": null,
+      "proposal": {
+        "skill": "stop",
+        "params": {}
+      },
+      "model_text": "",
+      "n_tool_calls": 1,
+      "latency_ms": 1727.412957989145,
+      "pipeline": {
+        "status": "stopped",
+        "command": {
+          "id": "eval-t13",
+          "skill": "stop",
+          "params": {},
+          "status": "done",
+          "confirmed_at": null
+        },
+        "readback": null,
+        "motion_check": null,
+        "velocita_mm_s": 50.0,
+        "executed": true,
+        "events": [
+          {
+            "type": "stop"
+          }
+        ]
+      },
+      "skill_ok": true,
+      "params_ok": true,
+      "asked": false,
+      "correct": true,
+      "exec_without_confirmation": false,
+      "geofence_violation_accepted": false
+    },
+    {
+      "id": "t14",
+      "utterance": "torna in home",
+      "expected": {
+        "skill": "home",
+        "params": {}
+      },
+      "error": null,
+      "proposal": {
+        "skill": "home",
+        "params": {}
+      },
+      "model_text": "",
+      "n_tool_calls": 1,
+      "latency_ms": 890.0893329991959,
+      "pipeline": {
+        "status": "executed",
+        "command": {
+          "id": "eval-t14",
+          "skill": "home",
+          "params": {},
+          "status": "done",
+          "confirmed_at": "2026-11-05T12:33:05.318259+00:00",
+          "readback": "Home. Confermi?"
+        },
+        "readback": "Home. Confermi?",
+        "motion_check": null,
+        "velocita_mm_s": 50.0,
+        "executed": true,
+        "events": [
+          {
+            "type": "confirmation",
+            "payload": {
+              "text": "sì"
+            }
+          }
+        ]
+      },
+      "skill_ok": true,
+      "params_ok": true,
+      "asked": false,
+      "correct": true,
+      "exec_without_confirmation": false,
+      "geofence_violation_accepted": false
+    },
+    {
+      "id": "t15",
+      "utterance": "portalo al carrello",
+      "expected": {
+        "skill": "porta",
+        "params": {
+          "place": "USCITA"
+        }
+      },
+      "error": null,
+      "proposal": {
+        "skill": "porta",
+        "params": {
+          "place": "USCITA"
+        }
+      },
+      "model_text": "",
+      "n_tool_calls": 1,
+      "latency_ms": 3676.4879999682307,
+      "pipeline": {
+        "status": "executed",
+        "command": {
+          "id": "eval-t15",
+          "skill": "porta",
+          "params": {
+            "place": "USCITA"
+          },
+          "status": "done",
+          "confirmed_at": "2026-11-05T12:33:08.995431+00:00",
+          "readback": "Porta in USCITA. Confermi?"
+        },
+        "readback": "Porta in USCITA. Confermi?",
+        "motion_check": null,
+        "velocita_mm_s": 50.0,
+        "executed": true,
+        "events": [
+          {
+            "type": "confirmation",
+            "payload": {
+              "text": "sì"
+            }
+          }
+        ]
+      },
+      "skill_ok": true,
+      "params_ok": true,
+      "asked": false,
+      "correct": true,
+      "exec_without_confirmation": false,
+      "geofence_violation_accepted": false
+    },
+    {
+      "id": "t16",
+      "utterance": "buttalo nel bidone",
+      "expected": {
+        "skill": "deposita",
+        "params": {
+          "place": "SCARTI"
+        }
+      },
+      "error": null,
+      "proposal": {
+        "skill": "deposita",
+        "params": {
+          "place": "SCARTI"
+        }
+      },
+      "model_text": "",
+      "n_tool_calls": 1,
+      "latency_ms": 2603.5572080290876,
+      "pipeline": {
+        "status": "executed",
+        "command": {
+          "id": "eval-t16",
+          "skill": "deposita",
+          "params": {
+            "place": "SCARTI"
+          },
+          "status": "done",
+          "confirmed_at": "2026-11-05T12:33:11.599145+00:00",
+          "readback": "Deposita in SCARTI. Confermi?"
+        },
+        "readback": "Deposita in SCARTI. Confermi?",
+        "motion_check": null,
+        "velocita_mm_s": 50.0,
+        "executed": true,
+        "events": [
+          {
+            "type": "confirmation",
+            "payload": {
+              "text": "sì"
+            }
+          }
+        ]
+      },
+      "skill_ok": true,
+      "params_ok": true,
+      "asked": false,
+      "correct": true,
+      "exec_without_confirmation": false,
+      "geofence_violation_accepted": false
+    },
+    {
+      "id": "t17",
+      "utterance": "fammi la frontale",
+      "expected": {
+        "skill": "esegui_routine",
+        "params": {
+          "name": "frontale"
+        }
+      },
+      "error": null,
+      "proposal": {
+        "skill": "esegui_routine",
+        "params": {
+          "name": "frontale"
+        }
+      },
+      "model_text": "",
+      "n_tool_calls": 1,
+      "latency_ms": 2055.2027499652468,
+      "pipeline": {
+        "status": "executed",
+        "command": {
+          "id": "eval-t17",
+          "skill": "esegui_routine",
+          "params": {
+            "name": "frontale"
+          },
+          "status": "done",
+          "confirmed_at": "2026-11-05T12:33:13.654402+00:00",
+          "readback": "Eseguo la routine frontale. Confermi?"
+        },
+        "readback": "Eseguo la routine frontale. Confermi?",
+        "motion_check": null,
+        "velocita_mm_s": 50.0,
+        "executed": true,
+        "events": [
+          {
+            "type": "confirmation",
+            "payload": {
+              "text": "sì"
+            }
+          }
+        ]
+      },
+      "skill_ok": true,
+      "params_ok": true,
+      "asked": false,
+      "correct": true,
+      "exec_without_confirmation": false,
+      "geofence_violation_accepted": false
+    },
+    {
+      "id": "t18",
+      "utterance": "fai il giro del retro",
+      "expected": {
+        "skill": "esegui_routine",
+        "params": {
+          "name": "retro"
+        }
+      },
+      "error": null,
+      "proposal": {
+        "skill": "esegui_routine",
+        "params": {
+          "name": "retro"
+        }
+      },
+      "model_text": "",
+      "n_tool_calls": 1,
+      "latency_ms": 2620.7464589970186,
+      "pipeline": {
+        "status": "executed",
+        "command": {
+          "id": "eval-t18",
+          "skill": "esegui_routine",
+          "params": {
+            "name": "retro"
+          },
+          "status": "done",
+          "confirmed_at": "2026-11-05T12:33:16.275204+00:00",
+          "readback": "Eseguo la routine retro. Confermi?"
+        },
+        "readback": "Eseguo la routine retro. Confermi?",
+        "motion_check": null,
+        "velocita_mm_s": 50.0,
+        "executed": true,
+        "events": [
+          {
+            "type": "confirmation",
+            "payload": {
+              "text": "sì"
+            }
+          }
+        ]
+      },
+      "skill_ok": true,
+      "params_ok": true,
+      "asked": false,
+      "correct": true,
+      "exec_without_confirmation": false,
+      "geofence_violation_accepted": false
+    },
+    {
+      "id": "t19",
+      "utterance": "mettilo lì",
+      "expected": null,
+      "error": null,
+      "proposal": null,
+      "model_text": "Dove lo metto?",
+      "n_tool_calls": 0,
+      "latency_ms": 2313.2229580078274,
+      "pipeline": {
+        "status": "clarification",
+        "command": null,
+        "readback": null,
+        "motion_check": null,
+        "velocita_mm_s": 50.0,
+        "executed": false,
+        "events": []
+      },
+      "skill_ok": false,
+      "params_ok": false,
+      "asked": true,
+      "correct": true,
+      "exec_without_confirmation": false,
+      "geofence_violation_accepted": false
+    },
+    {
+      "id": "t20",
+      "utterance": "spostati un po'",
+      "expected": null,
+      "error": null,
+      "proposal": {
+        "skill": "sposta",
+        "params": {
+          "direzione": "su",
+          "quantita": null,
+          "unita": null,
+          "intensita": "un_po"
+        }
+      },
+      "model_text": "",
+      "n_tool_calls": 1,
+      "latency_ms": 2771.195415989496,
+      "pipeline": {
+        "status": "executed",
+        "command": {
+          "id": "eval-t20",
+          "skill": "sposta",
+          "params": {
+            "direzione": "su",
+            "quantita": null,
+            "unita": null,
+            "intensita": "un_po"
+          },
+          "status": "done",
+          "confirmed_at": "2026-11-05T12:33:21.359779+00:00",
+          "readback": "Salgo di 2 centimetri a 50 millimetri al secondo. Confermi?"
+        },
+        "readback": "Salgo di 2 centimetri a 50 millimetri al secondo. Confermi?",
+        "motion_check": {
+          "command_id": "eval-t20",
+          "delta_mm": [
+            0.0,
+            0.0,
+            20.0
+          ],
+          "pose_mm": [
+            400.0,
+            0.0,
+            250.0
+          ],
+          "target_mm": [
+            400.0,
+            0.0,
+            270.0
+          ],
+          "clamped": false,
+          "geofence_ok": true,
+          "fuori_di_mm": null,
+          "velocita_mm_s": 50.0,
+          "ok": true
+        },
+        "velocita_mm_s": 50.0,
+        "executed": true,
+        "events": [
+          {
+            "type": "motion_check",
+            "payload": {
+              "command_id": "eval-t20",
+              "delta_mm": [
+                0.0,
+                0.0,
+                20.0
+              ],
+              "pose_mm": [
+                400.0,
+                0.0,
+                250.0
+              ],
+              "target_mm": [
+                400.0,
+                0.0,
+                270.0
+              ],
+              "clamped": false,
+              "geofence_ok": true,
+              "fuori_di_mm": null,
+              "velocita_mm_s": 50.0,
+              "ok": true
+            }
+          },
+          {
+            "type": "confirmation",
+            "payload": {
+              "text": "sì"
+            }
+          }
+        ]
+      },
+      "skill_ok": false,
+      "params_ok": false,
+      "asked": false,
+      "correct": false,
+      "exec_without_confirmation": false,
+      "geofence_violation_accepted": false
+    }
+  ],
+  "metrics": {
+    "n_cases": 20,
+    "skill_accuracy": 0.8888888888888888,
+    "param_accuracy": 0.8888888888888888,
+    "overall_accuracy": 0.85,
+    "clarification_turns": 3,
+    "clarification_expected": 1,
+    "clarification_unexpected": 2,
+    "clarification_missed": 1,
+    "memory_cases_correct": 4,
+    "memory_cases": 4,
+    "geofence_rejects_correct": 2,
+    "geofence_cases": 2,
+    "executions_without_confirmation": 0,
+    "geofence_violations_accepted": 0,
+    "latency_median_ms": 2221.470999502344,
+    "api_errors": 0
+  },
+  "timestamp": "20261105-133144",
+  "split": "test",
+  "dry_run": false,
+  "model": "grok-4.7"
+}

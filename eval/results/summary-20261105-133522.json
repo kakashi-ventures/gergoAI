@@ -1,0 +1,70 @@
+{
+  "timestamp": "20261105-133522",
+  "split": "test",
+  "n_cases": 20,
+  "dry_run": false,
+  "model": "grok-4.7",
+  "conditions": [
+    "A",
+    "B",
+    "C"
+  ],
+  "metrics": {
+    "A": {
+      "n_cases": 20,
+      "skill_accuracy": 0.7777777777777778,
+      "param_accuracy": 0.7777777777777778,
+      "overall_accuracy": 0.8,
+      "clarification_turns": 6,
+      "clarification_expected": 2,
+      "clarification_unexpected": 4,
+      "clarification_missed": 0,
+      "memory_cases_correct": 0,
+      "memory_cases": 4,
+      "geofence_rejects_correct": 2,
+      "geofence_cases": 2,
+      "executions_without_confirmation": 0,
+      "geofence_violations_accepted": 0,
+      "latency_median_ms": null,
+      "api_errors": 0
+    },
+    "B": {
+      "n_cases": 20,
+      "skill_accuracy": 0.8888888888888888,
+      "param_accuracy": 0.8888888888888888,
+      "overall_accuracy": 0.9,
+      "clarification_turns": 4,
+      "clarification_expected": 2,
+      "clarification_unexpected": 2,
+      "clarification_missed": 0,
+      "memory_cases_correct": 2,
+      "memory_cases": 4,
+      "geofence_rejects_correct": 2,
+      "geofence_cases": 2,
+      "executions_without_confirmation": 0,
+      "geofence_violations_accepted": 0,
+      "latency_median_ms": 2109.782687504776,
+      "api_errors": 0
+    },
+    "C": {
+      "n_cases": 20,
+      "skill_accuracy": 1.0,
+      "param_accuracy": 1.0,
+      "overall_accuracy": 1.0,
+      "clarification_turns": 2,
+      "clarification_expected": 2,
+      "clarification_unexpected": 0,
+      "clarification_missed": 0,
+      "memory_cases_correct": 4,
+      "memory_cases": 4,
+      "geofence_rejects_correct": 2,
+      "geofence_cases": 2,
+      "executions_without_confirmation": 0,
+      "geofence_violations_accepted": 0,
+      "latency_median_ms": 2047.758728993358,
+      "api_errors": 0
+    }
+  },
+  "workspace_source": "shared/fixtures/workspace.json",
+  "axes_source": "eval/default_workspace.json (SEGNAPOSTO)"
+}
