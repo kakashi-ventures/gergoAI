@@ -27,6 +27,13 @@ class Store:
     def guard_status(self, bridge_id: str) -> Optional[dict]: ...
     def ontology(self) -> dict: ...
     def set_skill_real_ok(self, ontology_version: int, name: str) -> None: ...
+    # composer
+    def pending_runs(self) -> list[dict]: ...
+    def routine(self, name: str, version: Optional[int]) -> Optional[dict]: ...
+    def update_run(self, rid: str, fields: dict) -> None: ...
+    def insert_command(self, c: dict) -> dict: ...
+    def command(self, cid: str) -> Optional[dict]: ...
+    def events_after(self, ts: str, routine_run_id: str, type_: str) -> list[dict]: ...
 
 
 class MemoryStore(Store):
@@ -36,6 +43,8 @@ class MemoryStore(Store):
         self.bridge_status: dict[str, dict] = {}
         self.guard: dict[str, dict] = {}
         self._ontology = ontology or default_ontology()
+        self.routines: list[dict] = []
+        self.routine_runs: list[dict] = []
 
     def add_command(self, **c) -> dict:
         c.setdefault("id", str(uuid.uuid4()))
@@ -81,6 +90,29 @@ class MemoryStore(Store):
         for s in self._ontology["skills"]:
             if s["name"] == name:
                 s["real_ok"] = True
+
+    def pending_runs(self):
+        return [deepcopy(r) for r in self.routine_runs if r["status"] == "confirmed"]
+
+    def routine(self, name, version):
+        rs = [r for r in self.routines if r["name"] == name and
+              (r["version"] == version if version else r["status"] == "active")]
+        return deepcopy(max(rs, key=lambda r: r["version"])) if rs else None
+
+    def update_run(self, rid, fields):
+        for r in self.routine_runs:
+            if r["id"] == rid:
+                r.update(fields)
+
+    def insert_command(self, c):
+        return deepcopy(self.add_command(**c))
+
+    def command(self, cid):
+        return next((deepcopy(c) for c in self.commands if c["id"] == cid), None)
+
+    def events_after(self, ts, routine_run_id, type_):
+        return [e for e in self.events if e["ts"] > ts and e.get("routine_run_id") == routine_run_id
+                and e["type"] == type_]
 
 
 def default_ontology() -> dict:
@@ -150,6 +182,30 @@ class SupabaseStore(Store):
         tool = self._req("GET", "/tools?attivo=is.true&limit=1") or []
         return {"version": v, "status": ov[0]["status"], "places": places, "skills": skills,
                 "workspace": ws[0] if ws else None, "tool": tool[0] if tool else None}
+
+    def pending_runs(self):
+        return self._req("GET", "/routine_runs?status=eq.confirmed&order=confirmed_at.asc&limit=5") or []
+
+    def routine(self, name, version):
+        q = f"/routines?name=eq.{urllib.parse.quote(name)}"
+        q += f"&version=eq.{int(version)}" if version else "&status=eq.active&order=version.desc&limit=1"
+        rows = self._req("GET", q) or []
+        return rows[0] if rows else None
+
+    def update_run(self, rid, fields):
+        self._req("PATCH", f"/routine_runs?id=eq.{rid}", fields, prefer="return=minimal")
+
+    def insert_command(self, c):
+        rows = self._req("POST", "/commands", c, prefer="return=representation")
+        return rows[0]
+
+    def command(self, cid):
+        rows = self._req("GET", f"/commands?id=eq.{cid}") or []
+        return rows[0] if rows else None
+
+    def events_after(self, ts, routine_run_id, type_):
+        return self._req("GET", f"/events?routine_run_id=eq.{routine_run_id}&type=eq.{type_}"
+                                f"&ts=gt.{urllib.parse.quote(ts)}&order=ts.asc") or []
 
     def set_skill_real_ok(self, ontology_version, name):
         self._req("PATCH", f"/skills?ontology_version=eq.{ontology_version}&name=eq.{name}",

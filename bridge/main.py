@@ -47,6 +47,7 @@ class Bridge:
         self._ont: Optional[dict] = None
         self._ont_at = 0.0
         self.lock = threading.Lock()
+        self.stop_count = 0  # il composer interrompe la routine se cambia
 
     # ------------------------------------------------------------------ helpers
     def ontology(self, max_age_s: float = 5.0) -> dict:
@@ -99,6 +100,7 @@ class Bridge:
 
     def emergency_stop_software(self, source: str = "tasto") -> None:
         """Stop software: ferma il programma e cancella la coda. Non è l'e-stop."""
+        self.stop_count += 1
         self.adapter.stop()
         n = self.store.cancel_pending()
         self.event("stop", source=source, cancelled=n)
@@ -289,10 +291,13 @@ def main(argv=None) -> int:
     threading.Thread(target=hb, daemon=True).start()
     _stop_key_thread(bridge)
 
+    from bridge.composer import Composer
+    composer = Composer(store, bridge)
+
     try:
         while True:
             try:
-                n = bridge.poll_once()
+                n = composer.poll_once() + bridge.poll_once()
             except Exception as e:
                 print("poll:", e)
                 n = 0
