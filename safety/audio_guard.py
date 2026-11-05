@@ -266,22 +266,53 @@ class KeywordSpotter:
                           "vosk-model-small-it-0.22 in safety/models/ o imposta VOSK_MODEL_PATH. !!!", e)
                 self.rec = None
         self.enabled = self.rec is not None
+        # Falsi positivi (05/11: 12 trigger in 2 minuti a braccio fermo): con la grammatica ristretta Vosk proietta
+        # qualsiasi parlato sulla parola di stop più vicina, e i risultati parziali non hanno confidenza.
+        # Finale: conta solo una parola con conf >= min_conf. Parziale: la stessa parola deve restare per
+        # partial_frames frame consecutivi (6 × 20 ms = 120 ms in più di latenza, lo stop resta sotto i 200 ms).
+        self.min_conf = float(os.environ.get("AUDIO_GUARD_KEYWORD_CONF", "0.8"))
+        self.partial_frames = int(os.environ.get("AUDIO_GUARD_PARTIAL_FRAMES", "6"))
+        self._partial_word: Optional[str] = None
+        self._partial_count = 0
+        if self.enabled and recognizer is None:
+            try:
+                self.rec.SetWords(True)
+            except Exception:
+                pass
+
+    def _hit(self, w: str) -> str:
+        self._partial_word, self._partial_count = None, 0
+        try:
+            self.rec.Reset()
+        except Exception:
+            pass
+        return w
 
     def process(self, frame: Sequence[float]) -> Optional[str]:
         if not self.enabled:
             return None
         pcm = array.array("h", (max(-32768, min(32767, int(v * 32767))) for v in frame)).tobytes()
         if self.rec.AcceptWaveform(pcm):
-            text = json.loads(self.rec.Result()).get("text", "")
+            res = json.loads(self.rec.Result())
+            self._partial_word, self._partial_count = None, 0
+            words = res.get("result")
+            if words is None:  # recognizer senza SetWords (test): nessuna confidenza, si fida del testo
+                words = [{"word": w, "conf": 1.0} for w in res.get("text", "").split()]
+            for w in words:
+                if w.get("word") in self.keywords and float(w.get("conf", 0.0)) >= self.min_conf:
+                    return self._hit(w["word"])
+            return None
+        words = json.loads(self.rec.PartialResult()).get("partial", "").split()
+        kw = next((w for w in reversed(words) if w in self.keywords), None)
+        if kw is None:
+            self._partial_word, self._partial_count = None, 0
+            return None
+        if kw == self._partial_word:
+            self._partial_count += 1
         else:
-            text = json.loads(self.rec.PartialResult()).get("partial", "")
-        for w in text.split():
-            if w in self.keywords:
-                try:
-                    self.rec.Reset()
-                except Exception:
-                    pass
-                return w
+            self._partial_word, self._partial_count = kw, 1
+        if self._partial_count >= self.partial_frames:
+            return self._hit(kw)
         return None
 
 
@@ -555,7 +586,9 @@ class AudioGuard:
                 log.error("stopper: connessione iniziale fallita (%s); si riproverà allo stop", e)
         self._last_frame = self.clock()
         self.alive = True
-        for target in (self._heartbeat_loop, self._log_loop):
+        self._hb_pending: Optional[dict] = None
+        targets = [self._heartbeat_loop, self._log_loop] + ([self._sink_hb_loop] if self.sink else [])
+        for target in targets:
             t = threading.Thread(target=target, daemon=True, name=f"audio_guard.{target.__name__}")
             t.start()
             self._threads.append(t)
@@ -648,9 +681,24 @@ class AudioGuard:
                         Path(tmp).write_text(json.dumps(item))
                         os.replace(tmp, self.heartbeat_file)
                     if self.sink:
-                        self.sink.upsert_heartbeat(item["alive"], item["last_trigger"])
+                        # A Supabase upsert takes ~700 ms on the venue network: done here it blocked the file
+                        # heartbeat and filled the queue. The sink thread sends only the latest heartbeat.
+                        self._hb_pending = item
             except Exception as e:  # rete giù ecc.: si logga, lo stop è già avvenuto
                 log.warning("log %s fallito: %s", kind, e)
+
+    def _sink_hb_loop(self) -> None:
+        while True:
+            item, self._hb_pending = self._hb_pending, None
+            if item is None:
+                if self._stop_evt.is_set():
+                    return
+                self._stop_evt.wait(0.05)
+                continue
+            try:
+                self.sink.upsert_heartbeat(item["alive"], item["last_trigger"])
+            except Exception as e:
+                log.warning("heartbeat su Supabase fallito: %s", e)
 
     # -- sorgenti audio
     def run_sounddevice(self, device: Any = None) -> None:
