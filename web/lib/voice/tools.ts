@@ -83,6 +83,20 @@ export const VOICE_TOOLS = [
     description: "Solo se l'operatore chiede esplicitamente di salvare negli script un movimento o una routine già provati (es. 'salvalo nello script'). Apre una proposta da rivedere, non cambia niente subito.",
     parameters: { type: "object", properties: { kind: { type: "string", enum: ["routine", "movimento"] }, name: { type: "string", description: "Nome della routine, solo per kind=routine." } }, required: ["kind"] },
   },
+  {
+    type: "function", name: "prova_movimento",
+    description: "L'operatore vuole provare un movimento prestabilito: avvicinamento alla stazione, alzata dal vassoio, spostamento laterale, pressione sull'etichetta.",
+    parameters: { type: "object", properties: { nome: { type: "string", enum: ["avvicinamento", "alzata", "laterale", "pressione"] } }, required: ["nome"] },
+  },
+  {
+    type: "function", name: "correggi_movimento",
+    description: "Dopo una prova, l'operatore dice come doveva muoversi: 'doveva scendere 2 centimetri in più', 'è andato troppo avanti di 5 millimetri' (= indietro 5 mm). Solo direzione e quantità dette dall'operatore.",
+    parameters: { type: "object", properties: {
+      direzione: { type: "string", enum: ["su", "giu", "avanti", "indietro", "destra", "sinistra"] },
+      quantita: { type: "number" }, unita: { type: "string", enum: ["mm", "cm"] },
+      passo: { type: ["integer", "null"], description: "Numero del passo, solo se l'operatore lo dice." } }, required: ["direzione", "quantita", "unita"] },
+  },
+  { type: "function", name: "movimento_corretto", description: "Dopo una prova, l'operatore dice che il movimento è giusto ('è giusto', 'perfetto', 'va bene così').", parameters: { type: "object", properties: {} } },
   { type: "function", name: "approva_proposta", description: "L'operatore risponde sì o no a una proposta di ottimizzazione ('Ho notato che…').", parameters: { type: "object", properties: { approva: { type: "boolean" } }, required: ["approva"] } },
 ] as const;
 
@@ -96,6 +110,7 @@ Regole:
 - Se il risultato ha ok=false, ripeti la frase e non riprovare da solo.
 - Se senti "stop", "fermo", "basta" o "alt", chiama subito "stop".
 - Per una routine: "definisci_routine", poi ripeti la rilettura; solo dopo un sì chiama "salva_routine" con lo stesso nome.
+- Prova di un movimento: "prova_movimento", poi dopo l'esecuzione chiedi se si è mosso bene; una correzione è "correggi_movimento", un "è giusto" è "movimento_corretto". "Troppo in basso di 2 cm" vuol dire direzione "su", 2 cm.
 - Per il resoconto racconta in tre frasi SOLO i numeri del risultato, senza calcolarne altri.
 - Il tuo stop è uno stop software: l'arresto di emergenza è il pulsante fisico dello staff.`;
 

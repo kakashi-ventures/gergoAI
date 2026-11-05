@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-05T14:01:01.710Z",
-  "source_commit": "86000a0ebc90e757e657bd144fc94515e280cf36",
+  "generated_at": "2026-11-05T14:16:02.920Z",
+  "source_commit": "d6ef8dd75849b1e2c5cefb1846408fe4a4e72861",
   "unavailable": false,
   "files": [
     {
@@ -327,16 +327,16 @@
     },
     {
       "path": "sdk/gergo_sdk/dashboard.py",
-      "bytes": 6791,
-      "lines": 165,
-      "sha256": "9a247079352525aea6b253e7c928e60588e6aeb2ce772275f6ac40035641bba8",
+      "bytes": 8707,
+      "lines": 202,
+      "sha256": "b355c2909dd3411c5337695c683e04a25724751057a100dc1437c82797df1a01",
       "test": false,
       "safety_critical": true,
       "last_commit": {
-        "sha": "54e9f85978b1bf99e14a7cfc1e8741a137199632",
-        "date": "2026-11-05T11:56:19+00:00",
-        "author": "Claude",
-        "subject": "BRACCIO: gergo_sdk for Elite CS (dashboard, RTSI, primary, mock, probe, motion), CS adapter"
+        "sha": "3c324f39dabe8058136dbfefd0c98fc8268a0773",
+        "date": "2026-11-05T14:58:22+01:00",
+        "author": "Federico Bottino",
+        "subject": "BRACCIO: Dashboard replies aligned with the real CS63 (4-line banner, multi-line version)"
       }
     },
     {
@@ -355,16 +355,16 @@
     },
     {
       "path": "sdk/gergo_sdk/mock.py",
-      "bytes": 12495,
-      "lines": 304,
-      "sha256": "6f5a39e27c1e8177cc7cf7116dc9454ac39fceff0e234f05257363d1aec408e8",
+      "bytes": 13137,
+      "lines": 312,
+      "sha256": "fdf03d75b0e68921fd9370b50fa638e2f9eef8d5a627a05a45ff67373cdaa31d",
       "test": false,
       "safety_critical": false,
       "last_commit": {
-        "sha": "54e9f85978b1bf99e14a7cfc1e8741a137199632",
-        "date": "2026-11-05T11:56:19+00:00",
-        "author": "Claude",
-        "subject": "BRACCIO: gergo_sdk for Elite CS (dashboard, RTSI, primary, mock, probe, motion), CS adapter"
+        "sha": "3c324f39dabe8058136dbfefd0c98fc8268a0773",
+        "date": "2026-11-05T14:58:22+01:00",
+        "author": "Federico Bottino",
+        "subject": "BRACCIO: Dashboard replies aligned with the real CS63 (4-line banner, multi-line version)"
       }
     },
     {
@@ -397,16 +397,16 @@
     },
     {
       "path": "sdk/gergo_sdk/probe.py",
-      "bytes": 3457,
+      "bytes": 3487,
       "lines": 83,
-      "sha256": "763b8cb16573fd4a41fd36311f141031d06f171c35e57fe26893e39ef0ed37fe",
+      "sha256": "c8732f9d25e571be865b82c647e8c2a3d0e50b8c176d1ce28b60d2cd234b44aa",
       "test": false,
       "safety_critical": false,
       "last_commit": {
-        "sha": "d87a2d9d966af7d770626b841d86820e321fba04",
-        "date": "2026-11-05T12:39:11+00:00",
-        "author": "Claude",
-        "subject": "BRACCIO: CS63 facts from label and pendant, FK check in probe, workspace sized for 624 mm reach"
+        "sha": "3c324f39dabe8058136dbfefd0c98fc8268a0773",
+        "date": "2026-11-05T14:58:22+01:00",
+        "author": "Federico Bottino",
+        "subject": "BRACCIO: Dashboard replies aligned with the real CS63 (4-line banner, multi-line version)"
       }
     },
     {
@@ -425,16 +425,16 @@
     },
     {
       "path": "sdk/tests/test_cs.py",
-      "bytes": 4902,
-      "lines": 148,
-      "sha256": "59b2edb005995e7769cb4c5aff54f8b9a2d1336e64bb12bedd3d55392362751a",
+      "bytes": 5658,
+      "lines": 163,
+      "sha256": "3a359058695f4e4601e2da35d4277406184b2cfda355b3987935fb1a78d71c8b",
       "test": true,
       "safety_critical": false,
       "last_commit": {
-        "sha": "54e9f85978b1bf99e14a7cfc1e8741a137199632",
-        "date": "2026-11-05T11:56:19+00:00",
-        "author": "Claude",
-        "subject": "BRACCIO: gergo_sdk for Elite CS (dashboard, RTSI, primary, mock, probe, motion), CS adapter"
+        "sha": "3c324f39dabe8058136dbfefd0c98fc8268a0773",
+        "date": "2026-11-05T14:58:22+01:00",
+        "author": "Federico Bottino",
+        "subject": "BRACCIO: Dashboard replies aligned with the real CS63 (4-line banner, multi-line version)"
       }
     },
     {
@@ -717,7 +717,7 @@
       "value": "{\n    \"echo\": r\"echo\",                      # cpp:96  -> \"Hello ELITE ROBOTS.\"\n    \"robotMode\": r\"robotMode\",            # cpp:211 -> \"robotMode: RUNNING\"\n    \"safety\": r\"safety -s\",               # cpp:242 -> \"Safety status: NORMAL\"\n    \"status\": r\"status\",                  # cpp:204/284 -> \"Targe…",
       "source_comment": null,
       "file": "sdk/gergo_sdk/dashboard.py",
-      "line": 20,
+      "line": 23,
       "category": "whitelist",
       "note": "Comandi di sola lettura ammessi sulla dashboard del controller (regex esatta)."
     },
@@ -726,7 +726,7 @@
       "value": "{\n    \"loadTask\": r\"task -p [A-Za-z0-9_./-]+\\.task\",  # cpp:378 -> \"Loaded task: ...\"\n    \"play\": r\"play\",                      # cpp:334\n    \"pause\": r\"pause\",                    # cpp:342\n    \"stop\": r\"stop\",                      # cpp:358\n}",
       "source_comment": null,
       "file": "sdk/gergo_sdk/dashboard.py",
-      "line": 32,
+      "line": 35,
       "category": "whitelist",
       "note": "Comandi di gestione task ammessi sulla dashboard: tutto il resto è rifiutato."
     },

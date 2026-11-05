@@ -19,11 +19,10 @@ export async function loadContext(phase: "propose" | "execute"): Promise<Context
   const s = db();
   const ont = await must(s.from("ontology_versions").select("version,status").order("version", { ascending: false }).limit(1));
   const version = ont[0]?.version ?? null;
-  const [skills, places, ws, tool, bridge, guard] = await Promise.all([
+  const [skills, places, ws, bridge, guard] = await Promise.all([
     must(s.from("skills").select("name,status,sim_ok,real_ok").eq("ontology_version", version ?? -1)),
     must(s.from("places").select("name").eq("ontology_version", version ?? -1)),
     must(s.from("workspace").select("frame,min_mm,max_mm").eq("attivo", true).limit(1)),
-    must(s.from("tools").select("nome,tcp_atteso_mm").eq("attivo", true).limit(1)),
     must(s.from("bridge_status").select("*").eq("bridge_id", BRIDGE_ID()).limit(1)),
     must(s.from("guard_status").select("alive,last_heartbeat_at").eq("bridge_id", BRIDGE_ID()).limit(1)),
   ]);
@@ -44,8 +43,9 @@ export async function loadContext(phase: "propose" | "execute"): Promise<Context
     speed_mm_s: b?.velocita_mm_s ?? VELOCITA_DEFAULT_MM_S,
     workspace: ws[0] ?? null,
     pose: (b?.pose_mm?.length === 3 ? b.pose_mm : null) as Vec3 | null,
-    tool_expected_tcp_mm: (tool[0]?.tcp_atteso_mm ?? null) as Vec3 | null,
-    tool_actual_tcp_mm: null, // lo legge il bridge dal controller e rifiuta se non coincide
+    // Il TCP vero lo legge solo il bridge dal controller, e rifiuta se non coincide con il tool: qui non si controlla.
+    tool_expected_tcp_mm: null,
+    tool_actual_tcp_mm: null,
     guard_alive: guardFresh || simGuard,
   };
 }
@@ -356,4 +356,21 @@ export async function modificaRoutine(name: string, from_version: number, steps:
 export async function presaVisione(alert_id: string, livello: string, titolo: string, by: string): Promise<ToolResult> {
   await event("approval", { oggetto: "allerta", alert_id, livello, titolo, by });
   return { ok: true, frase: "Presa visione registrata." };
+}
+
+/** Un passo della prova di un movimento, dopo il sì dell'operatore alla rilettura dell'intera prova. */
+export async function passoTest(p: { direzione: string; quantita: number; unita: string }, test: string, passo: number, totale: number): Promise<ToolResult> {
+  const ctx = await loadContext("execute");
+  const confirmed_at = new Date().toISOString();
+  const params = { direzione: p.direzione, quantita: p.quantita, unita: p.unita, intensita: null };
+  const d = validate({ id: "test", skill: "sposta", params, status: "confirmed", confirmed_at }, ctx);
+  if (!d.ok) {
+    await event("anomaly", { origine: "web", code: d.code, reason: d.reason, test, passo });
+    if (d.motion_check) await event("motion_check", { ...d.motion_check });
+    return { ok: false, frase: `Mi fermo al passo ${passo}: ${d.reason}.`, code: d.code };
+  }
+  const s = db();
+  const [row] = await must(s.from("commands").insert({ skill: "sposta", params, status: "confirmed", confirmed_at, readback: `${test} · passo ${passo}/${totale}: ${d.readback ?? ""}` }).select("id"));
+  await event("confirmation", { text: "sì", test, passo, totale }, row.id);
+  return { ok: true, frase: "", command_id: row.id };
 }

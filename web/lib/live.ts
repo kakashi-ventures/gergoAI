@@ -77,7 +77,7 @@ async function load(s: SupabaseClient): Promise<LiveData> {
     q<mock.Workspace[]>(s.from("workspace").select("frame,min_mm,max_mm").eq("attivo", true).limit(1)),
     q<Record<string, unknown>[]>(s.from("routines").select("name,version,status,source_utterance,parent_version,edited_from_version,steps").order("name").order("version", { ascending: false }).limit(40)).catch(() => []),
     q<Record<string, unknown>[]>(s.from("commands").select("id,skill,readback,status").eq("status", "queued").order("created_at", { ascending: false }).limit(1)),
-    q<Record<string, unknown>[]>(s.from("events").select("id,ts,type,payload,step,routine_run_id").order("ts", { ascending: false }).limit(150)),
+    q<Record<string, unknown>[]>(s.from("events").select("id,ts,type,payload,step,routine_run_id,command_id").order("ts", { ascending: false }).limit(150)),
     q<Record<string, unknown>[]>(s.from("proposals").select("id,status,change,before,after,observation_id,observations(summary,rule)").eq("status", "pending").order("created_at", { ascending: false }).limit(1)).catch(() => []),
     q<Record<string, unknown>[]>(s.from("v_shift_summary").select("*").limit(1)).catch(() => []),
     q<LiveData["cycles"]>(s.from("v_cycle_stats").select("routine_name,routine_version,cycles,avg_cycle_time_ms").order("routine_name").order("routine_version")).catch(() => []),
@@ -122,7 +122,7 @@ async function load(s: SupabaseClient): Promise<LiveData> {
     })(),
     events: evs.map((e) => {
       const p = (e.payload ?? {}) as Record<string, unknown>;
-      return { id: String(e.id), ts: String(e.ts), type: String(e.type), text: eventText(String(e.type), p), duration_ms: p.duration_ms as number | undefined, ok: p.ok as boolean | undefined, step: e.step as number | undefined, cycle: p.cycle === true, payload: p };
+      return { id: String(e.id), ts: String(e.ts), type: String(e.type), text: eventText(String(e.type), p), duration_ms: p.duration_ms as number | undefined, ok: p.ok as boolean | undefined, step: e.step as number | undefined, cycle: p.cycle === true, payload: p, command_id: (e.command_id as string) ?? null };
     }),
     proposal: props[0] ? { id: String(props[0].id), summary: String((props[0].observations as { summary?: string } | null)?.summary ?? (props[0].change as { diff?: string })?.diff ?? ""), rule: String((props[0].observations as { rule?: string } | null)?.rule ?? ""), before: (props[0].before as number) ?? null, after: (props[0].after as number) ?? null } : null,
     resoconto: summary[0]

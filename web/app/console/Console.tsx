@@ -5,6 +5,7 @@ import { AlertCenter } from "@/components/AlertCenter";
 import { CycleCompare } from "@/components/CycleCompare";
 import { Movimenti } from "@/components/Movimenti";
 import { MachineBar, Pendant } from "@/components/Pendant";
+import { type LocalTools, MovementTest } from "@/components/MovementTest";
 import { ScriptProposals } from "@/components/ScriptProposals";
 import { Dot, Panel } from "@/components/Panel";
 import { Registro } from "@/components/Registro";
@@ -36,6 +37,8 @@ export function Console() {
   const [msg, setMsg] = useState("");
   const [demo, setDemo] = useState(false);
   const [step, setStep] = useState(20);
+  const localTools = useRef<LocalTools>({} as LocalTools);
+  const say = (text: string) => setAnnounce({ id: Date.now(), text });
   useEffect(() => { setDemo(new URLSearchParams(window.location.search).has("demo")); }, []);
 
   const act = async (name: string, body: Record<string, unknown> = {}, domanda?: string) => {
@@ -78,6 +81,7 @@ export function Console() {
     <div className={`min-h-screen ${demo ? "text-[17px]" : ""}`}>
       <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0b0d10]/95 backdrop-blur">
         <div className="flex flex-wrap items-center gap-3 px-4 py-3">
+          <Link href="/" className="rounded-lg border border-white/15 px-2.5 py-1 text-sm text-white/70 hover:bg-white/5" title="Torna alla presentazione">← Indietro</Link>
           <Link href="/" className="text-xl font-black tracking-tight">Gergo</Link>
           <nav className="flex gap-1 text-sm">
             {NAV.map((n) => (
@@ -117,13 +121,14 @@ export function Console() {
         <main className="space-y-4 p-4">
           <MachineBar live={live} />
           <div className="grid gap-4 lg:grid-cols-[1.25fr_1fr_1fr]">
-            <VoicePanel announce={announce} big pendingFrase={live.pending?.frase ?? null} />
+            <VoicePanel announce={announce} big pendingFrase={live.pending?.frase ?? null} local={localTools} />
             <Pendant live={live} act={act} step={step} setStep={setStep} />
             <div className="space-y-4">
               <SafetyPanel s={s} />
               {workspace}
             </div>
           </div>
+          <MovementTest live={live} local={localTools} say={say} />
           <div className="grid gap-4 lg:grid-cols-[1.2fr_1.1fr]">
           <div className="space-y-4">
             {live.awaiting && (

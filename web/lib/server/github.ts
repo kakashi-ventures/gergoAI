@@ -35,9 +35,32 @@ async function gh(path: string, init: RequestInit = {}) {
 }
 
 /** Costruisce il file Python di dati per una routine attiva testata (almeno un ciclo ok) o per l'ultimo movimento eseguito. */
-export async function buildProposal(kind: "routine" | "movimento", name?: string): Promise<{ path: string; content: string; title: string; body: string; evidence: string[] } | { error: string }> {
+export async function buildProposal(kind: "routine" | "movimento" | "test", name?: string, test?: TestInput): Promise<{ path: string; content: string; title: string; body: string; evidence: string[] } | { error: string }> {
   const s = db();
   const now = new Date().toISOString();
+  if (kind === "test") {
+    if (!test) return { error: "Manca il movimento provato." };
+    // Il server non si fida del client: ogni passo deve esistere nel registro, eseguito con esito ok, con gli stessi parametri.
+    const ids = test.command_ids;
+    if (ids.length !== test.steps.length) return { error: "Il numero dei passi eseguiti non coincide con il movimento." };
+    const cmds = await must(s.from("commands").select("id,params,status,finished_at").in("id", ids));
+    const ends = await must(s.from("events").select("id,command_id,payload").eq("type", "step_end").in("command_id", ids));
+    for (let i = 0; i < ids.length; i++) {
+      const c = cmds.find((x: { id: string }) => x.id === ids[i]);
+      const st = test.steps[i];
+      if (!c || c.status !== "done") return { error: `Il passo ${i + 1} non risulta eseguito.` };
+      if (c.params?.direzione !== st.direzione || Number(c.params?.quantita) !== st.quantita || c.params?.unita !== st.unita) return { error: `Il passo ${i + 1} eseguito non coincide con quello proposto.` };
+      if (!ends.some((e: { command_id: string; payload: Record<string, unknown> }) => e.command_id === ids[i] && e.payload?.ok === true)) return { error: `Il passo ${i + 1} non ha un esito positivo nel registro.` };
+    }
+    const evidence = [...ids, ...ends.map((e: { id: string }) => e.id)];
+    const data = { id: test.id, name: test.name, version: test.version, steps: test.steps, history: test.history ?? [], esito: "corretto secondo l'operatore", command_ids: ids };
+    const content = header(`Movimento «${test.name}» v${test.version}`, now, evidence, `${ids.length} passi eseguiti con esito ok; l'operatore ha detto che è corretto`) + `MOVIMENTO = ${py(data)}\n`;
+    return {
+      path: `bridge/taught/movimento_${slug(test.id)}_v${test.version}.py`, content, evidence,
+      title: `Gergo: movimento «${test.name}» v${test.version} corretto a voce`,
+      body: `Proposta generata dalla console dopo la prova e la conferma dell'operatore.\n\n- Movimento: «${test.name}» v${test.version}\n- Passi: ${test.steps.map((x) => `${x.direzione} ${x.quantita} ${x.unita}`).join(", ")}\n- Correzioni: ${(test.history ?? []).join(" · ") || "—"}\n- Evidenze (comandi ed eventi del registro): ${evidence.join(", ")}\n\nIl file contiene solo dati (intenti, nessuna coordinata). Il bridge li rivalida con \`bridge/validator.py\`. Da rivedere e unire a cura di BRIDGE.`,
+    };
+  }
   if (kind === "routine") {
     const [r] = await must(s.from("routines").select("*").eq("name", name ?? "").eq("status", "active").limit(1));
     if (!r) return { error: `La routine «${name}» non è attiva: prima va approvata.` };
@@ -83,8 +106,10 @@ Il bridge rivalida tutto con bridge/validator.py prima di eseguire; questo file 
 `;
 }
 
-export async function proposeScript(kind: "routine" | "movimento", name: string | undefined, by: string): Promise<ScriptProposal> {
-  const p = await buildProposal(kind, name);
+export interface TestInput { id: string; name: string; version: number; steps: { direzione: string; quantita: number; unita: string }[]; history?: string[]; command_ids: string[] }
+
+export async function proposeScript(kind: "routine" | "movimento" | "test", name: string | undefined, by: string, test?: TestInput): Promise<ScriptProposal> {
+  const p = await buildProposal(kind, name, test);
   if ("error" in p) return { ok: false, frase: p.error };
   const sha256 = createHash("sha256").update(p.content).digest("hex");
   const s = db();

@@ -23,6 +23,7 @@ export interface EventRow {
   step?: number;
   cycle?: boolean;
   payload?: Record<string, unknown>;
+  command_id?: string | null;
 }
 
 export interface SafetyState {

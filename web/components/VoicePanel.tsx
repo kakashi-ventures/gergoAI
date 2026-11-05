@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { type Activity, VoiceSession } from "@/lib/voice/client";
+import type { MutableRefObject } from "react";
+import type { LocalTools } from "./MovementTest";
 
 // "Parla al braccio": ogni function call di Grok va a /api/tools/<nome>; la frase da dire la scrive il codice.
 // Inizio parlato durante un movimento → stop (stop software in più: l'arresto vocale e acustico locale è
@@ -12,6 +14,7 @@ const ALLOWED: Record<string, string[]> = {
   piu_piano: ["utterance"], piu_veloce: ["utterance"], conferma: [], annulla: [], stop: [],
   definisci_routine: ["name", "steps", "utterance"], salva_routine: ["name"], esegui_routine: ["name", "ripetizioni", "utterance"],
   fatto: [], segnala: ["text"], resoconto: [], approva_proposta: ["approva"], proponi_script: ["kind", "name"],
+  prova_movimento: ["nome"], correggi_movimento: ["direzione", "quantita", "unita", "passo"], movimento_corretto: [],
 };
 
 const LABEL: Record<Activity | "spenta" | "connessione" | "errore", string> = {
@@ -26,7 +29,7 @@ const RING: Record<string, string> = {
 
 export interface VoiceLine { who: "tu" | "gergo" | "sistema"; text: string; ts: number }
 
-export function VoicePanel({ announce, big = false, pendingFrase }: { announce?: { id: number; text: string } | null; big?: boolean; pendingFrase?: string | null }) {
+export function VoicePanel({ announce, big = false, pendingFrase, local }: { announce?: { id: number; text: string } | null; big?: boolean; pendingFrase?: string | null; local?: MutableRefObject<LocalTools> }) {
   const [state, setState] = useState<string>("spenta");
   const [act, setAct] = useState<Activity | null>(null);
   const [level, setLevel] = useState(0);
@@ -65,6 +68,13 @@ export function VoicePanel({ announce, big = false, pendingFrase }: { announce?:
       },
       onCall: async (name, args, meta) => {
         if (meta.transcript) push({ who: "tu", text: meta.transcript });
+        const lt = local?.current;
+        if (lt?.__intercept?.(name) && lt[name]) {
+          const out = await lt[name](args);
+          push({ who: "sistema", text: `${name} → ${String(out.frase ?? "")}` });
+          setAwaitingYes(null);
+          return out;
+        }
         const keep = ALLOWED[name] ?? [];
         const body = Object.fromEntries(Object.entries(args).filter(([k]) => keep.includes(k)));
         return call(name, name === "stop" ? { source: "voce" } : body);
