@@ -9,6 +9,7 @@ import { type LocalTools, MovementTest } from "@/components/MovementTest";
 import { ScriptProposals } from "@/components/ScriptProposals";
 import { Dot, Panel } from "@/components/Panel";
 import { Registro } from "@/components/Registro";
+import { RegistroOperazioni } from "@/components/RegistroOperazioni";
 import { SafetyPanel } from "@/components/SafetyPanel";
 import { StopButton } from "@/components/StopButton";
 import { VoicePanel } from "@/components/VoicePanel";
@@ -142,6 +143,7 @@ export function Console() {
             <CycleCompare cycles={live.cycles} />
           </div>
           <div className="space-y-4">
+            <RegistroOperazioni events={live.events} onReplay={(p) => act("sposta", { origine: "registro", direzione: p.direzione, quantita: p.quantita, unita: p.unita, intensita: p.intensita ?? null })} />
             <Registro events={live.events} />
             <Panel title="Resoconto del turno (da v_shift_summary)">
               <div className="grid grid-cols-3 gap-2 text-center">

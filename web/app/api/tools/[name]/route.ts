@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { RoutineStep, SkillName, SpostaParams } from "@/lib/contracts";
-import { annulla, approvaProposta, conferma, confermaSkill, definisciRoutine, deprecaSkill, eseguiRoutine, fatto, mina, modificaRoutine, passoTest, presaVisione, proponi, resoconto, salvaAngolo, salvaRoutine, segnala, stop, type ToolResult } from "@/lib/server/tools";
+import { annulla, approvaProposta, conferma, confermaSkill, definisciRoutine, deprecaSkill, eseguiRoutine, fatto, mina, modificaRoutine, passoBase, passoTest, presaVisione, proponi, resoconto, salvaAngolo, salvaRoutine, segnala, stop, type ToolResult } from "@/lib/server/tools";
 import type { Vec3 } from "@/lib/validator";
 import { proposeScript, type TestInput } from "@/lib/server/github";
 
@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 const Utt = { utterance: z.string().max(500).optional() };
 const Inputs = {
   propone_azione: z.strictObject({ skill: SkillName, params: z.record(z.string(), z.unknown()).default({}), ...Utt }),
-  sposta: z.strictObject({ direzione: SpostaParams.shape.direzione, quantita: z.number().nullable().optional(), unita: z.enum(["mm", "cm"]).nullable().optional(), intensita: z.enum(["poco", "un_po", "tanto"]).nullable().optional(), ...Utt }),
+  sposta: z.strictObject({ origine: z.enum(["voce", "pendant", "registro"]).optional(), direzione: SpostaParams.shape.direzione, quantita: z.number().nullable().optional(), unita: z.enum(["mm", "cm"]).nullable().optional(), intensita: z.enum(["poco", "un_po", "tanto"]).nullable().optional(), ...Utt }),
   piu_piano: z.strictObject({ ...Utt }),
   piu_veloce: z.strictObject({ ...Utt }),
   conferma: z.strictObject({ command_id: z.uuid().optional() }),
@@ -28,7 +28,8 @@ const Inputs = {
   resoconto: z.strictObject({}),
   mina: z.strictObject({}),
   proponi_script: z.strictObject({ kind: z.enum(["routine", "movimento", "test"]), name: z.string().min(1).max(40).optional(), by: z.string().min(1).max(60).default("operatore"),
-    test: z.strictObject({ id: z.string().regex(/^[a-z0-9_-]{1,40}$/), name: z.string().min(1).max(60), version: z.int().min(1).max(99), steps: z.array(z.strictObject({ direzione: SpostaParams.shape.direzione, quantita: z.number().gt(0).lte(10), unita: z.literal("cm").or(z.literal("mm")) })).min(1).max(8), history: z.array(z.string().max(200)).max(20).optional(), command_ids: z.array(z.uuid()).min(1).max(8) }).optional() }),
+    test: z.strictObject({ id: z.string().regex(/^[a-z0-9_-]{1,40}$/), name: z.string().min(1).max(60), version: z.int().min(1).max(99), steps: z.array(z.strictObject({ direzione: SpostaParams.shape.direzione, quantita: z.number().gt(0).lte(10), unita: z.literal("cm").or(z.literal("mm")) })).max(8), base: z.strictObject({ skill: z.enum(["solleva", "porta", "deposita", "applica", "home"]), place: z.string().nullable().optional(), task: z.string().max(80) }).optional(), base_command_id: z.uuid().optional(), history: z.array(z.string().max(200)).max(20).optional(), command_ids: z.array(z.uuid()).max(8) }).optional() }),
+  passo_base: z.strictObject({ skill: z.enum(["solleva", "porta", "deposita", "applica", "home"]), place: z.enum(["INGRESSO", "STAZIONE", "USCITA", "SCARTI", "HOME"]).nullable(), test: z.string().min(1).max(80) }),
   passo_test: z.strictObject({ step: z.strictObject({ direzione: SpostaParams.shape.direzione, quantita: z.number().gt(0).lte(10), unita: z.literal("cm").or(z.literal("mm")) }), test: z.string().min(1).max(80), passo: z.int().min(1).max(8), totale: z.int().min(1).max(8) }),
   modifica_routine: z.strictObject({ name: z.string().min(1).max(40), from_version: z.int().min(1), steps: z.array(RoutineStep).min(1).max(20), by: z.string().min(1).max(60).default("operatore"), motivo: z.string().min(3).max(300) }),
   presa_visione: z.strictObject({ alert_id: z.string().min(1).max(80), livello: z.enum(["critico", "attenzione", "info"]), titolo: z.string().max(200), by: z.string().min(1).max(60).default("operatore") }),
@@ -53,8 +54,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ name: s
     switch (name as Name) {
       case "propone_azione": r = await proponi(a.skill as z.infer<typeof SkillName>, a.params as Record<string, unknown>, a.utterance as string | undefined); break;
       case "sposta": {
-        const { utterance, ...p } = a;
-        r = await proponi("sposta", p, utterance as string | undefined);
+        const { utterance, origine, ...p } = a;
+        r = await proponi("sposta", p, utterance as string | undefined, (origine as string) ?? "voce");
         break;
       }
       case "piu_piano": case "piu_veloce": r = await proponi(name as "piu_piano" | "piu_veloce", {}, a.utterance as string | undefined); break;
@@ -71,6 +72,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ name: s
       case "resoconto": r = await resoconto(); break;
       case "mina": r = await mina(); break;
       case "proponi_script": r = (await proposeScript(a.kind as "routine" | "movimento" | "test", a.name as string | undefined, a.by as string, a.test as TestInput | undefined)) as ToolResult; break;
+      case "passo_base": r = await passoBase(a.skill as string, (a.place as string | null) ?? null, a.test as string); break;
       case "passo_test": r = await passoTest(a.step as { direzione: string; quantita: number; unita: string }, a.test as string, a.passo as number, a.totale as number); break;
       case "modifica_routine": r = await modificaRoutine(a.name as string, a.from_version as number, a.steps as never, a.by as string, a.motivo as string); break;
       case "presa_visione": r = await presaVisione(a.alert_id as string, a.livello as string, a.titolo as string, a.by as string); break;

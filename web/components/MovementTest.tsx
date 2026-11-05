@@ -1,7 +1,13 @@
 "use client";
 import { type MutableRefObject, useEffect, useRef, useState } from "react";
 import type { LiveData } from "@/lib/live";
-import { correct, type Movement, type MoveStep, PRESETS, readbackCorrection, readbackTest, stepPhrase } from "@/lib/movement";
+import tasksJson from "@/lib/generated/elite-tasks.json";
+import { baseText, correct, fromPendantTasks, type Movement, type MoveStep, PRESETS, readbackCorrection, readbackTest, stepPhrase } from "@/lib/movement";
+
+// Libreria: i task preinstallati sul pendant (letti da shared/fixtures/elite_tasks.json a ogni build) e gli spostamenti relativi.
+const PENDANT = fromPendantTasks((tasksJson as { tasks?: Record<string, string> }).tasks ?? {});
+const PENDANT_VERIFIED = (tasksJson as { verified?: boolean }).verified === true;
+const LIBRARY = [...PENDANT, ...PRESETS];
 
 // Prova di un movimento con correzione a voce:
 // scegli un movimento prestabilito → rilettura → sì → il braccio lo esegue passo per passo → "si è mosso bene?" →
@@ -21,6 +27,7 @@ export function MovementTest({ live, local, say }: { live: LiveData & { refresh:
   const [phase, setPhase] = useState<Phase>("scegli");
   const [msg, setMsg] = useState("");
   const [ran, setRan] = useState<string[]>([]);
+  const [baseId, setBaseId] = useState<string | null>(null);
   const [corr, setCorr] = useState<{ direzione: MoveStep["direzione"]; quantita: number; unita: "cm" | "mm"; passo: number | "" }>({ direzione: "giu", quantita: 1, unita: "cm", passo: "" });
   const events = useRef(live.events);
   useEffect(() => { events.current = live.events; }, [live.events]);
@@ -36,11 +43,19 @@ export function MovementTest({ live, local, say }: { live: LiveData & { refresh:
     return null;
   };
 
-  const choose = (m: Movement) => { setMov(m); setHistory([]); setRan([]); setPhase("conferma_prova"); const f = readbackTest(m, speed); setMsg(f); return f; };
+  const choose = (m: Movement) => { setMov(m); setHistory([]); setRan([]); setBaseId(null); setPhase("conferma_prova"); const f = readbackTest(m, speed); setMsg(f); return f; };
 
   const run = async (m: Movement) => {
-    setPhase("in_esecuzione"); setRan([]);
+    setPhase("in_esecuzione"); setRan([]); setBaseId(null);
     const ids: string[] = [];
+    if (m.base) {
+      setMsg(`Task di base: ${baseText(m.base)}…`);
+      const r = await post("passo_base", { skill: m.base.skill, place: m.base.place ?? null, test: `${m.name} v${m.version}` });
+      if (!r.ok) { setMsg(String(r.frase)); setPhase("valuta"); say(String(r.frase)); return; }
+      const e = await waitEnd(String(r.command_id));
+      if (!e || e.ok === false || e.payload?.ok === false) { const f = e ? "Il task di base non è andato a buon fine: vedi il registro." : "Il bridge non ha risposto in 30 secondi: interrompo la prova."; setMsg(f); setPhase("valuta"); say(f); return; }
+      setBaseId(String(r.command_id));
+    }
     for (let i = 0; i < m.steps.length; i++) {
       setMsg(`Passo ${i + 1} di ${m.steps.length}: ${stepPhrase(m.steps[i])}…`);
       const r = await post("passo_test", { step: m.steps[i], test: `${m.name} v${m.version}`, passo: i + 1, totale: m.steps.length });
@@ -68,7 +83,7 @@ export function MovementTest({ live, local, say }: { live: LiveData & { refresh:
 
   const save = async () => {
     if (!mov) return;
-    const r = await post("proponi_script", { kind: "test", test: { id: mov.id, name: mov.name, version: mov.version, steps: mov.steps, history, command_ids: ran } });
+    const r = await post("proponi_script", { kind: "test", test: { id: mov.id, name: mov.name, version: mov.version, steps: mov.steps, history, command_ids: ran, ...(mov.base ? { base: mov.base, base_command_id: baseId ?? undefined } : {}) } });
     setMsg(String(r.frase)); setPhase("salvato");
     if (r.content) {
       const a = document.createElement("a");
@@ -85,13 +100,13 @@ export function MovementTest({ live, local, say }: { live: LiveData & { refresh:
     const t: LocalTools = {
       prova_movimento: async (a) => {
         const n = String(a.nome ?? "").toLowerCase();
-        const m = PRESETS.find((p) => p.id === n || p.name.toLowerCase().includes(n)) ?? mov;
-        if (!m) return { ok: false, frase: `Quale movimento? ${PRESETS.map((p) => p.name).join(", ")}.` };
+        const m = LIBRARY.find((p) => p.id === n || p.name.toLowerCase() === n) ?? LIBRARY.find((p) => n && (p.name.toLowerCase().includes(n) || n.includes(p.name.toLowerCase()))) ?? mov;
+        if (!m) return { ok: false, frase: `Quale movimento? Per esempio ${LIBRARY.slice(0, 4).map((p) => p.name).join(", ")}.` };
         return { ok: true, frase: m === mov && phase !== "scegli" ? readbackTest(m, speed) : choose(m) };
       },
       correggi_movimento: async (a) => ({ ok: true, frase: applyCorrection({ direzione: a.direzione as MoveStep["direzione"], quantita: Number(a.quantita), unita: (a.unita as "cm" | "mm") ?? "cm", passo: (a.passo as number) ?? null }) }),
       movimento_corretto: async () => {
-        if (!mov || ran.length !== mov.steps.length) return { ok: false, frase: "Prima va provato fino in fondo." };
+        if (!mov || ran.length !== mov.steps.length || (mov.base && !baseId)) return { ok: false, frase: "Prima va provato fino in fondo." };
         setPhase("conferma_salva"); const f = `Salvo «${mov.name}» versione ${mov.version} nello script? Apro una proposta da rivedere. Confermi?`; setMsg(f); return { ok: true, frase: f };
       },
       conferma: async () => {
@@ -108,7 +123,7 @@ export function MovementTest({ live, local, say }: { live: LiveData & { refresh:
   return (
     <section className="rounded-xl border border-sky-400/30 bg-sky-400/[0.04] p-4">
       <div className="mb-2 flex items-center gap-2">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-sky-200/80">Prova un movimento e correggilo a voce</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-sky-200/80">Libreria dei movimenti · prova e correggi a voce</h2>
         {mov && <span className="ml-auto font-mono text-xs text-white/60">«{mov.name}» v{mov.version}</span>}
       </div>
       <ol className="mb-3 flex flex-wrap gap-1.5 text-[11px] text-white/50">
@@ -118,19 +133,27 @@ export function MovementTest({ live, local, say }: { live: LiveData & { refresh:
         })}
       </ol>
 
-      <div className="flex flex-wrap gap-2">
-        {PRESETS.map((p) => (
-          <button key={p.id} onClick={() => choose(p)} disabled={phase === "in_esecuzione"}
-            className={`rounded-lg border px-3 py-2 text-left text-sm disabled:opacity-40 ${mov?.id === p.id ? "border-sky-400 bg-sky-400/10" : "border-white/10 hover:border-white/30"}`}>
-            <span className="block font-semibold">{p.name}</span>
-            <span className="block font-mono text-[10px] text-white/50">{p.steps.map((s) => `${s.direzione} ${s.quantita} ${s.unita}`).join(" · ")}</span>
-          </button>
-        ))}
+      <div className="grid gap-3 lg:grid-cols-2">
+        <div>
+          <p className="mb-1.5 text-[11px] uppercase tracking-wider text-white/50">
+            Preinstallati sul pendant · {PENDANT.length} task {PENDANT_VERIFIED ? <span className="text-emerald-300">verificati sul controller</span> : <span className="text-amber-300">da verificare col probe</span>}
+          </p>
+          <div className="grid grid-cols-2 gap-1.5">
+            {PENDANT.map((p) => <LibItem key={p.id} m={p} on={mov?.id === p.id} disabled={phase === "in_esecuzione"} onClick={() => choose(p)} sub={p.base?.task ?? ""} />)}
+          </div>
+        </div>
+        <div>
+          <p className="mb-1.5 text-[11px] uppercase tracking-wider text-white/50">Spostamenti relativi · modificabili a voce</p>
+          <div className="grid grid-cols-2 gap-1.5">
+            {PRESETS.map((p) => <LibItem key={p.id} m={p} on={mov?.id === p.id} disabled={phase === "in_esecuzione"} onClick={() => choose(p)} sub={p.steps.map((x) => `${x.direzione} ${x.quantita} ${x.unita}`).join(" · ")} />)}
+          </div>
+        </div>
       </div>
 
       {mov && (
         <div className="mt-3 rounded-lg bg-black/30 p-3">
           <ol className="space-y-0.5 font-mono text-sm">
+            {mov.base && <li className={baseId ? "text-emerald-300" : "text-white/80"}>{baseId ? "✓" : "0."} {baseText(mov.base)}</li>}
             {mov.steps.map((s, i) => <li key={i} className={ran.length > i ? "text-emerald-300" : "text-white/80"}>{ran.length > i ? "✓" : `${i + 1}.`} {stepPhrase(s)}</li>)}
           </ol>
           {msg && <p className="mt-2 text-base">{msg}</p>}
@@ -143,7 +166,7 @@ export function MovementTest({ live, local, say }: { live: LiveData & { refresh:
             )}
             {phase === "valuta" && (
               <>
-                <button disabled={ran.length !== mov.steps.length} onClick={() => void local.current.movimento_corretto?.({})} className="rounded-lg bg-emerald-600 px-4 py-2 font-semibold disabled:opacity-30">È giusto</button>
+                <button disabled={ran.length !== mov.steps.length || (!!mov.base && !baseId)} onClick={() => void local.current.movimento_corretto?.({})} className="rounded-lg bg-emerald-600 px-4 py-2 font-semibold disabled:opacity-30">È giusto</button>
                 <button onClick={() => { setPhase("conferma_prova"); setMsg(readbackTest(mov, speed)); }} className="rounded-lg border border-white/20 px-4 py-2">Riprova</button>
               </>
             )}
@@ -169,5 +192,15 @@ export function MovementTest({ live, local, say }: { live: LiveData & { refresh:
       )}
       <p className="mt-3 text-[11px] text-white/40">A voce: «prova l&apos;avvicinamento alla stazione» · «sì» · «no, doveva scendere 2 centimetri in più» · «sì» · «è giusto» · «sì». Ogni passo passa dal validatore; la proposta di script la verifica il server sul registro.</p>
     </section>
+  );
+}
+
+function LibItem({ m, on, disabled, onClick, sub }: { m: Movement; on: boolean; disabled: boolean; onClick: () => void; sub: string }) {
+  return (
+    <button onClick={onClick} disabled={disabled}
+      className={`rounded-lg border px-2.5 py-1.5 text-left text-sm disabled:opacity-40 ${on ? "border-sky-400 bg-sky-400/10" : "border-white/10 hover:border-white/30"}`}>
+      <span className="block truncate font-semibold">{m.name}</span>
+      <span className="block truncate font-mono text-[10px] text-white/45">{sub}</span>
+    </button>
   );
 }

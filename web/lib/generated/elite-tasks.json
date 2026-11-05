@@ -1,0 +1,16 @@
+{
+  "_doc": "Mappa skill(+luogo) → task CS sul controller (caricato con 'task -p <nome>'). I 10 task si insegnano sul pendant seguendo sdk/TASKS.md. Nessun altro task è accettato dall'adapter. verified=true solo dopo il probe che li trova sul controller. Lo scrive BRACCIO.",
+  "verified": false,
+  "tasks": {
+    "home": "home.task",
+    "porta:INGRESSO": "porta_INGRESSO.task",
+    "solleva:INGRESSO": "solleva_INGRESSO.task",
+    "porta:STAZIONE": "porta_STAZIONE.task",
+    "deposita:STAZIONE": "deposita_STAZIONE.task",
+    "applica": "applica_STAZIONE.task",
+    "solleva:STAZIONE": "solleva_STAZIONE.task",
+    "porta:USCITA": "porta_USCITA.task",
+    "deposita:USCITA": "deposita_USCITA.task",
+    "deposita:SCARTI": "deposita_SCARTI.task"
+  }
+}

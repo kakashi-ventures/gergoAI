@@ -194,3 +194,16 @@ function main() {
 }
 
 main();
+
+// Libreria dei movimenti preinstallati: i task del pendant, letti dal file di BRACCIO (shared/fixtures/elite_tasks.json).
+{
+  const src = join(ROOT, "shared", "fixtures", "elite_tasks.json");
+  const dst = join(WEB, "lib", "generated", "elite-tasks.json");
+  if (existsSync(src)) {
+    mkdirSync(dirname(dst), { recursive: true });
+    writeFileSync(dst, readFileSync(src));
+    console.log(`[code-ledger] task del pendant copiati -> ${relative(WEB, dst)}`);
+  } else if (!existsSync(dst)) {
+    writeFileSync(dst, JSON.stringify({ verified: false, tasks: {} }) + "\n");
+  }
+}

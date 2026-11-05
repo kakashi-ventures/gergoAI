@@ -66,7 +66,7 @@ export function Pendant({ live, act, step, setStep }: { live: LiveData; act: Act
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">
         {DIRS.map((x) => (
-          <button key={x.d} onClick={() => act("sposta", { direzione: x.d, quantita: step / 10, unita: "cm" })}
+          <button key={x.d} onClick={() => act("sposta", { origine: "pendant", direzione: x.d, quantita: step / 10, unita: "cm" })}
             className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-left hover:border-sky-400/50 hover:bg-sky-400/10">
             <span className="font-semibold">{x.l}</span><span className="font-mono text-[11px] text-white/40">{x.k}</span>
           </button>
@@ -76,6 +76,17 @@ export function Pendant({ live, act, step, setStep }: { live: LiveData; act: Act
         <button onClick={() => act("piu_piano")} className="flex-1 rounded-lg bg-white/10 py-2 text-sm">− più piano</button>
         <span className="w-20 text-center font-mono text-sm text-sky-300">{s.velocita_mm_s} mm/s</span>
         <button onClick={() => act("piu_veloce")} className="flex-1 rounded-lg bg-white/10 py-2 text-sm">+ più veloce</button>
+      </div>
+      <div className="mt-3 rounded-lg bg-black/30 p-2">
+        <p className="mb-1 text-[10px] uppercase tracking-wider text-white/40">Ultimi movimenti (dal registro)</p>
+        <ol className="space-y-0.5 font-mono text-[11px]">
+          {live.events.filter((e) => e.type === "step_end" && !e.cycle).slice(0, 4).map((e) => (
+            <li key={e.id} className={e.ok === false ? "text-red-300" : "text-white/75"}>
+              {new Date(e.ts).toLocaleTimeString("it-IT")} {e.ok === false ? "✗" : "✓"} {e.text} {e.duration_ms != null ? `· ${(e.duration_ms / 1000).toFixed(1)} s` : ""}
+            </li>
+          ))}
+          {!live.events.some((e) => e.type === "step_end") && <li className="text-white/40">nessun movimento ancora</li>}
+        </ol>
       </div>
       <p className="mt-3 text-[11px] leading-snug text-white/40">
         Gli stessi comandi della voce: ogni pulsante prepara un comando, che va riletto e confermato con Sì. Massimo 10 cm per comando, dentro l&apos;area di lavoro. Accensione, freni e allarmi restano sul pendant vero.
