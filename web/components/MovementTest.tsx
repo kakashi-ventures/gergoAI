@@ -46,7 +46,7 @@ export function MovementTest({ live, local, say }: { live: LiveData & { refresh:
       const r = await post("passo_test", { step: m.steps[i], test: `${m.name} v${m.version}`, passo: i + 1, totale: m.steps.length });
       if (!r.ok) { setMsg(String(r.frase)); setPhase("valuta"); say(String(r.frase)); return; }
       const e = await waitEnd(String(r.command_id));
-      if (!e) { const f = "Il bridge non ha risposto in 30 secondi: mi fermo."; setMsg(f); setPhase("valuta"); say(f); return; }
+      if (!e) { const f = "Il bridge non ha risposto in 30 secondi: interrompo la prova."; setMsg(f); setPhase("valuta"); say(f); return; }
       if (e.ok === false || e.payload?.ok === false) { const f = `Il passo ${i + 1} non è andato a buon fine: ${String(e.payload?.error ?? "vedi registro")}.`; setMsg(f); setPhase("valuta"); say(f); return; }
       ids.push(String(r.command_id));
       setRan([...ids]);

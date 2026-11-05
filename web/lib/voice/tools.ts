@@ -112,6 +112,7 @@ Regole:
 - Per una routine: "definisci_routine", poi ripeti la rilettura; solo dopo un sì chiama "salva_routine" con lo stesso nome.
 - Prova di un movimento: "prova_movimento", poi dopo l'esecuzione chiedi se si è mosso bene; una correzione è "correggi_movimento", un "è giusto" è "movimento_corretto". "Troppo in basso di 2 cm" vuol dire direzione "su", 2 cm.
 - Per il resoconto racconta in tre frasi SOLO i numeri del risultato, senza calcolarne altri.
+- Non pronunciare MAI le parole "stop", "fermo", "basta", "alt": l'ascolto di sicurezza le sente dalle casse e ferma il braccio. Per dire che il braccio si è fermato usa "pausa".
 - Il tuo stop è uno stop software: l'arresto di emergenza è il pulsante fisico dello staff.`;
 
 /** Le 10 frasi della prova di P0, con la function call attesa (kill criterion: almeno 8 su 10 giuste). */

@@ -21,7 +21,7 @@ describe("allerta", () => {
     expect(deriveAlerts(base({ guard_hb_ms: 2500 }))).toEqual([]);
   });
   it("trigger acustico recente: critico con la latenza; sparisce dopo la presa visione", () => {
-    const ev = { id: "t1", ts: ts(5), type: "safety_trigger", payload: { trigger: "parola", latency_ms: 142.4 } };
+    const ev = { id: "t1", ts: ts(5), type: "safety_trigger", payload: { trigger: "parola", latency_ms: 142.4, features: { moving: true } } };
     const a = deriveAlerts(base({ events: [ev] }));
     expect(a[0]).toMatchObject({ level: "critico", titolo: "Arresto vocale e acustico: parola" });
     expect(a[0].sistema).toMatch(/142 ms/);
@@ -45,7 +45,25 @@ describe("allerta", () => {
     expect(a.map((x) => x.level)).toEqual(["critico", "attenzione"]);
   });
   it("non dice mai e-stop vocale", () => {
-    const a = deriveAlerts(base({ mode: "elite", guard_alive: false, bridge_hb_ms: 9000, events: [{ id: "t", ts: ts(1), type: "safety_trigger", payload: { trigger: "botta", latency_ms: 20 } }] }));
+    const a = deriveAlerts(base({ mode: "elite", guard_alive: false, bridge_hb_ms: 9000, events: [{ id: "t", ts: ts(1), type: "safety_trigger", payload: { trigger: "botta", latency_ms: 20, features: { moving: true } } }] }));
     expect(JSON.stringify(a)).not.toMatch(/e-stop vocale/i);
+  });
+  it("trigger a braccio fermo: attenzione, non critico", () => {
+    const a = deriveAlerts(base({ events: [{ id: "f", ts: ts(3), type: "safety_trigger", payload: { trigger: "parola", latency_ms: 24, features: { word: "stop", moving: false } } }] }));
+    expect(a[0].level).toBe("attenzione");
+    expect(a[0].titolo).toMatch(/braccio fermo/);
+  });
+  it("raffica di falsi positivi: una sola allerta con il conteggio", () => {
+    const evs = Array.from({ length: 12 }, (_, k) => ({ id: `r${k}`, ts: ts(k * 5), type: "safety_trigger", payload: { trigger: "parola", latency_ms: 24, features: { word: "stop", moving: false } } }));
+    const a = deriveAlerts(base({ events: evs }));
+    expect(a).toHaveLength(1);
+    expect(a[0]).toMatchObject({ level: "attenzione" });
+    expect(a[0].titolo).toMatch(/12 trigger/);
+  });
+  it("a braccio in moto resta critico anche dentro una raffica", () => {
+    const evs = [{ id: "m", ts: ts(1), type: "safety_trigger", payload: { trigger: "parola", latency_ms: 30, features: { moving: true } } },
+      ...Array.from({ length: 5 }, (_, k) => ({ id: `r${k}`, ts: ts(10 + k), type: "safety_trigger", payload: { trigger: "parola", latency_ms: 24, features: { moving: false } } }))];
+    const a = deriveAlerts(base({ events: evs }));
+    expect(a[0]).toMatchObject({ id: "m", level: "critico" });
   });
 });

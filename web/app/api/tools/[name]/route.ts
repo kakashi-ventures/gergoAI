@@ -88,7 +88,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ name: s
     return NextResponse.json(r);
   } catch (e) {
     // Lo stop non deve mai fallire in silenzio: si dice, e restano il tasto del bridge e l'e-stop fisico.
-    const frase = name === "stop" ? "Non riesco a mandare lo stop dal server: usa il tasto sul bridge o l'e-stop." : "C'è un problema col server, non faccio niente.";
+    const frase = name === "stop" ? "Non riesco a mandare la pausa dal server: usa il tasto sul bridge o l'e-stop." : "C'è un problema col server, non faccio niente.";
     return NextResponse.json({ ok: false, frase, errore: (e as Error).message }, { status: 500 });
   }
 }

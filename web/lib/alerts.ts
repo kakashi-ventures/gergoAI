@@ -29,6 +29,7 @@ const GUARD_MAX_MS = { elite: 1000, sim: 5000 } as const;
 const BRIDGE_MAX_MS = 5000;
 const RECENT_MS = { trigger: 120_000, stop: 30_000, reject: 60_000 };
 
+const BURST = 3;
 const ESTOP_HINTS = /e-?stop|emergenz|collisi|protective|safeguard|allarme|alarm|fault/i;
 
 export function deriveAlerts(i: AlertInput): Alert[] {
@@ -62,12 +63,28 @@ export function deriveAlerts(i: AlertInput): Alert[] {
     }
   }
 
+  // Arresti acustici: a braccio fermo non sono un'emergenza (nessun movimento da fermare). Una raffica di trigger
+  // in pochi minuti è quasi sempre un falso positivo del riconoscitore: si segnala UNA volta, con il conteggio.
+  const recentTriggers = i.events.filter((e) => e.type === "safety_trigger" && age(e.ts) < RECENT_MS.trigger);
+  const movingTriggers = recentTriggers.filter((e) => (e.payload?.features as Record<string, unknown> | undefined)?.moving === true);
+  const idleTriggers = recentTriggers.filter((e) => !movingTriggers.includes(e));
+  if (idleTriggers.length >= BURST) {
+    const last = idleTriggers[0];
+    const byType = idleTriggers.reduce<Record<string, number>>((m, e) => { const k = String(e.payload?.trigger ?? "?"); m[k] = (m[k] ?? 0) + 1; return m; }, {});
+    out.push({
+      id: `raffica-${last.id}`, level: "attenzione", titolo: `Arresto acustico: ${idleTriggers.length} trigger a braccio fermo in 2 minuti`, ts: last.ts, persistente: false,
+      successo: `Probabili falsi positivi (${Object.entries(byType).map(([k, n]) => `${k} ${n}`).join(", ")}). Il braccio era fermo.`,
+      sistema: "Ogni trigger manda comunque lo stop: nessun nuovo movimento parte finché il segnale non si calma.",
+      fare: "Usa un headset con microfono vicino alla bocca, abbassa il volume delle casse e ritara audio_guard sulla sala.",
+    });
+  }
   for (const e of i.events) {
     const p = e.payload ?? {};
     const a = age(e.ts);
-    if (e.type === "safety_trigger" && a < RECENT_MS.trigger) {
+    const moving = (p.features as Record<string, unknown> | undefined)?.moving === true;
+    if (e.type === "safety_trigger" && a < RECENT_MS.trigger && (moving || idleTriggers.length < BURST)) {
       out.push({
-        id: e.id, level: "critico", titolo: `Arresto vocale e acustico: ${String(p.trigger ?? "trigger")}`, ts: e.ts, persistente: false,
+        id: e.id, level: moving ? "critico" : "attenzione", titolo: `Arresto vocale e acustico: ${String(p.trigger ?? "trigger")}${moving ? "" : " (braccio fermo)"}`, ts: e.ts, persistente: false,
         successo: `audio_guard ha riconosciuto «${String(p.trigger)}»${p.features && (p.features as Record<string, unknown>).word ? ` (${String((p.features as Record<string, unknown>).word)})` : ""}.`,
         sistema: `Stop inviato direttamente al controller in ${Math.round(Number(p.latency_ms ?? 0))} ms. Coda dei comandi svuotata.`,
         fare: "Verifica che nessuno sia nell'area del braccio. Se il controller è in allarme, si riarma dal pendant (lo fa una persona).",

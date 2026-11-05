@@ -143,9 +143,9 @@ export async function stop(source: string): Promise<ToolResult> {
   const now = new Date().toISOString();
   await must(s.from("commands").update({ status: "cancelled" }).in("status", ["queued", "confirmed"]).neq("skill", "stop"));
   await must(s.from("routine_runs").update({ status: "cancelled", finished_at: now }).in("status", ["queued", "confirmed", "running"]));
-  const [row] = await must(s.from("commands").insert({ skill: "stop", params: {}, status: "confirmed", confirmed_at: now, readback: "Mi fermo." }).select("id"));
+  const [row] = await must(s.from("commands").insert({ skill: "stop", params: {}, status: "confirmed", confirmed_at: now, readback: "Braccio in pausa." }).select("id"));
   await event("stop", { source }, row.id);
-  return { ok: true, frase: "Mi fermo.", command_id: row.id };
+  return { ok: true, frase: "Braccio in pausa.", command_id: row.id };
 }
 
 /** "salva angolo": il primo angolo si tiene nel cookie, al secondo si scrive il workspace attivo. */
@@ -233,7 +233,7 @@ export async function eseguiRoutine(name: string, ripetizioni: number): Promise<
   await must(s.from("commands").update({ status: "cancelled" }).eq("status", "queued"));
   const [run] = await must(s.from("routine_runs").insert({ routine_name: name, routine_version: r.version, repetitions: ripetizioni, status: "queued" }).select("id"));
   const volte = ripetizioni === 1 ? "una volta" : `${ripetizioni} volte`;
-  return { ok: true, frase: `Faccio la «${name}» versione ${r.version}, ${volte}. Lo stop resta sempre attivo. Confermi?`, routine_run_id: run.id };
+  return { ok: true, frase: `Faccio la «${name}» versione ${r.version}, ${volte}. Puoi interrompermi quando vuoi. Confermi?`, routine_run_id: run.id };
 }
 
 async function currentRun(): Promise<string | null> {
@@ -266,7 +266,7 @@ export async function resoconto(): Promise<ToolResult> {
     `«${c.routine_name}» v${c.routine_version}: ${c.cycles} cicli, media ${sec(c.avg_cycle_time_ms)}`).join("; ");
   const n = (k: string) => Number(sum?.[k] ?? 0);
   const frase = `Oggi ${n("cycles_done")} cicli, tempo medio ${sec(sum?.avg_cycle_time_ms ?? null)}. ${per ? per + ". " : ""}` +
-    `${n("corrections")} correzioni, ${n("stops")} stop, ${n("anomalies")} anomalie, ${n("proposals_approved")} proposte approvate. ` +
+    `${n("corrections")} correzioni, ${n("stops")} interruzioni, ${n("anomalies")} anomalie, ${n("proposals_approved")} proposte approvate. ` +
     `Comandi eseguiti senza conferma: ${n("commands_unconfirmed_executed")}.`;
   return { ok: true, frase, numeri: { ...sum, per_routine: cycles }, nota: "Racconta solo questi numeri, senza calcolarne altri." };
 }
@@ -367,7 +367,7 @@ export async function passoTest(p: { direzione: string; quantita: number; unita:
   if (!d.ok) {
     await event("anomaly", { origine: "web", code: d.code, reason: d.reason, test, passo });
     if (d.motion_check) await event("motion_check", { ...d.motion_check });
-    return { ok: false, frase: `Mi fermo al passo ${passo}: ${d.reason}.`, code: d.code };
+    return { ok: false, frase: `Interrompo al passo ${passo}: ${d.reason}.`, code: d.code };
   }
   const s = db();
   const [row] = await must(s.from("commands").insert({ skill: "sposta", params, status: "confirmed", confirmed_at, readback: `${test} · passo ${passo}/${totale}: ${d.readback ?? ""}` }).select("id"));
