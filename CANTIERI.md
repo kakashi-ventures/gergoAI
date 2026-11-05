@@ -142,6 +142,15 @@ Formato: `- [ora] DA → A: cosa serve, perché` · chi la risolve la marca `✔
   `DryRunElite`; 3 test nuovi in `bridge/tests/test_main.py`. Sanity: bridge elite read-only collegato al mock CS 2.15 ok;
   bridge 92, sdk 49, safety+eval 41, web 95 test verdi; `gen_schemas --check` ok; `next build` ok.
 - [15:55] CONSOLE → BRACCIO (**urgente, demo**): audio_guard dà falsi positivi a raffica. Dal registro: 43 `safety_trigger` "parola" in 10 minuti (31 "stop", 7 "fermo", 3 "alt", 3 "basta"), **tutti con `moving: false`**, latenza ~24 ms (troppo veloce per una parola vera: scatta su ipotesi parziali). Causa in `safety/audio_guard.py` `KeywordSpotter.process`: il trigger parte su `PartialResult()`, instabile con una grammatica di 4 parole. Proposta: (1) sui parziali scattare solo se la parola chiave è l'**unico token** per **≥ 3 parziali consecutivi** (~60 ms); (2) sul finale `rec.SetWords(True)` e `conf ≥ 0.8`; (3) test con wav di parlato normale senza parole chiave = 0 trigger. Il kill criterion di MOTION_SAFETY §3 (>1 falso positivo/min) è superato di 4 volte. Lato console: trigger a braccio fermo = "attenzione", una raffica = una sola allerta; Gergo non pronuncia più stop/fermo/basta/alt (diceva "Mi fermo.", che audio_guard sentiva dalle casse). In sala: headset con microfono vicino alla bocca, casse basse.
+- [16:05] FONDAMENTA → BRIDGE, CONSOLE, BRACCIO: **analisi della catena voce → robot** (dati del DB vero). Oggi nessun comando
+  di movimento è mai arrivato al bridge: 2 soli command, entrambi `stop`. Alle 14:03 quattro «sposta su 2 cm» sono stati
+  rifiutati dalla route web (`tcp_unknown`, poi tolto da c55e5e0). Blocco strutturale in elite: il validatore (web e bridge)
+  esige skill `confirmed` e ontologia `confirmed`, ma **nessuno scriveva `sim_ok`** (precondizione della conferma) e **non esisteva
+  modo di confermare l'ontologia**. Corretto (ok di Federico): il bridge in sim imposta `sim_ok` dopo un passo riuscito (come
+  `real_ok` in elite armed); tool umano `conferma_ontologia` + pulsante in Movimenti (non è un tool vocale). Aperti, da decidere:
+  (a) soglia guardia lato web 1 s su timestamp scritto dal laptop: rischio di rifiuti «arresto acustico non attivo» con
+  audio_guard acceso (il bridge ricontrolla in locale); (b) `workspace` attivo nel DB = box di sim del seed, diverso da
+  `shared/fixtures/workspace.json` del CS63: insegnarlo con «salva angolo» prima dei movimenti reali.
 
 ---
 

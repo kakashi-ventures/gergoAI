@@ -150,3 +150,28 @@ def test_elite_mode_rejects_non_cs_series():
     from bridge.main import elite_adapter_from_env
     with pytest.raises(SystemExit):
         elite_adapter_from_env({"ELITE_SERIES": "EC"})
+
+
+# --- sim_ok: un passo riuscito in sim rende la skill confermabile (prima nessuno lo scriveva) -----------------
+
+def _flags(store, name):
+    return [s for s in store.ontology()["skills"] if s["name"] == name][0]
+
+
+def test_sim_success_sets_sim_ok_for_task_sposta_and_session():
+    store, arm, b = setup()
+    for name in ("solleva", "sposta", "piu_piano"):
+        assert not _flags(store, name).get("sim_ok")
+    store.add_command(skill="solleva", params={"place": "INGRESSO"}); b.poll_once()
+    store.add_command(skill="sposta", params={"direzione": "giu", "quantita": 2, "unita": "cm"}); b.poll_once()
+    store.add_command(skill="piu_piano"); b.poll_once()
+    for name in ("solleva", "sposta", "piu_piano"):
+        assert _flags(store, name)["sim_ok"] is True, name
+        assert not _flags(store, name).get("real_ok"), name
+
+
+def test_sim_failure_does_not_set_sim_ok():
+    store, arm, b = setup(inject=["fail:solleva"])
+    store.add_command(skill="solleva", params={"place": "INGRESSO"}); b.poll_once()
+    assert store.commands[0]["status"] == "failed"
+    assert not _flags(store, "solleva").get("sim_ok")

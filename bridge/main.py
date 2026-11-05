@@ -156,6 +156,7 @@ class Bridge:
             old, self.speed = self.speed, motion.next_speed(self.speed, skill)
             self.event("speed_change", cmd, da_mm_s=old, a_mm_s=self.speed)
             self.store.update_command(cmd["id"], {"status": "done"})
+            self._mark_ok(skill)
             return True
 
         self.store.update_command(cmd["id"], {"status": "running", "started_at": datetime.now(timezone.utc).isoformat()})
@@ -167,9 +168,20 @@ class Bridge:
         self._finish(cmd, r.ok, r.duration_ms, r.error, skill, **r.details)
         if r.ok:
             self.station.apply(skill, cmd.get("params", {}))
-            if self.mode == "elite" and self.adapter.status().mode == "armed":
-                self.store.set_skill_real_ok(self.ontology()["version"], skill)
+            self._mark_ok(skill)
         return r.ok
+
+    def _mark_ok(self, skill: str) -> None:
+        """Dopo un passo riuscito: sim_ok in sim, real_ok in elite armed. La conferma della skill resta umana
+        (console / conferma_skill): sim_ok è solo la precondizione che la rende possibile."""
+        try:
+            v = self.ontology()["version"]
+            if self.mode == "sim":
+                self.store.set_skill_sim_ok(v, skill)
+            elif self.mode == "elite" and self.adapter.status().mode == "armed":
+                self.store.set_skill_real_ok(v, skill)
+        except Exception as e:  # il flag non deve mai far fallire un passo già eseguito
+            print(f"flag ok di {skill} non scritto: {e}")
 
     def _sposta(self, cmd: dict, ctx: Context, d) -> bool:
         check = dict(d.motion_check)
@@ -201,6 +213,8 @@ class Bridge:
             moved = [round(a - b, 2) for a, b in zip(real.xyz, ctx.pose.xyz)]
             self._finish(cmd, ok, r.duration_ms, None if ok else f"errore di posa {err_mm:.1f} mm", "sposta",
                          spostamento_reale_mm=moved, errore_mm=round(err_mm, 2))
+            if ok:
+                self._mark_ok("sposta")
         else:
             self._finish(cmd, False, r.duration_ms, r.error, "sposta")
         return ok
