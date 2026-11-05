@@ -58,7 +58,7 @@ BRACCIO ──(serie CS/EC entro 13:15, al 1° slot)─────────�
 |---|---|---|---|---|
 | FONDAMENTA | 12:52 | **DB online** (`gergo-pavia`, ref `gppcwepbwrrcsojrwplp`); `0001_fondamenta_harden`; env example; `/api/health` su main (commit 8c11d58) | applicare migration 1xxx_/2xxx_ appena arrivano; /eval in corso; env Vercel | progetto Vercel `gergo` lo crea l'umano dalla dashboard (MCP 403) |
 | BRIDGE | 12:46 | `contracts-v1` = commit `1448eac` (`/shared`: schemi, fixtures, `contracts.md`; pydantic in `bridge/contracts.py`, 40 test verdi) | migration `1xxx_`, `RobotAdapter`, validator con geofence | tag git: il push dei tag dal cloud dà 403, va pushato a mano |
-| CONSOLE | — | — | layout console, prova della voce | contratti |
+| CONSOLE | 13:05 | `/web` su main (Next 15, `/console` con dati finti, STOP, pannello sicurezza, box di lavoro, passphrase); `shared/xai-notes.md`: **voce nel browser** con token effimeri, `XAI_VOICE_MODEL=grok-voice-3.0`; `lib/sposta.ts` + 14 test | zod da contracts-v1, `validator.ts`, migration `2xxx_`, `/console/probe` per il kill criterion della voce | XAI_API_KEY su Vercel per misurare la voce |
 | BRACCIO | 12:48 | serie = **CS** (etichetta, Federico) in `sdk/ELITE_NOTES.md` | transport CS (Dashboard 29999 + Primary 30001), mock CS, `motion`, `audio_guard` | manuale script CS e unità di `movel` dal tecnico (taglio 13:45) |
 
 ## Richieste tra cantieri
