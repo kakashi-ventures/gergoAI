@@ -141,6 +141,7 @@ Formato: `- [ora] DA → A: cosa serve, perché` · chi la risolve la marca `✔
   `ELITE_RTSI_PORT`, `GERGO_GUARD_HEARTBEAT`); se non si importa, `SystemExit` con il motivo; `--dry-run` esplicito resta
   `DryRunElite`; 3 test nuovi in `bridge/tests/test_main.py`. Sanity: bridge elite read-only collegato al mock CS 2.15 ok;
   bridge 92, sdk 49, safety+eval 41, web 95 test verdi; `gen_schemas --check` ok; `next build` ok.
+- [15:55] CONSOLE → BRACCIO (**urgente, demo**): audio_guard dà falsi positivi a raffica. Dal registro: 43 `safety_trigger` "parola" in 10 minuti (31 "stop", 7 "fermo", 3 "alt", 3 "basta"), **tutti con `moving: false`**, latenza ~24 ms (troppo veloce per una parola vera: scatta su ipotesi parziali). Causa in `safety/audio_guard.py` `KeywordSpotter.process`: il trigger parte su `PartialResult()`, instabile con una grammatica di 4 parole. Proposta: (1) sui parziali scattare solo se la parola chiave è l'**unico token** per **≥ 3 parziali consecutivi** (~60 ms); (2) sul finale `rec.SetWords(True)` e `conf ≥ 0.8`; (3) test con wav di parlato normale senza parole chiave = 0 trigger. Il kill criterion di MOTION_SAFETY §3 (>1 falso positivo/min) è superato di 4 volte. Lato console: trigger a braccio fermo = "attenzione", una raffica = una sola allerta; Gergo non pronuncia più stop/fermo/basta/alt (diceva "Mi fermo.", che audio_guard sentiva dalle casse). In sala: headset con microfono vicino alla bocca, casse basse.
 
 ---
 
