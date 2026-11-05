@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { SkillName, SpostaParams } from "@/lib/contracts";
-import { annulla, conferma, confermaSkill, deprecaSkill, proponi, salvaAngolo, stop, type ToolResult } from "@/lib/server/tools";
+import { RoutineStep, SkillName, SpostaParams } from "@/lib/contracts";
+import { annulla, approvaProposta, conferma, confermaSkill, definisciRoutine, deprecaSkill, eseguiRoutine, fatto, proponi, resoconto, salvaAngolo, salvaRoutine, segnala, stop, type ToolResult } from "@/lib/server/tools";
 import type { Vec3 } from "@/lib/validator";
 
 export const runtime = "nodejs";
@@ -19,6 +19,13 @@ const Inputs = {
   annulla: z.strictObject({}),
   stop: z.strictObject({ source: z.string().max(40).optional() }),
   salva_angolo: z.strictObject({}),
+  definisci_routine: z.strictObject({ name: z.string().min(1).max(40), steps: z.array(RoutineStep).min(1).max(20), ...Utt }),
+  salva_routine: z.strictObject({ name: z.string().min(1).max(40) }),
+  esegui_routine: z.strictObject({ name: z.string().min(1).max(40), ripetizioni: z.int().min(1).max(10).default(1), ...Utt }),
+  fatto: z.strictObject({}),
+  segnala: z.strictObject({ text: z.string().min(1).max(200) }),
+  resoconto: z.strictObject({}),
+  approva_proposta: z.strictObject({ approva: z.boolean(), by: z.string().max(60).default("operatore") }),
   conferma_skill: z.strictObject({ name: SkillName, by: z.string().min(1).max(60).default("operatore") }),
   depreca_skill: z.strictObject({ name: SkillName, motivo: z.string().min(3).max(300), by: z.string().min(1).max(60).default("operatore") }),
 } as const;
@@ -49,6 +56,13 @@ export async function POST(req: Request, { params }: { params: Promise<{ name: s
       case "stop": r = await stop((a.source as string) ?? "console"); break;
       case "conferma_skill": r = await confermaSkill(a.name as string, a.by as string); break;
       case "depreca_skill": r = await deprecaSkill(a.name as string, a.motivo as string, a.by as string); break;
+      case "definisci_routine": r = await definisciRoutine(a.name as string, a.steps as never, a.utterance as string | undefined); break;
+      case "salva_routine": r = await salvaRoutine(a.name as string); break;
+      case "esegui_routine": r = await eseguiRoutine(a.name as string, a.ripetizioni as number); break;
+      case "fatto": r = await fatto(); break;
+      case "segnala": r = await segnala(a.text as string); break;
+      case "resoconto": r = await resoconto(); break;
+      case "approva_proposta": r = await approvaProposta(a.approva as boolean, a.by as string); break;
       case "salva_angolo": {
         const cookie = req.headers.get("cookie")?.match(/gergo_corner=([^;]+)/)?.[1];
         const primo = cookie ? (JSON.parse(decodeURIComponent(cookie)) as Vec3) : null;

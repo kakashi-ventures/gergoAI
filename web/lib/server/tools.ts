@@ -1,6 +1,7 @@
 import "server-only";
 import { z } from "zod";
-import { Command, SkillName, SpostaParams, VELOCITA_DEFAULT_MM_S } from "../contracts";
+import { Command, Routine, SkillName, SpostaParams, VELOCITA_DEFAULT_MM_S } from "../contracts";
+import { checkSteps, readbackRoutine } from "../routines";
 import * as motion from "../motion";
 import { type Context, StationState, validate, type Vec3 } from "../validator";
 import { BRIDGE_ID, db, must } from "./db";
@@ -92,9 +93,12 @@ export async function proponi(skill: z.infer<typeof SkillName>, params: Record<s
 
 export async function conferma(command_id?: string): Promise<ToolResult> {
   const s = db();
-  const q = s.from("commands").select("*").eq("status", "queued").order("created_at", { ascending: false }).limit(1);
-  const rows = await must(command_id ? s.from("commands").select("*").eq("id", command_id).eq("status", "queued").limit(1) : q);
-  const c = rows[0];
+  const rows = await must(command_id
+    ? s.from("commands").select("*").eq("id", command_id).eq("status", "queued").limit(1)
+    : s.from("commands").select("*").eq("status", "queued").order("created_at", { ascending: false }).limit(1));
+  const runs = command_id ? [] : await must(s.from("routine_runs").select("*").eq("status", "queued").order("created_at", { ascending: false }).limit(1));
+  const c = rows[0], run = runs[0];
+  if (run && (!c || new Date(run.created_at) > new Date(c.created_at))) return confermaRun(run);
   if (!c) return { ok: false, frase: "Non c'è nessun comando da confermare." };
   if (Date.now() - new Date(c.created_at).getTime() > 60_000) {
     await must(s.from("commands").update({ status: "cancelled" }).eq("id", c.id));
@@ -113,8 +117,21 @@ export async function conferma(command_id?: string): Promise<ToolResult> {
   return { ok: true, frase: "Vado.", command_id: c.id };
 }
 
+async function confermaRun(run: { id: string; created_at: string; routine_name: string }): Promise<ToolResult> {
+  const s = db();
+  if (Date.now() - new Date(run.created_at).getTime() > 60_000) {
+    await must(s.from("routine_runs").update({ status: "cancelled" }).eq("id", run.id));
+    return { ok: false, frase: "La richiesta era troppo vecchia e l'ho annullata. Ripetimela." };
+  }
+  const confirmed_at = new Date().toISOString();
+  await must(s.from("routine_runs").update({ status: "confirmed", confirmed_at }).eq("id", run.id).eq("status", "queued"));
+  await must(s.from("events").insert({ type: "confirmation", routine_run_id: run.id, payload: { text: "sì", routine: run.routine_name } }));
+  return { ok: true, frase: "Parto.", routine_run_id: run.id };
+}
+
 export async function annulla(): Promise<ToolResult> {
   await must(db().from("commands").update({ status: "cancelled" }).eq("status", "queued"));
+  await must(db().from("routine_runs").update({ status: "cancelled" }).eq("status", "queued"));
   return { ok: true, frase: "Annullato." };
 }
 
@@ -122,6 +139,7 @@ export async function stop(source: string): Promise<ToolResult> {
   const s = db();
   const now = new Date().toISOString();
   await must(s.from("commands").update({ status: "cancelled" }).in("status", ["queued", "confirmed"]).neq("skill", "stop"));
+  await must(s.from("routine_runs").update({ status: "cancelled", finished_at: now }).in("status", ["queued", "confirmed", "running"]));
   const [row] = await must(s.from("commands").insert({ skill: "stop", params: {}, status: "confirmed", confirmed_at: now, readback: "Mi fermo." }).select("id"));
   await event("stop", { source }, row.id);
   return { ok: true, frase: "Mi fermo.", command_id: row.id };
@@ -169,4 +187,104 @@ export async function deprecaSkill(name: string, motivo: string, by: string): Pr
   if (!rows.length) return { ok: false, frase: `La skill ${name} non c'è o è già deprecata.` };
   await event("approval", { oggetto: "skill", azione: "depreca", name, motivo, by, ontology_version: v });
   return { ok: true, frase: `Skill ${name} deprecata.` };
+}
+
+// ---------------------------------------------------------------- routine, feedback, resoconto, proposte
+
+type Steps = Routine["steps"];
+
+export async function definisciRoutine(name: string, steps: Steps, utterance?: string): Promise<ToolResult> {
+  const r = Routine.safeParse({ name, version: 1, steps });
+  if (!r.success) return { ok: false, frase: "Non ho capito i passi. Me li ripeti uno per uno?", errore: r.error.issues[0]?.message };
+  const ctx = await loadContext("propose");
+  const chk = checkSteps(r.data.steps, ctx);
+  if (!chk.ok) return { ok: false, frase: `Non la posso salvare: ${chk.reason}.`, step: chk.step };
+  const s = db();
+  const prev = await must(s.from("routines").select("version,status").eq("name", name).order("version", { ascending: false }));
+  const version = (prev[0]?.version ?? 0) + 1;
+  const active = prev.find((x: { status: string }) => x.status === "active");
+  await must(s.from("routines").delete().eq("name", name).eq("status", "draft"));
+  await must(s.from("routines").insert({
+    name, version, parent_version: active?.version ?? null, steps: r.data.steps, taught_by_voice: true,
+    source_utterance: utterance ?? null, status: "draft",
+  }));
+  await event("interpretation", { routine: name, version, steps: r.data.steps, text: utterance ?? null });
+  return { ok: true, frase: readbackRoutine(name, r.data.steps), routine: name, version };
+}
+
+export async function salvaRoutine(name: string): Promise<ToolResult> {
+  const s = db();
+  const [d] = await must(s.from("routines").select("version").eq("name", name).eq("status", "draft").order("version", { ascending: false }).limit(1));
+  if (!d) return { ok: false, frase: `Non ho nessuna routine «${name}» da salvare.` };
+  await must(s.from("routines").update({ status: "deprecated" }).eq("name", name).eq("status", "active"));
+  await must(s.from("routines").update({ status: "active" }).eq("name", name).eq("version", d.version));
+  await event("approval", { oggetto: "routine", routine: name, version: d.version });
+  return { ok: true, frase: `Salvata: «${name}», versione ${d.version}.` };
+}
+
+export async function eseguiRoutine(name: string, ripetizioni: number): Promise<ToolResult> {
+  const s = db();
+  const [r] = await must(s.from("routines").select("version").eq("name", name).eq("status", "active").limit(1));
+  if (!r) return { ok: false, frase: `Non conosco una routine attiva che si chiama «${name}».` };
+  await must(s.from("routine_runs").update({ status: "cancelled" }).eq("status", "queued"));
+  await must(s.from("commands").update({ status: "cancelled" }).eq("status", "queued"));
+  const [run] = await must(s.from("routine_runs").insert({ routine_name: name, routine_version: r.version, repetitions: ripetizioni, status: "queued" }).select("id"));
+  const volte = ripetizioni === 1 ? "una volta" : `${ripetizioni} volte`;
+  return { ok: true, frase: `Faccio la «${name}» versione ${r.version}, ${volte}. Lo stop resta sempre attivo. Confermi?`, routine_run_id: run.id };
+}
+
+async function currentRun(): Promise<string | null> {
+  const [r] = await must(db().from("routine_runs").select("id").in("status", ["running", "confirmed"]).order("created_at", { ascending: false }).limit(1));
+  return r?.id ?? null;
+}
+
+/** "fatto": risponde al passo attendi_operatore del run in corso. */
+export async function fatto(): Promise<ToolResult> {
+  const id = await currentRun();
+  if (!id) return { ok: false, frase: "Non sto aspettando niente." };
+  await must(db().from("events").insert({ type: "feedback", routine_run_id: id, payload: { done: true, text: "fatto" } }));
+  return { ok: true, frase: "Bene, continuo." };
+}
+
+/** Segnalazione dell'operatore ("è storta"): finisce nel registro, il pattern miner la conta. */
+export async function segnala(text: string): Promise<ToolResult> {
+  const id = await currentRun();
+  await must(db().from("events").insert({ type: "feedback", routine_run_id: id, payload: { text } }));
+  return { ok: true, frase: `Registrato: «${text}».` };
+}
+
+/** Numeri del turno dalle view SQL; Grok li racconta, non li calcola. */
+export async function resoconto(): Promise<ToolResult> {
+  const s = db();
+  const [sum] = await must(s.from("v_shift_summary").select("*").limit(1));
+  const cycles = await must(s.from("v_cycle_stats").select("routine_name,routine_version,cycles,avg_cycle_time_ms").gt("cycles", 0));
+  const sec = (ms: number | null) => (ms == null ? "—" : `${(ms / 1000).toFixed(1).replace(".", ",")} secondi`);
+  const per = cycles.map((c: { routine_name: string; routine_version: number; cycles: number; avg_cycle_time_ms: number }) =>
+    `«${c.routine_name}» v${c.routine_version}: ${c.cycles} cicli, media ${sec(c.avg_cycle_time_ms)}`).join("; ");
+  const n = (k: string) => Number(sum?.[k] ?? 0);
+  const frase = `Oggi ${n("cycles_done")} cicli, tempo medio ${sec(sum?.avg_cycle_time_ms ?? null)}. ${per ? per + ". " : ""}` +
+    `${n("corrections")} correzioni, ${n("stops")} stop, ${n("anomalies")} anomalie, ${n("proposals_approved")} proposte approvate. ` +
+    `Comandi eseguiti senza conferma: ${n("commands_unconfirmed_executed")}.`;
+  return { ok: true, frase, numeri: { ...sum, per_routine: cycles }, nota: "Racconta solo questi numeri, senza calcolarne altri." };
+}
+
+export async function approvaProposta(approva: boolean, by: string): Promise<ToolResult> {
+  const s = db();
+  const [p] = await must(s.from("proposals").select("*").eq("status", "pending").order("created_at", { ascending: false }).limit(1));
+  if (!p) return { ok: false, frase: "Non ho proposte in attesa." };
+  const now = new Date().toISOString();
+  if (!approva) {
+    await must(s.from("proposals").update({ status: "rejected", decided_at: now, decided_by: by }).eq("id", p.id));
+    await event("approval", { oggetto: "proposta", id: p.id, esito: "rifiutata" });
+    return { ok: true, frase: "Va bene, lascio la routine com'è." };
+  }
+  const ch = p.change as { routine: string; from_version: number; to_version: number; diff: string };
+  const [to] = await must(s.from("routines").select("version,status").eq("name", ch.routine).eq("version", ch.to_version).limit(1));
+  if (!to) return { ok: false, frase: `Non trovo la versione ${ch.to_version} della «${ch.routine}».` };
+  const [st] = await must(s.from("v_cycle_stats").select("avg_cycle_time_ms").eq("routine_name", ch.routine).eq("routine_version", ch.from_version).limit(1));
+  await must(s.from("routines").update({ status: "deprecated" }).eq("name", ch.routine).eq("status", "active"));
+  await must(s.from("routines").update({ status: "active" }).eq("name", ch.routine).eq("version", ch.to_version));
+  await must(s.from("proposals").update({ status: "approved", decided_at: now, decided_by: by, before: st?.avg_cycle_time_ms ?? p.before ?? null }).eq("id", p.id));
+  await event("approval", { oggetto: "proposta", id: p.id, esito: "approvata", routine: ch.routine, from_version: ch.from_version, to_version: ch.to_version });
+  return { ok: true, frase: `Fatto: «${ch.routine}» versione ${ch.to_version} (${ch.diff}). Misuro il prossimo ciclo.` };
 }

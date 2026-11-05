@@ -43,6 +43,42 @@ export const VOICE_TOOLS = [
   { type: "function", name: "conferma", description: "L'operatore ha detto 'sì' (o equivalente) alla rilettura dell'ultimo comando.", parameters: { type: "object", properties: {} } },
   { type: "function", name: "annulla", description: "L'operatore ha detto 'no' o 'annulla' alla rilettura.", parameters: { type: "object", properties: {} } },
   { type: "function", name: "stop", description: "Fermati subito: stop, fermo, basta, alt.", parameters: { type: "object", properties: {} } },
+  {
+    type: "function",
+    name: "definisci_routine",
+    description: "L'operatore insegna una routine ('ti insegno…', 'chiamala…'). Traduci la descrizione in passi. Non la salva: il sistema la rilegge.",
+    parameters: {
+      type: "object",
+      properties: {
+        name: { type: "string", description: "Nome breve della routine, minuscolo, es. 'frontale'." },
+        steps: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              skill: { type: "string", enum: ["solleva", "deposita", "porta", "applica", "home", "attendi_operatore"] },
+              place: { type: ["string", "null"], enum: ["INGRESSO", "STAZIONE", "USCITA", "SCARTI", "HOME", null] },
+              prompt: { type: ["string", "null"], description: "Solo per attendi_operatore: cosa deve fare l'operatore, es. 'metti l'etichetta'." },
+            },
+            required: ["skill"],
+          },
+        },
+        utterance: UTT,
+      },
+      required: ["name", "steps"],
+    },
+  },
+  { type: "function", name: "salva_routine", description: "L'operatore ha detto sì alla rilettura di una routine appena definita.", parameters: { type: "object", properties: { name: { type: "string" } }, required: ["name"] } },
+  {
+    type: "function",
+    name: "esegui_routine",
+    description: "Esegui una routine già salvata, es. 'fai la frontale tre volte'. Crea una richiesta da confermare.",
+    parameters: { type: "object", properties: { name: { type: "string" }, ripetizioni: { type: "integer", minimum: 1, maximum: 10 }, utterance: UTT }, required: ["name"] },
+  },
+  { type: "function", name: "fatto", description: "L'operatore dice 'fatto' mentre la routine lo aspetta (es. ha messo l'etichetta).", parameters: { type: "object", properties: {} } },
+  { type: "function", name: "segnala", description: "L'operatore segnala un problema sul pezzo o sul ciclo, es. 'è storta', 'l'ha presa male'.", parameters: { type: "object", properties: { text: { type: "string" } }, required: ["text"] } },
+  { type: "function", name: "resoconto", description: "L'operatore chiede il resoconto del turno.", parameters: { type: "object", properties: {} } },
+  { type: "function", name: "approva_proposta", description: "L'operatore risponde sì o no a una proposta di ottimizzazione ('Ho notato che…').", parameters: { type: "object", properties: { approva: { type: "boolean" } }, required: ["approva"] } },
 ] as const;
 
 export const VOICE_INSTRUCTIONS = `Sei Gergo, l'assistente vocale di una postazione di etichettatura con un braccio robotico.
@@ -54,6 +90,8 @@ Regole:
 - Se la frase finisce con "Confermi?", aspetta la risposta. Solo un sì esplicito chiama "conferma"; un no chiama "annulla".
 - Se il risultato ha ok=false, ripeti la frase e non riprovare da solo.
 - Se senti "stop", "fermo", "basta" o "alt", chiama subito "stop".
+- Per una routine: "definisci_routine", poi ripeti la rilettura; solo dopo un sì chiama "salva_routine" con lo stesso nome.
+- Per il resoconto racconta in tre frasi SOLO i numeri del risultato, senza calcolarne altri.
 - Il tuo stop è uno stop software: l'arresto di emergenza è il pulsante fisico dello staff.`;
 
 /** Le 10 frasi della prova di P0, con la function call attesa (kill criterion: almeno 8 su 10 giuste). */

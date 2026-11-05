@@ -10,6 +10,8 @@ const ALLOWED: Record<string, string[]> = {
   propone_azione: ["skill", "params", "utterance"],
   sposta: ["direzione", "quantita", "unita", "intensita", "utterance"],
   piu_piano: ["utterance"], piu_veloce: ["utterance"], conferma: [], annulla: [], stop: [],
+  definisci_routine: ["name", "steps", "utterance"], salva_routine: ["name"], esegui_routine: ["name", "ripetizioni", "utterance"],
+  fatto: [], segnala: ["text"], resoconto: [], approva_proposta: ["approva"],
 };
 
 export function VoicePanel() {
