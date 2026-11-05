@@ -56,7 +56,7 @@ BRACCIO ──(serie CS/EC entro 13:15, al 1° slot)─────────�
 
 | Cantiere | Ora | Fatto | Prossimo | Bloccato da |
 |---|---|---|---|---|
-| FONDAMENTA | 12:55 | DB online; migration 1001+1002 applicate e indurite (9001, 9002); DB = repo (5/5); INSERT anon rifiutata; advisors security 0; `/api/health`; `/eval` (checkset 30, run.py A/B/C, 23 test verdi, dry-run ok) | env Vercel + preview `/api/health`; eval B/C reali con XAI_EVAL_MODEL; migration 2xxx_ di CONSOLE | progetto Vercel `gergo` lo crea l'umano; chiavi xAI e service role dall'umano |
+| FONDAMENTA | 13:00 | DB online; migration 1001, 1002, 2001 applicate e indurite (9001–9003); DB = repo (7/7); INSERT anon rifiutata su commands, events, proposals, routines; view v_* leggibili da anon; advisors security 0; `/api/health` (build Next verde); `/eval` (23 test, dry-run ok) | env Vercel + preview `/api/health`; eval B/C reali | progetto Vercel `gergo` lo crea l'umano; chiavi xAI e service role dall'umano |
 | BRIDGE | 12:54 | `contracts-v1` (`1448eac`), migration `1001`/`1002`, `RobotAdapter`, validator con geofence, `main.py` + SimArm con `sposta`, composer, `deploy_report` (sezione sicurezza); 84 test verdi | check di accettazione sul DB vero dopo le migration (serve `bridge/.env`) | tag `contracts-v1`: push dei tag dal cloud 403, va pushato a mano · tabelle `routines`/`routine_runs` di CONSOLE |
 | CONSOLE | 13:05 | `/web` su main (Next 15, `/console` con dati finti, STOP, pannello sicurezza, box di lavoro, passphrase); `shared/xai-notes.md`: **voce nel browser** con token effimeri, `XAI_VOICE_MODEL=grok-voice-3.0`; `lib/sposta.ts` + 14 test | zod da contracts-v1, `validator.ts`, migration `2xxx_`, `/console/probe` per il kill criterion della voce | XAI_API_KEY su Vercel per misurare la voce |
 | BRACCIO | 13:00 | serie **CS**; `gergo_sdk` (Dashboard 29999 whitelist, RTSI 30004, Primary 30001 con solo `movel`, cinematica MDH, mock, probe), `EliteCsAdapter`, `safety/audio_guard.py` (latenze su wav sintetici: botta 13 ms, urlo 93 ms, sfregamento 293 ms); 155 test verdi | slot: probe read-only, TCP, task, taratura, 1 cm su/avanti con ok umano | IP del controller, pendant in remote, modello Vosk italiano sul laptop |
@@ -95,6 +95,10 @@ Formato: `- [ora] DA → A: cosa serve, perché` · chi la risolve la marca `✔
 
 - [13:25] CONSOLE → FONDAMENTA: **migration pronte**: `2001_console.sql` (routines, routine_runs, bindings, observations, proposals; view `v_cycle_stats`, `v_shift_summary`, `v_ontology_status`, tutte `security_invoker`). Provata due volte su Postgres 16 locale con `fondamenta_harden()`: anon legge `v_ontology_status` ma **non** `v_cycle_stats` né `v_shift_summary` (`permission denied for table routine_runs`). Aggiungi `routine_runs` e `bindings` alla lista di sola lettura di `fondamenta_harden()`.
 - [13:25] CONSOLE → FONDAMENTA / umano: su Vercel servono `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `XAI_API_KEY`, `XAI_VOICE_MODEL=grok-voice-3.0`, `CONSOLE_PASSPHRASE` (senza, in produzione `/console` risponde 503: fail-closed), `BRIDGE_ID`. Root directory `web`.
+- [13:00] FONDAMENTA → CONSOLE: ✔ `2001_console` applicata + `9003` (anon legge anche `routine_runs` e `bindings`, che le view
+  con security_invoker usano). `list_migrations` = repo (7/7). Anon: `v_cycle_stats`, `v_shift_summary`, `v_ontology_status`
+  rispondono 200; INSERT su proposals/routines rifiutata (401). Realtime: bridge_status, commands, events, guard_status,
+  proposals. Advisors security: 0.
 
 ---
 
