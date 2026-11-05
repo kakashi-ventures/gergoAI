@@ -56,7 +56,7 @@ BRACCIO ──(serie CS/EC entro 13:15, al 1° slot)─────────�
 
 | Cantiere | Ora | Fatto | Prossimo | Bloccato da |
 |---|---|---|---|---|
-| FONDAMENTA | 13:22 | DB = repo (9/9), advisors security 0; Vercel `gergoai` builda Next (commit 907a568); `/api/health` in prod: Supabase ok, tabelle ok, nessun segreto NEXT_PUBLIC_; `CLAUDE.md`; README in bozza; `bridge/.env.example` completo | eval B/C reali; README finale; 15:00 freeze | `CONSOLE_PASSPHRASE` assente su Vercel (umano); `XAI_EVAL_MODEL` assente; region funzioni iad1 (meglio fra1) |
+| FONDAMENTA | 13:48 | DB = repo (9/9), advisors security 0; **`/api/health` 200 su https://gergoai.vercel.app** (env complete, Supabase ok; `degraded` solo perché bridge e audio_guard non girano); `CLAUDE.md`; README in bozza; note SDK Python CS per BRACCIO | eval B/C reali (o A + dry-run alle 14:15); README finale 14:30; freeze 15:00 | chiave xAI e modello testo per l'eval (umano); region funzioni iad1 (meglio fra1) |
 | BRIDGE | 12:54 | `contracts-v1` (`1448eac`), migration `1001`/`1002`, `RobotAdapter`, validator con geofence, `main.py` + SimArm con `sposta`, composer, `deploy_report` (sezione sicurezza); 84 test verdi | check di accettazione sul DB vero dopo le migration (serve `bridge/.env`) | tag `contracts-v1`: push dei tag dal cloud 403, va pushato a mano · tabelle `routines`/`routine_runs` di CONSOLE |
 | CONSOLE | 14:40 | Nuova UX: «Parla al braccio» (sfera voce, rilettura scritta dal codice, Sì/No), **sistema di allerta** (regole in `lib/alerts.ts`, schermo intero per i critici, presa visione nel registro), **Movimenti** (approva nuovi e modificati con confronto per passo; modifica = sempre nuova versione in bozza), registro filtrabile ed esportabile, tempo di ciclo per versione, **modalità demo** (`/console?demo`), **`/console/codice`** (44 parametri di sicurezza letti dai `.py` con file:riga, impronte sha256, storia GitHub con patch), **landing** `/` dal pitch di Control8 con link al deck; 90 test verdi | probe voce dal vivo e prova end to end sull'URL Vercel | `CONSOLE_PASSPHRASE` e `XAI_API_KEY` su Vercel (umano); `GITHUB_TOKEN` consigliato per la storia del codice |
 | BRACCIO | 13:39 | **CS63** (sbraccio 624 mm), IP **192.168.1.200**; orientamento della nostra FK = pendant (verificato); `gergo_sdk` + `EliteCsAdapter` + `audio_guard`; probe con `fk_check`; 155 test verdi | probe read-only dal laptop su 192.168.1.x, TCP, task salvati con nome, posa di partenza piegata | laptop sulla rete del braccio, pendant in remote, nomi dei task |
@@ -125,6 +125,10 @@ Formato: `- [ora] DA → A: cosa serve, perché` · chi la risolve la marca `✔
   - Dashboard: `stopProgram`, `pauseProgram`, `playProgram`, `unlockProtectiveStop` (quest'ultimo resta FUORI whitelist).
   - Non c'è un wheel su PyPI: si compila con CMake (`doc/BuildGuide`, target `python_wheel`). **Consiglio: non migrare ora**
     il transport stdlib che avete; usatelo solo come riferimento o controprova sul laptop, se compila in < 10 min.
+- [13:48] FONDAMENTA → tutti: `/api/health` su produzione (commit cafa24c) = **200 `degraded`**: tutte le env obbligatorie
+  presenti, Supabase ok (486 ms), `bridge_status` e `guard_status` vuote. Diventa `ok` quando bridge (`BRIDGE_ID=pavia-postazione-1`)
+  e audio_guard (`--bridge-id pavia-postazione-1`) scrivono il loro heartbeat sul DB vero. Console e `/api/tools` ora aperte
+  con la passphrase.
 
 ---
 
