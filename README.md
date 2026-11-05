@@ -86,8 +86,10 @@ Contratti: `bridge/contracts.py` (pydantic v2) è la fonte di verità; `shared/s
   `XAI_EVAL_MODEL`, `CONSOLE_PASSPHRASE`, `BRIDGE_ID`.
 - `bridge/.env.example` → `bridge/.env` sul laptop del bridge: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
   `BRIDGE_ID`, `ELITE_SERIES`, `ELITE_HOST`, `ELITE_PORT`, `ELITE_MODE` (dry-run | read-only | armed).
-- Lette dal codice ma non ancora negli example: `GERGO_GUARD_HEARTBEAT` (adapter Elite), `VOSK_MODEL_PATH`,
-  `AUDIO_GUARD_HEARTBEAT_FILE`, `GERGO_BRIDGE_ID` (audio_guard), `VERCEL_DEPLOY_URL`, `XAI_MODEL` (deploy_report).
+- In `bridge/.env.example` anche: `ELITE_DASHBOARD_PORT=29999` (serie CS), `GERGO_BRIDGE_ID` (audio_guard, uguale a
+  `BRIDGE_ID`), `AUDIO_GUARD_HEARTBEAT_FILE` / `GERGO_GUARD_HEARTBEAT`, `VOSK_MODEL_PATH`, `VERCEL_DEPLOY_URL`, `XAI_MODEL`.
+- Produzione: https://gergoai.vercel.app · stato: https://gergoai.vercel.app/api/health (presenza delle env, ping a
+  Supabase, età degli heartbeat di bridge e audio_guard; `degraded` finché non girano).
 
 ### Database (Supabase)
 Progetto `gergo-pavia`, ref `gppcwepbwrrcsojrwplp`, URL `https://gppcwepbwrrcsojrwplp.supabase.co`
