@@ -49,6 +49,19 @@ def probe(host: str, dashboard_port: int = 29999, primary_port: int = 30001, rts
         out["tcp_offset_mm"] = [round(v * 1000, 2) for v in c.tcp_offset[:3]]
         m = pr.wait_for("mdh")
         out["mdh"] = {"a": m.a, "d": m.d, "alpha": m.alpha}
+        # Verifica della cinematica: FK(MDH del controller, giunti RTSI) contro la posa RTSI.
+        if "joints_deg" in out:
+            from gergo_sdk import kinematics as kin
+            mdh = kin.MDH(alpha=tuple(m.alpha), a=tuple(m.a), d=tuple(m.d))
+            q = [math.radians(v) for v in out["joints_deg"]]
+            f = kin.fk(mdh, q, tcp=c.tcp_offset)
+            p = out["tcp_pose_base_mm_rad"]
+            out["fk_check"] = {
+                "fk_mm": [round(v * 1000, 2) for v in f[:3]],
+                "errore_posizione_mm": round(math.dist([v * 1000 for v in f[:3]], p[:3]), 2),
+                "errore_orientamento_rad": round(kin.rotation_distance(f[3:], p[3:]), 4),
+                "ok": math.dist([v * 1000 for v in f[:3]], p[:3]) < 1.0,
+            }
     except Exception as e:
         out["primary"] = f"ERRORE {e}"
     finally:
