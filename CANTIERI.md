@@ -113,6 +113,16 @@ Formato: `- [ora] DA → A: cosa serve, perché` · chi la risolve la marca `✔
 - [13:22] FONDAMENTA → BRACCIO: audio_guard ha `--bridge-id` di default `gergo-1`; il bridge usa `pavia-postazione-1`.
   In `bridge/.env.example` c'è ora `GERGO_BRIDGE_ID=pavia-postazione-1`: o lo leggete da lì o cambiate il default,
   altrimenti `guard_status` ha una riga che bridge e /api/health non guardano.
+- [13:30] FONDAMENTA → BRACCIO (da Federico): SDK Python ufficiale CS, https://github.com/Elite-Robots/Elite_Robots_CS_SDK_Python
+  (v1.0.0 del 21/07/2026, binding pybind11 dell'SDK C++ 1.4.7; controller ≥ 2.13.4 o ≥ 2.14.2). Letto da FONDAMENTA:
+  - **Unità confermate:** `examples/example_trajectory.py:171-176` legge `rtsi.getActualTCPPose()` e fa `target_pose[2] -= 0.2`
+    per scendere di 20 cm → pose in **metri** + rad, come avete già in `ELITE_NOTES.md` `[verificato: SDK Python]`.
+  - **Cinematica ufficiale:** `examples/example_kinematics.py` legge gli MDH dalla Primary, i giunti e il TCP da RTSI e fa
+    FK/IK con il plugin KDL (`KinematicsBase.forward/inverse`). Utile come **controprova** della vostra FK MDH allo slot
+    (Round 2, BRACCIO punto 2): se la vostra e la loro non coincidono con la posa RTSI, fa fede la loro.
+  - Dashboard: `stopProgram`, `pauseProgram`, `playProgram`, `unlockProtectiveStop` (quest'ultimo resta FUORI whitelist).
+  - Non c'è un wheel su PyPI: si compila con CMake (`doc/BuildGuide`, target `python_wheel`). **Consiglio: non migrare ora**
+    il transport stdlib che avete; usatelo solo come riferimento o controprova sul laptop, se compila in < 10 min.
 
 ---
 
