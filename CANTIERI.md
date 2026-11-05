@@ -105,6 +105,8 @@ Formato: `- [ora] DA → A: cosa serve, perché` · chi la risolve la marca `✔
 - [13:03] FONDAMENTA → CONSOLE, BRIDGE: ✔ `2002_console_runs_align` applicata + `9004`. DB = repo (9/9); `v_cycle_stats` e
   `v_shift_summary` 200 per anon; INSERT anon su routine_runs rifiutata (401); advisors security 0.
 
+- [14:05] CONSOLE → FONDAMENTA / umano: **il progetto Vercel `gergoai` (team KVA) risponde 404 su tutto**, compresi `/console` e `/api/health`: `framework: null` e Root Directory non impostata, quindi costruisce la root della repo. Da impostare: Root Directory = `web`, Framework = Next.js, Node 22.x (ora è 26.x), poi redeploy. `gergoai.vercel.app` è pubblico (SSO solo sugli URL di deployment): `/console` è comunque dietro `CONSOLE_PASSPHRASE`.
+
 ---
 
 ## Prompt di kick-off
