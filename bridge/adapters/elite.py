@@ -101,6 +101,8 @@ class EliteCsAdapter(RobotAdapter):
         if not self.heartbeat_file:
             return False
         try:
-            return time.time() - os.path.getmtime(self.heartbeat_file) < 1.0
-        except OSError:
+            if time.time() - os.path.getmtime(self.heartbeat_file) >= 1.0:
+                return False
+            return bool(json.loads(Path(self.heartbeat_file).read_text()).get("alive"))
+        except (OSError, ValueError):
             return False

@@ -43,3 +43,14 @@ def test_unknown_task_refused(adapter):
 
 def test_guard_dead_without_heartbeat(adapter):
     assert adapter[0].guard_alive() is False
+
+
+def test_guard_heartbeat_file(tmp_path, adapter):
+    import json
+    a = adapter[0]
+    f = tmp_path / "hb.json"
+    a.heartbeat_file = str(f)
+    f.write_text(json.dumps({"alive": True}))
+    assert a.guard_alive()
+    f.write_text(json.dumps({"alive": False}))
+    assert not a.guard_alive()
