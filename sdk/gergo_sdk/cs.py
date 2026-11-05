@@ -51,6 +51,7 @@ class CsController:
         self.primary = PrimaryClient(host, primary_port, mode, log=self.log)
         self.rtsi = RtsiReader(host, rtsi_port)
         self.connected = False
+        self.primary_error: Optional[str] = None
 
     # --- connessione -------------------------------------------------------------------------------------------
     def connect(self) -> None:
@@ -58,7 +59,16 @@ class CsController:
             self.connected = True
             return
         self.dash.connect()
-        self.primary.connect()
+        try:
+            self.primary.connect()
+        except OSError as e:
+            # In read-only la Primary serve solo a MDH e TCP: senza, si legge comunque stato (Dashboard) e posa
+            # (RTSI) e gli spostamenti vengono rifiutati. In armed è obbligatoria (è anche la porta del movel).
+            # Visto in sala (05/11): con il controllo remoto abilitato ma il pendant in LOCAL, 30001-30003 rifiutano.
+            if self.mode == "armed":
+                raise
+            self.primary_error = f"Primary {self.host}:{self.ports[1]} non raggiungibile ({e}): il pendant è in Remote?"
+            self.log("ATTENZIONE: " + self.primary_error + " Continuo in sola lettura senza MDH e TCP.")
         self.rtsi.connect()
         self.connected = True
 
@@ -97,10 +107,16 @@ class CsController:
     def pose_base_m(self) -> list[float]:
         return list(self.rtsi.wait_fresh()["actual_TCP_pose"])
 
+    def _need_primary(self) -> None:
+        if self.primary_error:
+            raise ConnectionError(self.primary_error)
+
     def tcp_offset_m(self) -> list[float]:
+        self._need_primary()
         return list(self.primary.wait_for("cartesian").tcp_offset)
 
     def mdh(self):
+        self._need_primary()
         return self.primary.wait_for("mdh")
 
     # --- conferma del primo comando ------------------------------------------------------------------------------

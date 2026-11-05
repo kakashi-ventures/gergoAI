@@ -54,3 +54,49 @@ def test_guard_heartbeat_file(tmp_path, adapter):
     assert a.guard_alive()
     f.write_text(json.dumps({"alive": False}))
     assert not a.guard_alive()
+
+
+def test_make_adapter_elite_uses_cs_adapter(monkeypatch):
+    """--mode elite deve dare EliteCsAdapter, mai un dry-run silenzioso."""
+    from bridge.main import make_adapter
+    monkeypatch.setenv("ELITE_HOST", "127.0.0.1")
+    monkeypatch.setenv("ELITE_MODE", "dry-run")
+    a = make_adapter("elite", [], dry_run=False, sim_guard=False)
+    assert isinstance(a, EliteCsAdapter) and a.cs.mode == "dry-run"
+    assert type(make_adapter("elite", [], dry_run=True, sim_guard=False)).__name__ == "DryRunElite"
+
+
+def _close_primary(m):
+    """Come in sala il 05/11: pendant in LOCAL con il controllo remoto abilitato → 30001 rifiuta."""
+    s = m.servers[1]
+    s.shutdown()
+    s.server_close()
+
+
+def test_read_only_starts_without_primary_and_refuses_motion():
+    m = MockController()
+    try:
+        _close_primary(m)
+        c = CsController(m.host, "read-only", m.dashboard_port, m.primary_port, m.rtsi_port, log=lambda s: None)
+        a = EliteCsAdapter(controller=c)
+        a.connect()
+        st = a.status()
+        assert st.connected and not st.robot_ready and "Primary" in st.message and st.tcp_mm is None
+        p = a.read_pose()  # la posa arriva da RTSI
+        lc = a.check_line(p, p.translated((0, 0, -10)))
+        assert not lc.ok and "cinematica non disponibile" in lc.reason
+        assert not m.state.scripts
+    finally:
+        m.close()
+
+
+def test_armed_requires_primary():
+    m = MockController()
+    try:
+        _close_primary(m)
+        c = CsController(m.host, "armed", m.dashboard_port, m.primary_port, m.rtsi_port, confirm=lambda s: True,
+                         log=lambda s: None)
+        with pytest.raises(OSError):
+            EliteCsAdapter(controller=c).connect()
+    finally:
+        m.close()

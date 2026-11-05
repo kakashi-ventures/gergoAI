@@ -53,9 +53,13 @@ class EliteCsAdapter(RobotAdapter):
         if self.cs.mode == "dry-run":
             return AdapterStatus(connected=False, mode="dry-run", robot_ready=True, message="dry-run: nessun socket")
         try:
-            why = self.cs.preflight()
+            why = self.cs.preflight() or self.cs.primary_error
+            try:
+                tcp = self.read_tcp_mm()
+            except Exception:
+                tcp = None  # Primary assente (read-only): lo stato resta leggibile, i movimenti no
             return AdapterStatus(connected=True, mode=self.cs.mode, robot_ready=why is None, message=why or "",
-                                 tcp_mm=self.read_tcp_mm(), details=self.cs.status())
+                                 tcp_mm=tcp, details=self.cs.status())
         except Exception as e:
             return AdapterStatus(connected=False, mode=self.cs.mode, robot_ready=False,
                                  message=f"Controller non raggiungibile: {e}")
@@ -70,7 +74,10 @@ class EliteCsAdapter(RobotAdapter):
     def check_line(self, start: Pose, target: Pose) -> LineCheck:
         if self.cs.mode == "dry-run":
             return LineCheck(ok=True, reason="dry-run: cinematica non controllata")
-        mdh = self.cs.mdh()
+        try:
+            mdh = self.cs.mdh()
+        except Exception as e:
+            return LineCheck(ok=False, reason=f"cinematica non disponibile: {e}")
         m = kin.MDH(alpha=tuple(mdh.alpha), a=tuple(mdh.a), d=tuple(mdh.d))
         r = motion.check_line(m, self._to_base_m(start), self._to_base_m(target), self.cs.joints(),
                               tcp=self.cs.tcp_offset_m())
