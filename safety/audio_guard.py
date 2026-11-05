@@ -52,6 +52,14 @@ log = logging.getLogger("safety.audio_guard")
 
 BASELINE_DIR = Path(__file__).resolve().parent / "baseline"
 KEYWORDS = ("stop", "fermo", "basta", "alt")
+# Words of the voice commands, in the grammar but NOT triggers. With only the stop words in the grammar Vosk forced
+# every utterance onto the nearest one: measured 05/11 on Italian TTS, "sposta su di dieci centimetri" → stop+basta,
+# "sì conferma" → stop+fermo, so every voice command stopped the arm. Real "stop"/"fermo"/"basta" still trigger.
+DISTRACTORS = ("sposta", "spostati", "su", "giù", "destra", "sinistra", "avanti", "indietro", "di", "a", "e",
+               "centimetri", "centimetro", "millimetri", "uno", "due", "tre", "quattro", "cinque", "sei", "sette",
+               "otto", "nove", "dieci", "sì", "no", "conferma", "confermo", "annulla", "più", "piano", "veloce",
+               "braccio", "salva", "angolo", "esegui", "routine", "poco", "un", "po", "tanto", "vai", "ok", "fatto",
+               "prova", "test", "porta", "solleva", "deposita", "applica", "home", "stazione", "ingresso", "uscita")
 PRIORITY = {"parola": 1, "botta": 1, "urlo": 2, "sfregamento": 3}
 EPS = 1e-12
 
@@ -258,7 +266,8 @@ class KeywordSpotter:
                 import vosk  # type: ignore
                 vosk.SetLogLevel(-1)
                 model = vosk.Model(model_path)
-                grammar = json.dumps(list(self.keywords) + ["[unk]"])
+                vocab = [w for w in DISTRACTORS if w not in self.keywords]  # Vosk ignores out-of-vocabulary words
+                grammar = json.dumps(list(self.keywords) + vocab + ["[unk]"])
                 self.rec = vosk.KaldiRecognizer(model, sample_rate, grammar)
             except Exception as e:  # ImportError, modello mancante, ...
                 log.error("!!! PAROLA CHIAVE DISABILITATA: vosk/modello non disponibile (%s). "
