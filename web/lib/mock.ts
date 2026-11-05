@@ -5,7 +5,7 @@ export type SkillStatus = "draft" | "confirmed" | "deprecated";
 
 export interface SkillRow {
   name: string;
-  kind: "primitive" | "composite";
+  kind: "primitive" | "composite" | "motion" | "session";
   preconditions: string[];
   jbi: string | null;
   status: SkillStatus;
