@@ -22,6 +22,7 @@ export interface EventRow {
   ok?: boolean;
   step?: number;
   cycle?: boolean;
+  payload?: Record<string, unknown>;
 }
 
 export interface SafetyState {

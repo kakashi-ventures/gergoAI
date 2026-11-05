@@ -1,0 +1,924 @@
+{
+  "generated_at": "2026-11-05T12:34:27.874Z",
+  "source_commit": "82935655559acdf620e583069563640673f5cd44",
+  "unavailable": false,
+  "files": [
+    {
+      "path": "bridge/__init__.py",
+      "bytes": 0,
+      "lines": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": false,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "1448eac9a376191db8520a24618f1a6ee74261d7",
+        "date": "2026-11-05T11:44:46+00:00",
+        "author": "Claude",
+        "subject": "BRIDGE: contracts-v1 in /shared with sposta, session speed, Tool, Workspace, safety events"
+      }
+    },
+    {
+      "path": "bridge/adapters/__init__.py",
+      "bytes": 0,
+      "lines": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": false,
+      "safety_critical": true,
+      "last_commit": {
+        "sha": "1448eac9a376191db8520a24618f1a6ee74261d7",
+        "date": "2026-11-05T11:44:46+00:00",
+        "author": "Claude",
+        "subject": "BRIDGE: contracts-v1 in /shared with sposta, session speed, Tool, Workspace, safety events"
+      }
+    },
+    {
+      "path": "bridge/adapters/base.py",
+      "bytes": 3282,
+      "lines": 96,
+      "sha256": "960b7e94df43cbd0c3a4de16fcf79ee85baecca0152b4b252af53727c9b4648d",
+      "test": false,
+      "safety_critical": true,
+      "last_commit": {
+        "sha": "0ed7009416ea9c8810d07f944f1bb952011cad2a",
+        "date": "2026-11-05T11:46:54+00:00",
+        "author": "Claude",
+        "subject": "BRIDGE: RobotAdapter interface, motion (intent to mm, geofence, speed, readback), validator"
+      }
+    },
+    {
+      "path": "bridge/adapters/dryrun.py",
+      "bytes": 1529,
+      "lines": 36,
+      "sha256": "a544b2b7e54bafc7d79d042729742c40022eb54ce4d0b094362796615780ad16",
+      "test": false,
+      "safety_critical": true,
+      "last_commit": {
+        "sha": "54753c328d73771ec9b88d012700b129e2e57f5f",
+        "date": "2026-11-05T11:50:08+00:00",
+        "author": "Claude",
+        "subject": "BRIDGE: main loop, SimArm with poses and sposta, dry-run elite, PostgREST store, guard gating"
+      }
+    },
+    {
+      "path": "bridge/adapters/elite.py",
+      "bytes": 5265,
+      "lines": 108,
+      "sha256": "13e54bc5f62ae77dcae5da2edf466112f117e4d335b40c3cd5ea5bd0919ba84e",
+      "test": false,
+      "safety_critical": true,
+      "last_commit": {
+        "sha": "73252742cea5153946198f7454d1079f726f5aef",
+        "date": "2026-11-05T11:57:39+00:00",
+        "author": "Claude",
+        "subject": "BRACCIO: audio_guard (voice and acoustic software stop), guard heartbeat in CS adapter"
+      }
+    },
+    {
+      "path": "bridge/adapters/sim.py",
+      "bytes": 4874,
+      "lines": 119,
+      "sha256": "e9af925adb02f5054376a1ba08571e82ec247f0834e9f9a670f13abdd0a9f80c",
+      "test": false,
+      "safety_critical": true,
+      "last_commit": {
+        "sha": "54753c328d73771ec9b88d012700b129e2e57f5f",
+        "date": "2026-11-05T11:50:08+00:00",
+        "author": "Claude",
+        "subject": "BRIDGE: main loop, SimArm with poses and sposta, dry-run elite, PostgREST store, guard gating"
+      }
+    },
+    {
+      "path": "bridge/composer.py",
+      "bytes": 5695,
+      "lines": 115,
+      "sha256": "05f172e9d569216e00f0106820c15a462557f55457e54b13a936f0eb00b5494f",
+      "test": false,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "7d079013ab90f59e7b11b2ca3be2f98f6fc1777c",
+        "date": "2026-11-05T11:51:51+00:00",
+        "author": "Claude",
+        "subject": "BRIDGE: composer for routine runs (one command at a time, attendi_operatore, cycle_time_ms, stop)"
+      }
+    },
+    {
+      "path": "bridge/contracts.py",
+      "bytes": 10386,
+      "lines": 326,
+      "sha256": "f358e8ceddfc984a7151223297d8e5de4bff35e2955ef392b04515b2cbf44d27",
+      "test": false,
+      "safety_critical": true,
+      "last_commit": {
+        "sha": "1448eac9a376191db8520a24618f1a6ee74261d7",
+        "date": "2026-11-05T11:44:46+00:00",
+        "author": "Claude",
+        "subject": "BRIDGE: contracts-v1 in /shared with sposta, session speed, Tool, Workspace, safety events"
+      }
+    },
+    {
+      "path": "bridge/deploy_report.py",
+      "bytes": 18629,
+      "lines": 371,
+      "sha256": "524aa2362884e8cf4cfd9f27d8a68d6ae5ffde7b5cb41922790f1520043102c5",
+      "test": false,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "fe595d92449211b5a01bd79e7302df8e72f2e039",
+        "date": "2026-11-05T11:53:07+00:00",
+        "author": "Claude",
+        "subject": "BRIDGE: deploy_report with safety section (triggers by type, median latency, geofence refusals), md+json with queries"
+      }
+    },
+    {
+      "path": "bridge/gen_schemas.py",
+      "bytes": 1066,
+      "lines": 35,
+      "sha256": "40e2fea57e86c06a01922eb3ecd9dc98b4db884c53c389dfad1c5f692c138760",
+      "test": false,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "1448eac9a376191db8520a24618f1a6ee74261d7",
+        "date": "2026-11-05T11:44:46+00:00",
+        "author": "Claude",
+        "subject": "BRIDGE: contracts-v1 in /shared with sposta, session speed, Tool, Workspace, safety events"
+      }
+    },
+    {
+      "path": "bridge/main.py",
+      "bytes": 13372,
+      "lines": 320,
+      "sha256": "fd876512090af99f781e30fd30afaebec17a76229a4bd0cc238d233b3e1eecac",
+      "test": false,
+      "safety_critical": true,
+      "last_commit": {
+        "sha": "7d079013ab90f59e7b11b2ca3be2f98f6fc1777c",
+        "date": "2026-11-05T11:51:51+00:00",
+        "author": "Claude",
+        "subject": "BRIDGE: composer for routine runs (one command at a time, attendi_operatore, cycle_time_ms, stop)"
+      }
+    },
+    {
+      "path": "bridge/motion.py",
+      "bytes": 3464,
+      "lines": 102,
+      "sha256": "ae9cf0a03a91626b8c78e48a857f685a23d7db4c4899a611c7cc867eb54fe7ba",
+      "test": false,
+      "safety_critical": true,
+      "last_commit": {
+        "sha": "0ed7009416ea9c8810d07f944f1bb952011cad2a",
+        "date": "2026-11-05T11:46:54+00:00",
+        "author": "Claude",
+        "subject": "BRIDGE: RobotAdapter interface, motion (intent to mm, geofence, speed, readback), validator"
+      }
+    },
+    {
+      "path": "bridge/store.py",
+      "bytes": 8960,
+      "lines": 212,
+      "sha256": "c04ac19065ea2ab2ad8811d0dc9cbf8b0e167446933224d4c0c1487f22052647",
+      "test": false,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "7d079013ab90f59e7b11b2ca3be2f98f6fc1777c",
+        "date": "2026-11-05T11:51:51+00:00",
+        "author": "Claude",
+        "subject": "BRIDGE: composer for routine runs (one command at a time, attendi_operatore, cycle_time_ms, stop)"
+      }
+    },
+    {
+      "path": "bridge/tests/__init__.py",
+      "bytes": 0,
+      "lines": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": true,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "1448eac9a376191db8520a24618f1a6ee74261d7",
+        "date": "2026-11-05T11:44:46+00:00",
+        "author": "Claude",
+        "subject": "BRIDGE: contracts-v1 in /shared with sposta, session speed, Tool, Workspace, safety events"
+      }
+    },
+    {
+      "path": "bridge/tests/test_composer.py",
+      "bytes": 3682,
+      "lines": 89,
+      "sha256": "6c7c194d5f50dfff31fb1158615e8c80b2ac2b13f659c198f65221f98c1fe5d6",
+      "test": true,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "7d079013ab90f59e7b11b2ca3be2f98f6fc1777c",
+        "date": "2026-11-05T11:51:51+00:00",
+        "author": "Claude",
+        "subject": "BRIDGE: composer for routine runs (one command at a time, attendi_operatore, cycle_time_ms, stop)"
+      }
+    },
+    {
+      "path": "bridge/tests/test_contracts.py",
+      "bytes": 1152,
+      "lines": 41,
+      "sha256": "9e1f291f50bb69829cc8baf75dbf70992d17fa395f8458ced2c10ade396f79f2",
+      "test": true,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "1448eac9a376191db8520a24618f1a6ee74261d7",
+        "date": "2026-11-05T11:44:46+00:00",
+        "author": "Claude",
+        "subject": "BRIDGE: contracts-v1 in /shared with sposta, session speed, Tool, Workspace, safety events"
+      }
+    },
+    {
+      "path": "bridge/tests/test_deploy_report.py",
+      "bytes": 4223,
+      "lines": 84,
+      "sha256": "46d8fa4f06152cc073bd222e199eb68902c6d5f0cfc9940cae19d7ca9c20f82f",
+      "test": true,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "fe595d92449211b5a01bd79e7302df8e72f2e039",
+        "date": "2026-11-05T11:53:07+00:00",
+        "author": "Claude",
+        "subject": "BRIDGE: deploy_report with safety section (triggers by type, median latency, geofence refusals), md+json with queries"
+      }
+    },
+    {
+      "path": "bridge/tests/test_elite_adapter.py",
+      "bytes": 1581,
+      "lines": 56,
+      "sha256": "31a9f79089f1dc34d90ce5300fa71c13dbda4cf76b37eed482ca017bad609072",
+      "test": true,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "73252742cea5153946198f7454d1079f726f5aef",
+        "date": "2026-11-05T11:57:39+00:00",
+        "author": "Claude",
+        "subject": "BRACCIO: audio_guard (voice and acoustic software stop), guard heartbeat in CS adapter"
+      }
+    },
+    {
+      "path": "bridge/tests/test_main.py",
+      "bytes": 4709,
+      "lines": 124,
+      "sha256": "6ad0a04006ecf2f8f6dd00cd989c473d1ace98c743e1bd2502818bc70b730196",
+      "test": true,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "54753c328d73771ec9b88d012700b129e2e57f5f",
+        "date": "2026-11-05T11:50:08+00:00",
+        "author": "Claude",
+        "subject": "BRIDGE: main loop, SimArm with poses and sposta, dry-run elite, PostgREST store, guard gating"
+      }
+    },
+    {
+      "path": "bridge/tests/test_validator.py",
+      "bytes": 5168,
+      "lines": 134,
+      "sha256": "38a70991ed97313db6289e13565b08a6ba7f427ea405fb5f368c007b62cfb222",
+      "test": true,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "0ed7009416ea9c8810d07f944f1bb952011cad2a",
+        "date": "2026-11-05T11:46:54+00:00",
+        "author": "Claude",
+        "subject": "BRIDGE: RobotAdapter interface, motion (intent to mm, geofence, speed, readback), validator"
+      }
+    },
+    {
+      "path": "bridge/validator.py",
+      "bytes": 6266,
+      "lines": 160,
+      "sha256": "7b7a9761648254a2425bb3dc81de0142578dcd81bd6986368959d77aa3acc91f",
+      "test": false,
+      "safety_critical": true,
+      "last_commit": {
+        "sha": "0ed7009416ea9c8810d07f944f1bb952011cad2a",
+        "date": "2026-11-05T11:46:54+00:00",
+        "author": "Claude",
+        "subject": "BRIDGE: RobotAdapter interface, motion (intent to mm, geofence, speed, readback), validator"
+      }
+    },
+    {
+      "path": "sdk/gergo_sdk/__init__.py",
+      "bytes": 0,
+      "lines": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": false,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "54e9f85978b1bf99e14a7cfc1e8741a137199632",
+        "date": "2026-11-05T11:56:19+00:00",
+        "author": "Claude",
+        "subject": "BRACCIO: gergo_sdk for Elite CS (dashboard, RTSI, primary, mock, probe, motion), CS adapter"
+      }
+    },
+    {
+      "path": "sdk/gergo_sdk/cs.py",
+      "bytes": 9572,
+      "lines": 206,
+      "sha256": "8da347d53848eaca599c590e9f31627eb1bf1144c69efa85385df1ba86cb4a8c",
+      "test": false,
+      "safety_critical": true,
+      "last_commit": {
+        "sha": "54e9f85978b1bf99e14a7cfc1e8741a137199632",
+        "date": "2026-11-05T11:56:19+00:00",
+        "author": "Claude",
+        "subject": "BRACCIO: gergo_sdk for Elite CS (dashboard, RTSI, primary, mock, probe, motion), CS adapter"
+      }
+    },
+    {
+      "path": "sdk/gergo_sdk/dashboard.py",
+      "bytes": 6791,
+      "lines": 165,
+      "sha256": "9a247079352525aea6b253e7c928e60588e6aeb2ce772275f6ac40035641bba8",
+      "test": false,
+      "safety_critical": true,
+      "last_commit": {
+        "sha": "54e9f85978b1bf99e14a7cfc1e8741a137199632",
+        "date": "2026-11-05T11:56:19+00:00",
+        "author": "Claude",
+        "subject": "BRACCIO: gergo_sdk for Elite CS (dashboard, RTSI, primary, mock, probe, motion), CS adapter"
+      }
+    },
+    {
+      "path": "sdk/gergo_sdk/kinematics.py",
+      "bytes": 10968,
+      "lines": 283,
+      "sha256": "df312f1a966c6c7fab9058a72f994c2a7e5fa7cbf2de0ad1455a3de1f1906169",
+      "test": false,
+      "safety_critical": true,
+      "last_commit": {
+        "sha": "54e9f85978b1bf99e14a7cfc1e8741a137199632",
+        "date": "2026-11-05T11:56:19+00:00",
+        "author": "Claude",
+        "subject": "BRACCIO: gergo_sdk for Elite CS (dashboard, RTSI, primary, mock, probe, motion), CS adapter"
+      }
+    },
+    {
+      "path": "sdk/gergo_sdk/mock.py",
+      "bytes": 12495,
+      "lines": 304,
+      "sha256": "6f5a39e27c1e8177cc7cf7116dc9454ac39fceff0e234f05257363d1aec408e8",
+      "test": false,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "54e9f85978b1bf99e14a7cfc1e8741a137199632",
+        "date": "2026-11-05T11:56:19+00:00",
+        "author": "Claude",
+        "subject": "BRACCIO: gergo_sdk for Elite CS (dashboard, RTSI, primary, mock, probe, motion), CS adapter"
+      }
+    },
+    {
+      "path": "sdk/gergo_sdk/motion.py",
+      "bytes": 6246,
+      "lines": 129,
+      "sha256": "faee9ea3fdd1a21d60eef28969edf42bf42334979ee2be99b7b7618c6b55fd0a",
+      "test": false,
+      "safety_critical": true,
+      "last_commit": {
+        "sha": "54e9f85978b1bf99e14a7cfc1e8741a137199632",
+        "date": "2026-11-05T11:56:19+00:00",
+        "author": "Claude",
+        "subject": "BRACCIO: gergo_sdk for Elite CS (dashboard, RTSI, primary, mock, probe, motion), CS adapter"
+      }
+    },
+    {
+      "path": "sdk/gergo_sdk/primary.py",
+      "bytes": 6705,
+      "lines": 161,
+      "sha256": "c9b65f2622fa2b565e60714a782b091a69868e73ebd13f4269bc4164003d1f7a",
+      "test": false,
+      "safety_critical": true,
+      "last_commit": {
+        "sha": "54e9f85978b1bf99e14a7cfc1e8741a137199632",
+        "date": "2026-11-05T11:56:19+00:00",
+        "author": "Claude",
+        "subject": "BRACCIO: gergo_sdk for Elite CS (dashboard, RTSI, primary, mock, probe, motion), CS adapter"
+      }
+    },
+    {
+      "path": "sdk/gergo_sdk/probe.py",
+      "bytes": 2684,
+      "lines": 70,
+      "sha256": "d0f58aea4ea7e78c552656bcd585e107be2a432bd148d6dbbdb9430ae2850c2f",
+      "test": false,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "54e9f85978b1bf99e14a7cfc1e8741a137199632",
+        "date": "2026-11-05T11:56:19+00:00",
+        "author": "Claude",
+        "subject": "BRACCIO: gergo_sdk for Elite CS (dashboard, RTSI, primary, mock, probe, motion), CS adapter"
+      }
+    },
+    {
+      "path": "sdk/gergo_sdk/rtsi.py",
+      "bytes": 4773,
+      "lines": 121,
+      "sha256": "0fbf123be1848758c2ebfc9842262d17b94e5d70334de58b308f6ceff45278f7",
+      "test": false,
+      "safety_critical": true,
+      "last_commit": {
+        "sha": "54e9f85978b1bf99e14a7cfc1e8741a137199632",
+        "date": "2026-11-05T11:56:19+00:00",
+        "author": "Claude",
+        "subject": "BRACCIO: gergo_sdk for Elite CS (dashboard, RTSI, primary, mock, probe, motion), CS adapter"
+      }
+    },
+    {
+      "path": "sdk/tests/test_cs.py",
+      "bytes": 4902,
+      "lines": 148,
+      "sha256": "59b2edb005995e7769cb4c5aff54f8b9a2d1336e64bb12bedd3d55392362751a",
+      "test": true,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "54e9f85978b1bf99e14a7cfc1e8741a137199632",
+        "date": "2026-11-05T11:56:19+00:00",
+        "author": "Claude",
+        "subject": "BRACCIO: gergo_sdk for Elite CS (dashboard, RTSI, primary, mock, probe, motion), CS adapter"
+      }
+    },
+    {
+      "path": "sdk/tests/test_kinematics.py",
+      "bytes": 3477,
+      "lines": 95,
+      "sha256": "82ba52c9efc329a820a1025086726fd1ef202fe424270def629e03680a4887f7",
+      "test": true,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "54e9f85978b1bf99e14a7cfc1e8741a137199632",
+        "date": "2026-11-05T11:56:19+00:00",
+        "author": "Claude",
+        "subject": "BRACCIO: gergo_sdk for Elite CS (dashboard, RTSI, primary, mock, probe, motion), CS adapter"
+      }
+    },
+    {
+      "path": "sdk/tests/test_motion.py",
+      "bytes": 3116,
+      "lines": 83,
+      "sha256": "92161a58c0c5e711037d26d5e171a62f4187053819e849c81dd1790690ab3c9d",
+      "test": true,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "54e9f85978b1bf99e14a7cfc1e8741a137199632",
+        "date": "2026-11-05T11:56:19+00:00",
+        "author": "Claude",
+        "subject": "BRACCIO: gergo_sdk for Elite CS (dashboard, RTSI, primary, mock, probe, motion), CS adapter"
+      }
+    },
+    {
+      "path": "safety/__init__.py",
+      "bytes": 0,
+      "lines": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": false,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "73252742cea5153946198f7454d1079f726f5aef",
+        "date": "2026-11-05T11:57:39+00:00",
+        "author": "Claude",
+        "subject": "BRACCIO: audio_guard (voice and acoustic software stop), guard heartbeat in CS adapter"
+      }
+    },
+    {
+      "path": "safety/audio_guard.py",
+      "bytes": 34107,
+      "lines": 783,
+      "sha256": "cf9cbb1a539f0ed96ea6b2b8196356ead097bf56faf04e9aa655026cafe1d1b7",
+      "test": false,
+      "safety_critical": true,
+      "last_commit": {
+        "sha": "73252742cea5153946198f7454d1079f726f5aef",
+        "date": "2026-11-05T11:57:39+00:00",
+        "author": "Claude",
+        "subject": "BRACCIO: audio_guard (voice and acoustic software stop), guard heartbeat in CS adapter"
+      }
+    },
+    {
+      "path": "safety/tests/__init__.py",
+      "bytes": 0,
+      "lines": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": true,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "73252742cea5153946198f7454d1079f726f5aef",
+        "date": "2026-11-05T11:57:39+00:00",
+        "author": "Claude",
+        "subject": "BRACCIO: audio_guard (voice and acoustic software stop), guard heartbeat in CS adapter"
+      }
+    },
+    {
+      "path": "safety/tests/test_audio_guard.py",
+      "bytes": 12897,
+      "lines": 365,
+      "sha256": "97adbec1dd1a745356ac626cbedd112e3d34fa1c1acb05693818b5e8307c427e",
+      "test": true,
+      "safety_critical": false,
+      "last_commit": {
+        "sha": "73252742cea5153946198f7454d1079f726f5aef",
+        "date": "2026-11-05T11:57:39+00:00",
+        "author": "Claude",
+        "subject": "BRACCIO: audio_guard (voice and acoustic software stop), guard heartbeat in CS adapter"
+      }
+    }
+  ],
+  "params": [
+    {
+      "name": "CLAMP_MM",
+      "value": "100.0",
+      "source_comment": null,
+      "file": "bridge/motion.py",
+      "line": 15,
+      "category": "movimento",
+      "note": "Spostamento massimo per singolo comando vocale (mm): oltre, il valore viene tagliato."
+    },
+    {
+      "name": "INTENSITA_MM",
+      "value": "{\"poco\": 10.0, \"un_po\": 20.0, \"tanto\": 50.0}",
+      "source_comment": null,
+      "file": "bridge/motion.py",
+      "line": 16,
+      "category": "movimento",
+      "note": "Traduzione delle parole d'intensità (poco / un po' / tanto) in millimetri."
+    },
+    {
+      "name": "DEFAULT_MM",
+      "value": "20.0",
+      "source_comment": null,
+      "file": "bridge/motion.py",
+      "line": 17,
+      "category": "movimento",
+      "note": "Spostamento usato quando l'operatore non dice quanto."
+    },
+    {
+      "name": "DEFAULT_FRAME",
+      "value": "{\n    \"su\": [\"z\", 1], \"giu\": [\"z\", -1],\n    \"avanti\": [\"x\", 1], \"indietro\": [\"x\", -1],\n    \"destra\": [\"y\", -1], \"sinistra\": [\"y\", 1],\n}",
+      "source_comment": null,
+      "file": "bridge/motion.py",
+      "line": 21,
+      "category": "movimento",
+      "note": "Riferimento di lavoro di default (assi e limiti) se manca il file del frame."
+    },
+    {
+      "name": "VELOCITA_DEFAULT_MM_S",
+      "value": "50.0",
+      "source_comment": null,
+      "file": "bridge/contracts.py",
+      "line": 219,
+      "category": "velocità",
+      "note": "Velocità iniziale della sessione (mm/s)."
+    },
+    {
+      "name": "VELOCITA_MIN_MM_S",
+      "value": "10.0",
+      "source_comment": null,
+      "file": "bridge/contracts.py",
+      "line": 220,
+      "category": "velocità",
+      "note": "Limite inferiore di velocità impostabile a voce (mm/s)."
+    },
+    {
+      "name": "VELOCITA_MAX_MM_S",
+      "value": "100.0",
+      "source_comment": null,
+      "file": "bridge/contracts.py",
+      "line": 221,
+      "category": "velocità",
+      "note": "Limite superiore di velocità impostabile a voce (mm/s)."
+    },
+    {
+      "name": "MAX_SPEED_M_S",
+      "value": "0.1",
+      "source_comment": "clamp velocità in demo",
+      "file": "sdk/gergo_sdk/motion.py",
+      "line": 14,
+      "category": "velocità",
+      "note": "Velocità cartesiana massima inviata al controller (m/s)."
+    },
+    {
+      "name": "MAX_ACC_M_S2",
+      "value": "1.0",
+      "source_comment": null,
+      "file": "sdk/gergo_sdk/motion.py",
+      "line": 16,
+      "category": "velocità",
+      "note": "Accelerazione massima dei movimenti lineari (m/s²)."
+    },
+    {
+      "name": "MAX_SPEED_M_S",
+      "value": "0.1",
+      "source_comment": "MOTION_SAFETY.md §2.7: massimo 100 mm/s in demo",
+      "file": "sdk/gergo_sdk/primary.py",
+      "line": 32,
+      "category": "velocità",
+      "note": "Tetto di velocità applicato al momento dell'invio sulla porta primaria (m/s)."
+    },
+    {
+      "name": "MAX_ACC_M_S2",
+      "value": "0.5",
+      "source_comment": null,
+      "file": "sdk/gergo_sdk/primary.py",
+      "line": 33,
+      "category": "velocità",
+      "note": "Tetto di accelerazione sulla porta primaria (m/s²)."
+    },
+    {
+      "name": "MAX_COMMAND_AGE_S",
+      "value": "30.0",
+      "source_comment": null,
+      "file": "bridge/validator.py",
+      "line": 16,
+      "category": "conferma",
+      "note": "Un comando più vecchio di così viene rifiutato: niente esecuzioni in ritardo."
+    },
+    {
+      "name": "TCP_TOLERANCE_MM",
+      "value": "2.0",
+      "source_comment": null,
+      "file": "bridge/validator.py",
+      "line": 17,
+      "category": "conferma",
+      "note": "Scostamento massimo tra posa attesa e posa letta prima di muovere."
+    },
+    {
+      "name": "MOTION_SKILLS",
+      "value": "{\"sposta\"}",
+      "source_comment": null,
+      "file": "bridge/validator.py",
+      "line": 18,
+      "category": "conferma",
+      "note": "Comandi trattati come movimento (richiedono i controlli di posa)."
+    },
+    {
+      "name": "SESSION_SKILLS",
+      "value": "{\"piu_piano\", \"piu_veloce\"}",
+      "source_comment": null,
+      "file": "bridge/validator.py",
+      "line": 19,
+      "category": "conferma",
+      "note": "Comandi che cambiano solo la sessione (velocità), senza muovere."
+    },
+    {
+      "name": "GUARD_GRACE_S",
+      "value": "1.0",
+      "source_comment": null,
+      "file": "bridge/main.py",
+      "line": 26,
+      "category": "arresto acustico",
+      "note": "Tempo concesso alla guardia acustica per dare segni di vita prima di bloccare i movimenti."
+    },
+    {
+      "name": "TIMEOUT_S",
+      "value": "{\"solleva\": 20, \"deposita\": 20, \"porta\": 20, \"applica\": 15, \"home\": 20, \"sposta\": 15}",
+      "source_comment": null,
+      "file": "bridge/main.py",
+      "line": 25,
+      "category": "conferma",
+      "note": "Tempo massimo di esecuzione per ogni abilità: oltre, il comando è dichiarato fallito."
+    },
+    {
+      "name": "HEARTBEAT_S",
+      "value": "2.0",
+      "source_comment": null,
+      "file": "bridge/main.py",
+      "line": 27,
+      "category": "altro",
+      "note": "Intervallo del battito del bridge verso la console."
+    },
+    {
+      "name": "POSE_TOLERANCE_MM",
+      "value": "1.0",
+      "source_comment": null,
+      "file": "bridge/main.py",
+      "line": 29,
+      "category": "conferma",
+      "note": "Tolleranza di posa a fine movimento (mm)."
+    },
+    {
+      "name": "RUN_MAX_AGE_S",
+      "value": "30.0",
+      "source_comment": null,
+      "file": "bridge/composer.py",
+      "line": 21,
+      "category": "conferma",
+      "note": "Età massima di una routine prima che venga scartata."
+    },
+    {
+      "name": "FEEDBACK_TIMEOUT_S",
+      "value": "120.0",
+      "source_comment": null,
+      "file": "bridge/composer.py",
+      "line": 22,
+      "category": "conferma",
+      "note": "Attesa massima del riscontro dell'operatore durante una routine."
+    },
+    {
+      "name": "READ_ONLY",
+      "value": "{\n    \"echo\": r\"echo\",                      # cpp:96  -> \"Hello ELITE ROBOTS.\"\n    \"robotMode\": r\"robotMode\",            # cpp:211 -> \"robotMode: RUNNING\"\n    \"safety\": r\"safety -s\",               # cpp:242 -> \"Safety status: NORMAL\"\n    \"status\": r\"status\",                  # cpp:204/284 -> \"Targe…",
+      "source_comment": null,
+      "file": "sdk/gergo_sdk/dashboard.py",
+      "line": 20,
+      "category": "whitelist",
+      "note": "Comandi di sola lettura ammessi sulla dashboard del controller (regex esatta)."
+    },
+    {
+      "name": "TASK",
+      "value": "{\n    \"loadTask\": r\"task -p [A-Za-z0-9_./-]+\\.task\",  # cpp:378 -> \"Loaded task: ...\"\n    \"play\": r\"play\",                      # cpp:334\n    \"pause\": r\"pause\",                    # cpp:342\n    \"stop\": r\"stop\",                      # cpp:358\n}",
+      "source_comment": null,
+      "file": "sdk/gergo_sdk/dashboard.py",
+      "line": 32,
+      "category": "whitelist",
+      "note": "Comandi di gestione task ammessi sulla dashboard: tutto il resto è rifiutato."
+    },
+    {
+      "name": "MOVEL_RE",
+      "value": "re.compile(\n    rf\"^def gergo_sposta\\(\\):\\n\\tmovel\\(\\[{_NUM}, {_NUM}, {_NUM}, {_NUM}, {_NUM}, {_NUM}\\], \"\n    rf\"a={_NUM}, v={_NUM}\\)\\nend$\")",
+      "source_comment": null,
+      "file": "sdk/gergo_sdk/primary.py",
+      "line": 35,
+      "category": "whitelist",
+      "note": "Unico script ammesso sulla porta primaria: un solo movel con numeri formattati."
+    },
+    {
+      "name": "MAX_TRANSLATION_M",
+      "value": "0.1",
+      "source_comment": "clamp 100 mm per comando",
+      "file": "sdk/gergo_sdk/motion.py",
+      "line": 15,
+      "category": "movimento",
+      "note": "Traslazione massima per comando nello SDK (m)."
+    },
+    {
+      "name": "MAX_ROT_CHANGE_RAD",
+      "value": "1e-3",
+      "source_comment": "l'orientamento deve restare identico",
+      "file": "sdk/gergo_sdk/motion.py",
+      "line": 17,
+      "category": "cinematica",
+      "note": "Variazione d'orientamento ammessa: l'utensile non deve ruotare."
+    },
+    {
+      "name": "START_POSE_TOL_M",
+      "value": "1e-3",
+      "source_comment": "la posa iniziale deve coincidere con FK(q_start) entro 1 mm",
+      "file": "sdk/gergo_sdk/motion.py",
+      "line": 18,
+      "category": "cinematica",
+      "note": "La posa di partenza deve coincidere con la cinematica diretta entro questa tolleranza."
+    },
+    {
+      "name": "max_jump_deg",
+      "value": "15.0",
+      "source_comment": null,
+      "file": "sdk/gergo_sdk/motion.py",
+      "line": 37,
+      "category": "cinematica",
+      "note": "Salto massimo di un giunto tra due punti della traiettoria (gradi)."
+    },
+    {
+      "name": "max_ratio_deg_per_mm",
+      "value": "1.0",
+      "source_comment": null,
+      "file": "sdk/gergo_sdk/motion.py",
+      "line": 37,
+      "category": "cinematica",
+      "note": "Rapporto massimo gradi di giunto per mm cartesiano: protegge dalle singolarità."
+    },
+    {
+      "name": "JOINT_LIMIT_RAD",
+      "value": "2.0 * math.pi",
+      "source_comment": "±360°",
+      "file": "sdk/gergo_sdk/kinematics.py",
+      "line": 26,
+      "category": "cinematica",
+      "note": "Limite di rotazione dei giunti usato dalla cinematica inversa."
+    },
+    {
+      "name": "POSE_TOL_M",
+      "value": "0.001",
+      "source_comment": "step_end ok se l'errore finale è sotto 1 mm (MOTION_SAFETY.md §2.8)",
+      "file": "sdk/gergo_sdk/cs.py",
+      "line": 23,
+      "category": "cinematica",
+      "note": "Errore finale ammesso perché un passo sia dichiarato riuscito (m)."
+    },
+    {
+      "name": "KEYWORDS",
+      "value": "(\"stop\", \"fermo\", \"basta\", \"alt\")",
+      "source_comment": null,
+      "file": "safety/audio_guard.py",
+      "line": 54,
+      "category": "arresto acustico",
+      "note": "Parole che fermano il braccio."
+    },
+    {
+      "name": "PRIORITY",
+      "value": "{\"parola\": 1, \"botta\": 1, \"urlo\": 2, \"sfregamento\": 3}",
+      "source_comment": null,
+      "file": "safety/audio_guard.py",
+      "line": 55,
+      "category": "arresto acustico",
+      "note": "Priorità dei tipi di evento sonoro (1 = più alta)."
+    },
+    {
+      "name": "botta_rise_db",
+      "value": "15.0",
+      "source_comment": null,
+      "file": "safety/audio_guard.py",
+      "line": 174,
+      "category": "arresto acustico",
+      "note": "Salita di energia che identifica un colpo (dB)."
+    },
+    {
+      "name": "botta_crest",
+      "value": "3.5",
+      "source_comment": null,
+      "file": "safety/audio_guard.py",
+      "line": 175,
+      "category": "arresto acustico",
+      "note": "Fattore di cresta minimo (picco/RMS) per un colpo."
+    },
+    {
+      "name": "botta_min_over_baseline_db",
+      "value": "15.0",
+      "source_comment": null,
+      "file": "safety/audio_guard.py",
+      "line": 176,
+      "category": "arresto acustico",
+      "note": "Livello minimo sopra il rumore di fondo per un colpo (dB)."
+    },
+    {
+      "name": "urlo_over_db",
+      "value": "20.0",
+      "source_comment": null,
+      "file": "safety/audio_guard.py",
+      "line": 177,
+      "category": "arresto acustico",
+      "note": "Livello sopra il riferimento per riconoscere un urlo (dB)."
+    },
+    {
+      "name": "urlo_min_ms",
+      "value": "100.0",
+      "source_comment": null,
+      "file": "safety/audio_guard.py",
+      "line": 178,
+      "category": "arresto acustico",
+      "note": "Durata minima di un urlo (ms)."
+    },
+    {
+      "name": "urlo_centroid_hz",
+      "value": "1200.0",
+      "source_comment": null,
+      "file": "safety/audio_guard.py",
+      "line": 179,
+      "category": "arresto acustico",
+      "note": "Centroide spettrale minimo di un urlo (Hz)."
+    },
+    {
+      "name": "sfreg_hf_over_db",
+      "value": "10.0",
+      "source_comment": null,
+      "file": "safety/audio_guard.py",
+      "line": 180,
+      "category": "arresto acustico",
+      "note": "Energia in alta frequenza sopra il profilo di moto per uno sfregamento (dB)."
+    },
+    {
+      "name": "sfreg_min_ms",
+      "value": "300.0",
+      "source_comment": null,
+      "file": "safety/audio_guard.py",
+      "line": 182,
+      "category": "arresto acustico",
+      "note": "Durata minima di uno sfregamento (ms)."
+    },
+    {
+      "name": "debounce_s",
+      "value": "1.0",
+      "source_comment": null,
+      "file": "safety/audio_guard.py",
+      "line": 184,
+      "category": "arresto acustico",
+      "note": "Tempo minimo tra due arresti consecutivi (s)."
+    },
+    {
+      "name": "HEARTBEAT_S",
+      "value": "0.25",
+      "source_comment": null,
+      "file": "safety/audio_guard.py",
+      "line": 527,
+      "category": "arresto acustico",
+      "note": "Intervallo del battito della guardia acustica (s)."
+    },
+    {
+      "name": "NO_AUDIO_S",
+      "value": "0.5",
+      "source_comment": null,
+      "file": "safety/audio_guard.py",
+      "line": 528,
+      "category": "arresto acustico",
+      "note": "Senza audio per questo tempo la guardia va in failsafe."
+    }
+  ],
+  "missing": []
+}

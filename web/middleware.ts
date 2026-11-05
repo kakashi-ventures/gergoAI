@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 // Auth minima di postazione (DEPLOY.md prompt 2 §5): cookie httpOnly con la passphrase.
 // Se CONSOLE_PASSPHRASE non è impostata, in produzione si nega tutto (fail-closed); in dev si lascia passare.
-export const config = { matcher: ["/console/:path*", "/api/tools/:path*", "/api/voice/:path*"] };
+export const config = { matcher: ["/console", "/console/:path*", "/api/tools/:path*", "/api/voice/:path*"], runtime: "nodejs" };
 
 export function middleware(req: NextRequest) {
   const pass = process.env.CONSOLE_PASSPHRASE;

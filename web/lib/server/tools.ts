@@ -326,3 +326,31 @@ export async function mina(): Promise<ToolResult & { nuove: string[] }> {
   }
   return { ok: true, frase: nuove[0] ?? "", nuove };
 }
+
+/** Modifica di un movimento insegnato: crea SEMPRE una nuova versione in bozza, mai una sovrascrittura. */
+export async function modificaRoutine(name: string, from_version: number, steps: Steps, by: string, motivo: string): Promise<ToolResult> {
+  const r = Routine.safeParse({ name, version: 1, steps });
+  if (!r.success) return { ok: false, frase: "I passi non sono validi.", errore: r.error.issues[0]?.message };
+  const ctx = await loadContext("propose");
+  const chk = checkSteps(r.data.steps, ctx);
+  if (!chk.ok) return { ok: false, frase: `Non la posso salvare: ${chk.reason}.`, step: chk.step };
+  const s = db();
+  const all = await must(s.from("routines").select("version,status,steps").eq("name", name).order("version", { ascending: false }));
+  const from = all.find((x: { version: number }) => x.version === from_version);
+  if (!from) return { ok: false, frase: `La versione ${from_version} della «${name}» non esiste.` };
+  if (JSON.stringify(from.steps) === JSON.stringify(r.data.steps)) return { ok: false, frase: "Non hai cambiato niente." };
+  const version = (all[0]?.version ?? 0) + 1;
+  await must(s.from("routines").delete().eq("name", name).eq("status", "draft"));
+  await must(s.from("routines").insert({
+    name, version, parent_version: from_version, edited_from_version: from_version, steps: r.data.steps,
+    taught_by_voice: false, source_utterance: `modifica dalla console (${by}): ${motivo}`, status: "draft",
+  }));
+  await event("correction", { oggetto: "routine", routine: name, from_version, to_version: version, by, motivo, steps: r.data.steps });
+  return { ok: true, frase: `Versione ${version} della «${name}» pronta: va approvata prima di essere usata.`, version };
+}
+
+/** Presa visione di un'allerta: resta nel registro con chi e quando. Non resetta niente sul controller. */
+export async function presaVisione(alert_id: string, livello: string, titolo: string, by: string): Promise<ToolResult> {
+  await event("approval", { oggetto: "allerta", alert_id, livello, titolo, by });
+  return { ok: true, frase: "Presa visione registrata." };
+}

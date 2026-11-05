@@ -5,6 +5,11 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { useEffect, useRef, useState } from "react";
 import * as mock from "./mock";
 
+export interface RoutineRow {
+  name: string; version: number; status: string; source_utterance: string | null; diff: string;
+  steps: { skill: string; place?: string | null; prompt?: string | null }[]; parent_version: number | null; edited_from_version: number | null;
+}
+
 export interface LiveData {
   source: "db" | "finti";
   realtime: boolean;
@@ -12,7 +17,9 @@ export interface LiveData {
   workspace: mock.Workspace | null;
   tcp: [number, number, number] | null;
   skills: mock.SkillRow[];
-  routines: { name: string; version: number; status: string; source_utterance: string | null; diff: string }[];
+  routines: RoutineRow[];
+  cycles: { routine_name: string; routine_version: number; cycles: number; avg_cycle_time_ms: number | null }[];
+  acked: Set<string>;
   pending: { id?: string; skill: string; frase: string } | null;
   awaiting: string | null;
   events: mock.EventRow[];
@@ -23,8 +30,13 @@ export interface LiveData {
 }
 
 const MOCK: LiveData = {
-  source: "finti", realtime: false, awaiting: null, safety: mock.mockSafety, workspace: mock.mockWorkspace, tcp: mock.mockTcp,
-  skills: mock.mockSkills, routines: mock.mockRoutines, pending: mock.mockPending, events: mock.mockEvents,
+  source: "finti", realtime: false, awaiting: null, acked: new Set(),
+  cycles: [{ routine_name: "frontale", routine_version: 1, cycles: 4, avg_cycle_time_ms: 14200 }, { routine_name: "frontale", routine_version: 2, cycles: 2, avg_cycle_time_ms: 11900 }], safety: mock.mockSafety, workspace: mock.mockWorkspace, tcp: mock.mockTcp,
+  skills: mock.mockSkills,
+  routines: mock.mockRoutines.map((r) => ({ ...r, edited_from_version: r.parent_version, steps: [
+    { skill: "solleva", place: "INGRESSO" }, { skill: "porta", place: "STAZIONE" }, { skill: "attendi_operatore", prompt: "metti l'etichetta frontale" },
+    { skill: "applica" }, { skill: "deposita", place: "USCITA" }, ...(r.version === 1 ? [{ skill: "home" }] : []),
+  ] })), pending: mock.mockPending, events: mock.mockEvents,
   proposal: mock.mockProposal, resoconto: mock.mockResoconto,
 };
 
@@ -58,16 +70,17 @@ async function load(s: SupabaseClient): Promise<LiveData> {
   };
   const ont = await q<{ version: number; status: string }[]>(s.from("ontology_versions").select("version,status").order("version", { ascending: false }).limit(1));
   const v = ont[0]?.version ?? -1;
-  const [bridge, guard, skills, ws, routines, cmds, evs, props, summary] = await Promise.all([
+  const [bridge, guard, skills, ws, routines, cmds, evs, props, summary, cycles] = await Promise.all([
     q<Record<string, unknown>[]>(s.from("bridge_status").select("*").eq("bridge_id", BRIDGE_ID).limit(1)),
     q<Record<string, unknown>[]>(s.from("guard_status").select("*").eq("bridge_id", BRIDGE_ID).limit(1)),
     q<mock.SkillRow[]>(s.from("skills").select("name,kind,preconditions,jbi,status,sim_ok,real_ok").eq("ontology_version", v).order("name")),
     q<mock.Workspace[]>(s.from("workspace").select("frame,min_mm,max_mm").eq("attivo", true).limit(1)),
-    q<Record<string, unknown>[]>(s.from("routines").select("name,version,status,source_utterance,parent_version").order("name").order("version", { ascending: false }).limit(10)).catch(() => []),
+    q<Record<string, unknown>[]>(s.from("routines").select("name,version,status,source_utterance,parent_version,edited_from_version,steps").order("name").order("version", { ascending: false }).limit(40)).catch(() => []),
     q<Record<string, unknown>[]>(s.from("commands").select("id,skill,readback,status").eq("status", "queued").order("created_at", { ascending: false }).limit(1)),
-    q<Record<string, unknown>[]>(s.from("events").select("id,ts,type,payload,step").order("ts", { ascending: false }).limit(60)),
+    q<Record<string, unknown>[]>(s.from("events").select("id,ts,type,payload,step,routine_run_id").order("ts", { ascending: false }).limit(150)),
     q<Record<string, unknown>[]>(s.from("proposals").select("id,status,change,before,after,observation_id,observations(summary,rule)").eq("status", "pending").order("created_at", { ascending: false }).limit(1)).catch(() => []),
     q<Record<string, unknown>[]>(s.from("v_shift_summary").select("*").limit(1)).catch(() => []),
+    q<LiveData["cycles"]>(s.from("v_cycle_stats").select("routine_name,routine_version,cycles,avg_cycle_time_ms").order("routine_name").order("routine_version")).catch(() => []),
   ]);
   const b = bridge[0] ?? {}, g = guard[0] ?? {};
   const lt = g.last_trigger as { trigger?: string; latency_ms?: number; ts?: string } | null;
@@ -89,7 +102,12 @@ async function load(s: SupabaseClient): Promise<LiveData> {
     workspace: ws[0] ?? null,
     tcp: Array.isArray(b.pose_mm) && b.pose_mm.length >= 3 ? (b.pose_mm.slice(0, 3) as [number, number, number]) : null,
     skills,
-    routines: routines.map((r) => ({ name: String(r.name), version: Number(r.version), status: String(r.status), source_utterance: (r.source_utterance as string) ?? null, diff: "" })),
+    routines: routines.map((r) => ({
+      name: String(r.name), version: Number(r.version), status: String(r.status), source_utterance: (r.source_utterance as string) ?? null, diff: "",
+      steps: (r.steps as RoutineRow["steps"]) ?? [], parent_version: (r.parent_version as number) ?? null, edited_from_version: (r.edited_from_version as number) ?? null,
+    })),
+    cycles,
+    acked: new Set(evs.filter((e) => e.type === "approval" && (e.payload as Record<string, unknown>)?.oggetto === "allerta").map((e) => String((e.payload as Record<string, unknown>).alert_id))),
     pending: cmds[0] ? { id: String(cmds[0].id), skill: String(cmds[0].skill), frase: String(cmds[0].readback ?? cmds[0].skill) } : null,
     awaiting: (() => {
       // l'ultimo feedback {awaiting} non ancora seguito da un {done}
@@ -103,7 +121,7 @@ async function load(s: SupabaseClient): Promise<LiveData> {
     })(),
     events: evs.map((e) => {
       const p = (e.payload ?? {}) as Record<string, unknown>;
-      return { id: String(e.id), ts: String(e.ts), type: String(e.type), text: eventText(String(e.type), p), duration_ms: p.duration_ms as number | undefined, ok: p.ok as boolean | undefined, step: e.step as number | undefined, cycle: p.cycle === true };
+      return { id: String(e.id), ts: String(e.ts), type: String(e.type), text: eventText(String(e.type), p), duration_ms: p.duration_ms as number | undefined, ok: p.ok as boolean | undefined, step: e.step as number | undefined, cycle: p.cycle === true, payload: p };
     }),
     proposal: props[0] ? { id: String(props[0].id), summary: String((props[0].observations as { summary?: string } | null)?.summary ?? (props[0].change as { diff?: string })?.diff ?? ""), rule: String((props[0].observations as { rule?: string } | null)?.rule ?? ""), before: (props[0].before as number) ?? null, after: (props[0].after as number) ?? null } : null,
     resoconto: summary[0]

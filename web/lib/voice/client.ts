@@ -10,7 +10,12 @@ export interface VoiceHandlers {
   onTranscript?: (text: string) => void;
   onLog?: (line: string) => void;
   onState?: (s: "connessione" | "in ascolto" | "chiusa" | "errore") => void;
+  onActivity?: (a: Activity) => void;
+  onLevel?: (rms: number) => void; // 0..1, livello del microfono
+  onReply?: (text: string) => void; // ciò che Grok sta dicendo (trascrizione dell'audio in uscita)
 }
+
+export type Activity = "ascolto" | "parli" | "penso" | "risponde";
 
 const WORKLET = `class P extends AudioWorkletProcessor{process(i){const c=i[0]&&i[0][0];if(c)this.port.postMessage(c.slice(0));return true}}registerProcessor("pcm-capture",P)`;
 const RATE = 24000;
@@ -44,6 +49,16 @@ export class VoiceSession {
   private speechStoppedAt: number | null = null;
   private transcript = "";
   private pendingOutputs = 0;
+  private reply = "";
+  private idleTimer: ReturnType<typeof setTimeout> | null = null;
+
+  private activity(a: Activity) { this.h.onActivity?.(a); }
+  private scheduleIdle() {
+    if (!this.ctx) return;
+    if (this.idleTimer) clearTimeout(this.idleTimer);
+    const ms = Math.max(0, (this.playhead - this.ctx.currentTime) * 1000) + 150;
+    this.idleTimer = setTimeout(() => this.activity("ascolto"), ms);
+  }
 
   constructor(private h: VoiceHandlers) {}
 
@@ -64,6 +79,10 @@ export class VoiceSession {
     let buf: Float32Array[] = [], n = 0;
     node.port.onmessage = (e: MessageEvent<Float32Array>) => {
       buf.push(e.data); n += e.data.length;
+      if (this.h.onLevel) {
+        let sum = 0; for (let k = 0; k < e.data.length; k++) sum += e.data[k] * e.data[k];
+        this.h.onLevel(Math.min(1, Math.sqrt(sum / e.data.length) * 6));
+      }
       if (n >= RATE / 10) { // ~100 ms per pacchetto
         const all = new Float32Array(n); let o = 0;
         for (const c of buf) { all.set(c, o); o += c.length; }
@@ -120,10 +139,23 @@ export class VoiceSession {
       case "input_audio_buffer.speech_started":
         this.stopPlayback();
         this.transcript = "";
+        this.activity("parli");
         this.h.onSpeechStarted?.();
         break;
       case "input_audio_buffer.speech_stopped":
         this.speechStoppedAt = performance.now();
+        this.activity("penso");
+        break;
+      case "response.created":
+        this.reply = "";
+        break;
+      case "response.output_audio_transcript.delta":
+      case "response.audio_transcript.delta":
+        this.reply += String(m.delta ?? "");
+        this.h.onReply?.(this.reply);
+        break;
+      case "response.done":
+        this.scheduleIdle();
         break;
       case "conversation.item.input_audio_transcription.updated":
       case "conversation.item.input_audio_transcription.completed":
@@ -133,6 +165,8 @@ export class VoiceSession {
       case "response.output_audio.delta":
       case "response.audio.delta":
         this.play(String(m.delta));
+        this.activity("risponde");
+        this.scheduleIdle();
         break;
       case "response.function_call_arguments.done": {
         const latency = this.speechStoppedAt != null ? Math.round(performance.now() - this.speechStoppedAt) : null;

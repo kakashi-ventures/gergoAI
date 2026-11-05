@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prebuild": "node scripts/code-ledger.mjs",
+    "ledger": "node scripts/code-ledger.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0",
