@@ -104,6 +104,33 @@ def _cross(u, v):
     return (u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0])
 
 
+# ---------------------------------------------------------------- RPY del controller CS
+
+def rpy_to_matrix(rpy: Sequence[float]) -> Mat:
+    """R = Rz(yaw)·Ry(pitch)·Rx(roll). Misurato il 05/11 sul CS63: `actual_TCP_pose` RTSI riporta l'orientamento
+    in RPY, non come vettore di rotazione (la nostra FK convertita in RPY coincide al 4° decimale)."""
+    r, p, y = rpy
+    cr, sr, cp, sp, cy, sy = math.cos(r), math.sin(r), math.cos(p), math.sin(p), math.cos(y), math.sin(y)
+    return [[cy * cp, cy * sp * sr - sy * cr, cy * sp * cr + sy * sr],
+            [sy * cp, sy * sp * sr + cy * cr, sy * sp * cr - cy * sr],
+            [-sp, cp * sr, cp * cr]]
+
+
+def rpy_to_rotvec(rpy: Sequence[float]) -> tuple:
+    return matrix_to_rotvec(rpy_to_matrix(rpy))
+
+
+def rotvec_to_rpy(rv: Sequence[float]) -> tuple:
+    R = rotvec_to_matrix(rv)
+    pitch = math.asin(max(-1.0, min(1.0, -R[2][0])))
+    return (math.atan2(R[2][1], R[2][2]), pitch, math.atan2(R[1][0], R[0][0]))
+
+
+def controller_pose_to_rotvec(pose: Sequence[float]) -> tuple:
+    """Posa del controller (xyz + RPY) → posa della nostra cinematica (xyz + vettore di rotazione)."""
+    return tuple(pose[:3]) + rpy_to_rotvec(pose[3:6])
+
+
 # ---------------------------------------------------------------- vettore di rotazione
 
 def rotvec_to_matrix(rv: Sequence[float]) -> Mat:

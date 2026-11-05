@@ -666,10 +666,12 @@ class AudioGuard:
             except queue.Full:
                 err.append("coda audio piena")
 
-        self.start()
         try:
             with sd.InputStream(samplerate=self.det.sr, channels=1, dtype="float32",
                                 blocksize=self.det.frame_len, device=device, callback=cb):
+                # The watchdog starts only once the stream is open: Core Audio can take > NO_AUDIO_S to open,
+                # and starting before it made the guard fail-safe on every launch.
+                self.start()
                 while self.alive:
                     try:
                         self.feed(q.get(timeout=self.NO_AUDIO_S))

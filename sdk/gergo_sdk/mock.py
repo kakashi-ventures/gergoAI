@@ -60,7 +60,8 @@ class MockState:
             return None
         try:
             m = kin.MDH(alpha=tuple(self.mdh[2]), a=tuple(self.mdh[0]), d=tuple(self.mdh[1]))
-            return list(kin.fk(m, q))
+            f = kin.fk(m, q)
+            return list(f[:3]) + list(kin.rotvec_to_rpy(f[3:6]))  # come il CS63: orientamento in RPY
         except Exception:
             return None
 
@@ -69,7 +70,7 @@ class MockState:
             return q_ref
         try:
             m = kin.MDH(alpha=tuple(self.mdh[2]), a=tuple(self.mdh[0]), d=tuple(self.mdh[1]))
-            return list(kin.ik_near(m, pose, q_ref) or q_ref)
+            return list(kin.ik_near(m, kin.controller_pose_to_rotvec(pose), q_ref) or q_ref)
         except Exception:
             return q_ref
 

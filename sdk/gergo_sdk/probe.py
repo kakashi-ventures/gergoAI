@@ -59,7 +59,7 @@ def probe(host: str, dashboard_port: int = 29999, primary_port: int = 30001, rts
             out["fk_check"] = {
                 "fk_mm": [round(v * 1000, 2) for v in f[:3]],
                 "errore_posizione_mm": round(math.dist([v * 1000 for v in f[:3]], p[:3]), 2),
-                "errore_orientamento_rad": round(kin.rotation_distance(f[3:], p[3:]), 4),
+                "errore_orientamento_rad": round(kin.rotation_distance(f[3:], kin.rpy_to_rotvec(p[3:])), 4),
                 "ok": math.dist([v * 1000 for v in f[:3]], p[:3]) < 1.0,
             }
     except Exception as e:

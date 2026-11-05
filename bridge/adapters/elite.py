@@ -38,11 +38,17 @@ class EliteCsAdapter(RobotAdapter):
         self.heartbeat_file = guard_heartbeat_file or os.environ.get("GERGO_GUARD_HEARTBEAT")
 
     # --- conversioni ------------------------------------------------------------------------------------------
-    def _to_base_m(self, p: Pose) -> list[float]:
+    # Il controller CS parla in xyz (m) + RPY; dentro l'adapter le Pose sono nel frame utente con il vettore di
+    # rotazione. La conversione avviene solo qui, al confine con il controller.
+    def _to_base_rv(self, p: Pose) -> list[float]:
         return list(kin.user_to_base(self.frame_base_m, motion.pose_mm_to_m([p.x, p.y, p.z, p.rx, p.ry, p.rz])))
 
+    def _to_base_m(self, p: Pose) -> list[float]:
+        b = self._to_base_rv(p)
+        return b[:3] + list(kin.rotvec_to_rpy(b[3:6]))
+
     def _to_user(self, base_m: list[float]) -> Pose:
-        u = kin.base_to_user(self.frame_base_m, base_m)
+        u = kin.base_to_user(self.frame_base_m, kin.controller_pose_to_rotvec(base_m))
         return Pose(u[0] * 1000, u[1] * 1000, u[2] * 1000, u[3], u[4], u[5])
 
     # --- RobotAdapter -----------------------------------------------------------------------------------------
@@ -79,7 +85,7 @@ class EliteCsAdapter(RobotAdapter):
         except Exception as e:
             return LineCheck(ok=False, reason=f"cinematica non disponibile: {e}")
         m = kin.MDH(alpha=tuple(mdh.alpha), a=tuple(mdh.a), d=tuple(mdh.d))
-        r = motion.check_line(m, self._to_base_m(start), self._to_base_m(target), self.cs.joints(),
+        r = motion.check_line(m, self._to_base_rv(start), self._to_base_rv(target), self.cs.joints(),
                               tcp=self.cs.tcp_offset_m())
         return LineCheck(ok=r.ok, reason=r.reason, samples=r.samples, max_joint_jump_deg=r.max_joint_jump_deg,
                          max_ratio_deg_per_mm=r.max_ratio_deg_per_mm)

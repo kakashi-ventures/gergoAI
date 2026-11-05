@@ -93,3 +93,14 @@ def test_user_base_roundtrip():
     back = base_to_user(frame, pb)
     assert _pos_err(back, pose_u) < 1e-12
     assert rotation_distance(back[3:], pose_u[3:]) < 1e-9
+
+
+def test_controller_rpy_roundtrip_and_cs63_measurement():
+    # 05/11, CS63 in sala: actual_TCP_pose riporta RPY; la nostra FK convertita in RPY coincide al 4° decimale.
+    import math
+    from gergo_sdk import kinematics as kin
+    rpy = (-2.8825, 0.0259, -2.2698)
+    rv = kin.rpy_to_rotvec(rpy)
+    assert kin.rotation_distance(rv, (-1.2579, 2.7127, -0.3368)) < 1e-3
+    back = kin.rotvec_to_rpy(rv)
+    assert all(abs(math.remainder(a - b, 2 * math.pi)) < 1e-9 for a, b in zip(back, rpy))
