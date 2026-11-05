@@ -67,12 +67,13 @@ export default function Home() {
             <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden><rect x="3" y="16" width="10" height="5" rx="1.5" fill="#374151" /><path d="M8 16l3-8 7-2" fill="none" stroke="#ff7a1a" strokeWidth="3" strokeLinecap="round" /><circle cx="19" cy="6" r="2.5" fill="#1d3fd6" /></svg>
             Gergo
           </Link>
-          <nav aria-label="Principale" className="hidden gap-6 text-sm text-[#374151] md:flex">
+          <nav aria-label="Principale" className="hidden gap-5 text-sm text-[#374151] xl:flex">
             <a href="#come-funziona" className="hover:text-[#0f1419]">Come funziona</a>
             <a href="#per-chi" className="hover:text-[#0f1419]">Per chi</a>
             <a href="#video" className="hover:text-[#0f1419]">Video</a>
             <a href="#fiducia" className="hover:text-[#0f1419]">Sicurezza</a>
             <a href="#security-stack" className="hover:text-[#0f1419]">Security stack</a>
+            <a href="#codeless" className="hover:text-[#0f1419]">Codeless</a>
             <a href="#numeri" className="hover:text-[#0f1419]">Numeri</a>
             <a href="#pilota" className="hover:text-[#0f1419]">Pilota</a>
           </nav>
@@ -107,7 +108,7 @@ export default function Home() {
           <div className="mt-12 grid gap-5 md:grid-cols-3">
             {[
               { icon: <IconOperator />, who: "Operatore", h: "Cambi il ciclo con la voce", t: "Insegni una variante in un minuto, la correggi quando serve, chiedi il resoconto del turno. Ogni movimento te lo rilegge prima di farlo." },
-              { icon: <IconTech />, who: "Tecnico e integratore", h: "Installi una volta, assisti di più", t: "Insegni i gesti di base sul pendant e lasci alla postazione le varianti. Meno chiamate per piccole modifiche, più cobot seguiti da ogni tecnico." },
+              { icon: <IconTech />, who: "Tecnico e integratore", h: "Installi una volta, approvi invece di programmare", t: "Insegni i gesti di base sul pendant e lasci alla postazione le varianti. Le modifiche ti arrivano già provate e controllate dai gate: le approvi, senza scrivere Python." },
               { icon: <IconPlant />, who: "Responsabile di produzione", h: "Vedi cosa migliora davvero", t: "Ogni routine è versionata, approvata da una persona e misurata: tempo di ciclo prima e dopo, correzioni, stop. Niente cambia da solo." },
             ].map((c) => (
               <article key={c.who} className="rounded-2xl border border-[#e3e6ea] bg-[#f8f9fa] p-7">
@@ -196,6 +197,53 @@ export default function Home() {
               <h3 className="mt-3 text-2xl font-semibold leading-snug">Ogni modifica diventa un caso di verifica.</h3>
             </div>
             <p className="text-white/75">Frase dell&apos;operatore, prova sul braccio, script generato, esito di ogni gate e decisione finale: tutto finisce in un dataset esportabile. È la base di un workflow di verifica di sicurezza e qualità degli script, oggi per i comandi vocali e domani per gli input da visione e videocamera.</p>
+          </div>
+        </section>
+
+
+        {/* Codeless */}
+        <section id="codeless" className="bg-[#f6f7f9]">
+          <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6">
+            <Eyebrow>Davvero codeless</Eyebrow>
+            <h2 className="mt-4 max-w-4xl text-4xl font-semibold tracking-tight sm:text-5xl">Il codice c&apos;è, ma nessuno deve scriverlo. E nessuno deve fidarsi alla cieca.</h2>
+            <p className="mt-5 max-w-3xl text-lg text-[#4b5563]">Lo script Python del movimento lo genera Gergo dalla prova sul braccio. I gate finali lo controllano al posto delle persone: il tecnico installatore e l&apos;operatore lavorano con la voce e con un sì, senza aprire un editor.</p>
+
+            {/* Il percorso di una modifica, dalla voce al braccio */}
+            <ol className="mt-12 grid gap-3 md:grid-cols-5" aria-label="Il percorso di una modifica">
+              {[
+                { k: "Voce", t: "«Doveva scendere 2 cm in più»" },
+                { k: "Prova", t: "Il braccio riprova la versione 2 e l'operatore dice «è giusto»" },
+                { k: "Script", t: "Gergo genera il file Python: solo dati, con la provenienza" },
+                { k: "Gate", t: "Codice, agente AI e CI lo verificano. Basta un no per fermarlo" },
+                { k: "Approvato", t: "Il tecnico vede l'esito dei controlli e approva con un clic" },
+              ].map((x, i) => (
+                <li key={x.k} className="relative rounded-2xl border border-[#e3e6ea] bg-white p-5">
+                  <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#1d3fd6]">{String(i + 1).padStart(2, "0")} · {x.k}</p>
+                  <p className="mt-2 text-[15px] leading-snug text-[#111827]">{x.t}</p>
+                  {i < 4 && <span aria-hidden className="absolute -right-3 top-1/2 hidden -translate-y-1/2 text-xl text-[#9aa3ad] md:block">→</span>}
+                </li>
+              ))}
+            </ol>
+
+            <div className="mt-10 grid gap-5 md:grid-cols-3">
+              {[
+                { who: "Operatore", h: "Corregge parlando", t: "Prova il movimento, dice cosa non va, riprova. Non vede mai una riga di codice: vede il braccio che si muove e una frase da confermare." },
+                { who: "Tecnico installatore", h: "Approva, non programma", t: "Riceve la modifica già provata e già controllata, con una tabella in italiano: cosa cambia, chi l'ha chiesta, l'esito di ogni gate. Niente Python da scrivere o da leggere riga per riga." },
+                { who: "Responsabile e compliance", h: "Tutto tracciato", t: "Ogni modifica ha la frase che l'ha generata, la prova sul braccio, l'esito dei gate e chi l'ha approvata. Il registro del codice mostra i limiti di sicurezza letti dai sorgenti." },
+              ].map((c) => (
+                <article key={c.who} className="rounded-2xl border border-[#e3e6ea] bg-white p-7">
+                  <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#6b7280]">{c.who}</p>
+                  <h3 className="mt-2 text-2xl font-semibold tracking-tight">{c.h}</h3>
+                  <p className="mt-3 leading-relaxed text-[#4b5563]">{c.t}</p>
+                </article>
+              ))}
+            </div>
+
+            <div className="mt-8 flex flex-col gap-4 rounded-2xl border border-[#c7d2fe] bg-[#eef2ff] p-6 sm:flex-row sm:items-center">
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-[#1d3fd6]">Perché è più sicuro</p>
+              <p className="text-[15px] text-[#1e3a8a]">Senza codeless, una piccola modifica significa un tecnico che riscrive uno script sotto pressione, con il cobot fermo. Con Gergo la modifica nasce da una prova reale, passa controlli identici ogni volta e arriva al braccio solo dopo un sì umano. Meno codice scritto a mano, meno errori nascosti.</p>
+              <Link href={LEDGER_URL} prefetch={false} className="shrink-0 rounded-lg border border-[#a5b4fc] bg-white px-4 py-2 text-sm font-semibold text-[#1d3fd6] hover:bg-[#e0e7ff]">Guarda il registro del codice →</Link>
+            </div>
           </div>
         </section>
 
