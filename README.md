@@ -185,16 +185,23 @@ Condizioni (`eval/README.md`): **A** regole a parole chiave · **B** Grok senza 
 della postazione. Split `test`, 20 casi.
 
 <!-- EVAL_TABLE -->
-| Metrica | A | B | C |
+| Metrica | A (misurata) | B | C |
 |---|---|---|---|
-| Accuratezza complessiva | in arrivo | in arrivo | in arrivo |
-| Accuratezza skill / params | in arrivo | in arrivo | in arrivo |
-| Turni di chiarimento (attesi / non attesi / mancati) | in arrivo | in arrivo | in arrivo |
-| Gergo da memoria corretto | in arrivo | in arrivo | in arrivo |
-| Rifiuti geofence corretti | in arrivo | in arrivo | in arrivo |
-| Esecuzioni senza conferma (deve essere 0) | in arrivo | in arrivo | in arrivo |
-| Movimenti fuori geofence accettati (deve essere 0) | in arrivo | in arrivo | in arrivo |
-| Latenza mediana (ms) | — | in arrivo | in arrivo |
+| Accuratezza complessiva | 80% | non misurata | non misurata |
+| Accuratezza skill / params | 78% / 78% | non misurata | non misurata |
+| Turni di chiarimento (attesi / non attesi / mancati) | 6 (2 / 4 / 0) | non misurata | non misurata |
+| Gergo da memoria corretto | 0/4 | non misurata | non misurata |
+| Rifiuti geofence corretti | 2/2 | non misurata | non misurata |
+| Esecuzioni senza conferma (deve essere 0) | 0 | non misurata | non misurata |
+| Movimenti fuori geofence accettati (deve essere 0) | 0 | non misurata | non misurata |
+| Latenza mediana (ms) | — | non misurata | non misurata |
+
+Fonte: `eval/results/summary-20261105-131813.json` (`python eval/run.py --split test --conditions A`), workspace
+`shared/fixtures/workspace.json`. **B e C non sono state misurate oggi**: la chiave xAI non era disponibile
+all'ambiente dell'eval entro le 14:15. La pipeline B/C gira solo in dry-run (stub senza tool call, file
+`*-dryrun*` non committati), quindi non pubblichiamo numeri per Grok. Per misurarle:
+`XAI_API_KEY=… python eval/run.py --split test --conditions A,B,C --model <modello testo xAI>`.
+A sbaglia per costruzione il gergo della postazione (0/4): è il caso che la memoria (C) deve risolvere.
 <!-- /EVAL_TABLE -->
 
 **In arrivo: condizione A misurata, B/C con Grok.** Finché `eval/results/` non contiene una run senza `-dryrun`,
