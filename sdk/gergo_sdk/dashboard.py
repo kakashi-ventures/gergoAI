@@ -15,6 +15,9 @@ import threading
 from typing import Callable, Optional
 
 DASHBOARD_PORT = 29999
+BANNER_QUIET_S = 0.3     # silenzio che chiude il benvenuto alla connessione
+MULTILINE_QUIET_S = 0.2  # silenzio che chiude una risposta su più righe (solo `version`)
+BANNER_LAST = re.compile(r"^Type `usage")  # ultima riga del benvenuto sul CS63 in sala (05/11)
 
 # Comandi ammessi: regex completa sulla riga inviata (senza "\n").
 READ_ONLY = {
@@ -73,14 +76,10 @@ class DashboardClient:
         s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         s.settimeout(self.reply_timeout)
         self._sock, self._buf = s, b""
-        # Il server manda una riga di benvenuto alla connessione: la si consuma se arriva.
-        try:
-            s.settimeout(0.3)
-            self._log("< " + self._readline())
-        except (socket.timeout, OSError):
-            pass
-        finally:
-            s.settimeout(self.reply_timeout)
+        # Il server manda un benvenuto su più righe (4 sul CS63 in sala, 05/11): si consumano tutte, finché il socket
+        # resta in silenzio per BANNER_QUIET_S. Se ne restasse una, ogni risposta sarebbe quella del comando prima.
+        for line in self._read_until_quiet(BANNER_QUIET_S, stop_at=BANNER_LAST):
+            self._log("< " + line)
 
     def close(self) -> None:
         if self._sock:
@@ -88,6 +87,41 @@ class DashboardClient:
                 self._sock.close()
             finally:
                 self._sock = None
+
+    def _read_until_quiet(self, quiet_s: float, stop_at: Optional[re.Pattern] = None) -> list[str]:
+        """Righe che arrivano finché il socket resta muto per quiet_s secondi, o fino alla riga che fa match con
+        stop_at (così lo `stop` su una connessione nuova non aspetta il silenzio)."""
+        assert self._sock
+        lines: list[str] = []
+        self._sock.settimeout(quiet_s)
+        try:
+            while True:
+                lines.append(self._readline())
+                if stop_at and stop_at.match(lines[-1]):
+                    break
+        except (socket.timeout, OSError):
+            pass
+        finally:
+            self._sock.settimeout(self.reply_timeout)
+        return lines
+
+    def _drain(self) -> None:
+        """Butta le righe già arrivate e non lette (resti di una risposta su più righe), senza aspettare."""
+        assert self._sock
+        self._sock.setblocking(False)
+        try:
+            while True:
+                chunk = self._sock.recv(4096)
+                if not chunk:
+                    break
+                self._buf += chunk
+        except (BlockingIOError, OSError):
+            pass
+        finally:
+            self._sock.settimeout(self.reply_timeout)
+        if self._buf:
+            self._log("< (scartato) " + self._buf.decode("utf-8", "replace").strip())
+            self._buf = b""
 
     def _readline(self) -> str:
         assert self._sock
@@ -100,7 +134,7 @@ class DashboardClient:
         return line.decode("utf-8", "replace").rstrip("\r")
 
     # --- comandi -----------------------------------------------------------------------------------------------
-    def send(self, cmd: str) -> str:
+    def send(self, cmd: str, multiline: bool = False) -> str:
         """Invia una riga e ritorna la risposta (senza \\r\\n). Rifiuta prima del socket se fuori whitelist."""
         cmd = cmd.strip()
         if not allowed(cmd, "armed" if self.mode == "armed" else "read-only"):
@@ -116,9 +150,12 @@ class DashboardClient:
                     if self._sock is None:
                         self.connect()
                     assert self._sock
+                    self._drain()
                     self._log("> " + cmd)
                     self._sock.sendall((cmd + "\n").encode())
                     reply = self._readline()
+                    if multiline:  # es. `version`: 4 righe sul CS63
+                        reply = " | ".join([reply, *self._read_until_quiet(MULTILINE_QUIET_S)])
                     self._log("< " + reply)
                     return reply
                 except (OSError, ConnectionError):
@@ -152,7 +189,7 @@ class DashboardClient:
         return self.send("remoteControl -s").strip()
 
     def version(self) -> str:
-        return self.send("version").strip()
+        return self.send("version", multiline=True).strip()
 
     # --- task --------------------------------------------------------------------------------------------------
     def load_task(self, path: str) -> str:

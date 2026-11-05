@@ -54,6 +54,8 @@ def test_primary_refuses_arbitrary_script(mock):
 def test_probe_reads_everything(mock):
     out = probe(mock.host, mock.dashboard_port, mock.primary_port, mock.rtsi_port)
     assert out["robot_mode"] == "robotMode: RUNNING"
+    assert out["safety"] == "Safety status: NORMAL" and out["remote"] == "REMOTE"
+    assert "Version: 2.15.0.477" in out["version"] and out["task_status"].startswith("Task is")
     assert len(out["joints_deg"]) == 6 and len(out["mdh"]["a"]) == 6
     assert out["tcp_offset_mm"] == [0.0, 0.0, 0.0]
     assert not mock.state.scripts and "play" not in mock.state.commands
@@ -146,3 +148,16 @@ def test_dry_run_opens_no_socket():
     c.connect()
     assert c.run_task("home.task").ok
     assert c.move_linear([0.4, 0, 0.3, math.pi, 0, 0], 0.05).ok
+
+
+def test_dashboard_replies_stay_aligned_after_banner_and_version(mock):
+    """Il CS63 in sala manda un benvenuto di 4 righe e risponde a `version` con 4 righe (05/11): ogni risposta
+    deve restare agganciata al suo comando, o il preflight leggerebbe safety e robotMode sbagliati."""
+    d = DashboardClient(mock.host, mock.dashboard_port, "read-only")
+    d.connect()
+    assert d.robot_mode() == "RUNNING"
+    assert "2.15.0.477" in d.version()
+    assert d.safety_mode() == "NORMAL"
+    assert d.remote() == "REMOTE"
+    assert d.task_status() == "stopped"
+    d.close()

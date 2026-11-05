@@ -112,6 +112,14 @@ class MockState:
 
 
 # --- Dashboard ---------------------------------------------------------------------------------------------------
+# Benvenuto su 4 righe, byte per byte come quello letto dal CS63 in sala (05/11): un client che ne consuma una sola
+# legge le righe d'aiuto come risposte ai comandi successivi.
+BANNER = (b"EliRobot dashboard shell, version 2.15.0.0.\r\n"
+          b"These shell commands are defined internally.  Type `help` to see this list.\r\n"
+          b"Type `help name` to find out more about the function `name`.\r\n"
+          b"Type `usage name` to displays the usage for given command or all commands if none is specified.\r\n")
+
+
 def dashboard_reply(st: MockState, cmd: str) -> str:
     st.commands.append(cmd)
     st.tick()
@@ -125,8 +133,8 @@ def dashboard_reply(st: MockState, cmd: str) -> str:
         return st.remote
     if cmd == "remoteControl -status":
         return "true" if st.remote == "REMOTE" else "false"
-    if cmd == "version":
-        return "2.16.1 (mock)"
+    if cmd == "version":  # risposta su 4 righe, come il CS63 in sala (05/11, controller 2.15.0.477)
+        return "Project: RT ROBOT\r\nVersion: 2.15.0.477\r\nBuildDate: 2026-01-16 06:45:14\r\nCommitHashInfo: 00cb5e6"
     if cmd == "robot -t":
         return "CS66"
     if cmd == "task":
@@ -159,7 +167,7 @@ def dashboard_reply(st: MockState, cmd: str) -> str:
 class _DashHandler(socketserver.StreamRequestHandler):
     def handle(self):
         st: MockState = self.server.state  # type: ignore[attr-defined]
-        self.wfile.write(b"Connected: Elite Robots Dashboard Server (mock)\r\n")
+        self.wfile.write(BANNER)
         for raw in self.rfile:
             cmd = raw.decode().strip()
             if not cmd:

@@ -24,7 +24,7 @@ def probe(host: str, dashboard_port: int = 29999, primary_port: int = 30001, rts
                        ("safety", "safety -s"), ("remote", "remoteControl -s"), ("task", "task"),
                        ("task_status", "task -s")]:
             try:
-                out[k] = d.send(cmd)
+                out[k] = d.send(cmd, multiline=(cmd == "version"))
             except Exception as e:
                 out[k] = f"ERRORE {e}"
     finally:
