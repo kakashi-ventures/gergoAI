@@ -1,0 +1,50 @@
+{
+  "ontology_versions": [
+    {"version": 1, "status": "draft", "confirmed_by": null, "confirmed_at": null},
+    {"version": 2, "status": "confirmed", "confirmed_by": "Federico", "confirmed_at": "2026-11-05T12:20:00+00:00"}
+  ],
+  "skills": [
+    {"ontology_version": 1, "name": "solleva", "status": "confirmed", "confirmed_by": "x", "confirmed_at": "2026-11-05T10:00:00+00:00", "sim_ok": true, "real_ok": false},
+    {"ontology_version": 2, "name": "solleva", "status": "confirmed", "confirmed_by": "Federico", "confirmed_at": "2026-11-05T12:21:00+00:00", "sim_ok": true, "real_ok": true},
+    {"ontology_version": 2, "name": "deposita", "status": "confirmed", "confirmed_by": "Federico", "confirmed_at": "2026-11-05T12:22:00+00:00", "sim_ok": true, "real_ok": false},
+    {"ontology_version": 2, "name": "applica", "status": "deprecated", "deprecated_reason": "spintore smontato", "updated_at": "2026-11-05T13:00:00+00:00", "sim_ok": true, "real_ok": false},
+    {"ontology_version": 2, "name": "sposta", "status": "draft", "sim_ok": false, "real_ok": false}
+  ],
+  "commands": [
+    {"id": "c0", "skill": "solleva", "status": "done", "created_at": "2026-11-05T10:00:00+00:00", "confirmed_at": "2026-11-05T10:00:01+00:00"},
+    {"id": "c1", "skill": "solleva", "status": "done", "created_at": "2026-11-05T12:30:00+00:00", "confirmed_at": "2026-11-05T12:30:05+00:00"},
+    {"id": "c2", "skill": "deposita", "status": "done", "created_at": "2026-11-05T12:31:00+00:00", "confirmed_at": "2026-11-05T12:31:05+00:00"},
+    {"id": "c3", "skill": "sposta", "status": "failed", "created_at": "2026-11-05T12:32:00+00:00", "confirmed_at": "2026-11-05T12:32:05+00:00"},
+    {"id": "c4", "skill": "sposta", "status": "failed", "created_at": "2026-11-05T12:33:00+00:00", "confirmed_at": "2026-11-05T12:33:05+00:00"},
+    {"id": "c5", "skill": "applica", "status": "failed", "created_at": "2026-11-05T12:34:00+00:00", "confirmed_at": "2026-11-05T12:34:05+00:00"},
+    {"id": "c6", "skill": "solleva", "status": "queued", "created_at": "2026-11-05T12:35:00+00:00", "confirmed_at": null}
+  ],
+  "events": [
+    {"type": "step_start", "ts": "2026-11-05T10:00:02+00:00", "command_id": "c0", "payload": {"skill": "solleva"}},
+    {"type": "step_end", "ts": "2026-11-05T10:00:09+00:00", "command_id": "c0", "payload": {"skill": "solleva", "ok": true, "duration_ms": 99999}},
+    {"type": "step_start", "ts": "2026-11-05T12:30:06+00:00", "command_id": "c1", "payload": {"skill": "solleva"}},
+    {"type": "step_end", "ts": "2026-11-05T12:30:10+00:00", "command_id": "c1", "routine_run_id": "rr1", "payload": {"skill": "solleva", "ok": true, "duration_ms": 4000}},
+    {"type": "step_start", "ts": "2026-11-05T12:31:06+00:00", "command_id": "c2", "payload": {"skill": "deposita"}},
+    {"type": "step_end", "ts": "2026-11-05T12:31:10+00:00", "command_id": "c2", "routine_run_id": "rr1", "payload": {"skill": "deposita", "ok": true, "duration_ms": 3000}},
+    {"type": "motion_check", "ts": "2026-11-05T12:32:06+00:00", "command_id": "c3", "payload": {"geofence_ok": false, "ok": false}},
+    {"type": "anomaly", "ts": "2026-11-05T12:32:06+00:00", "command_id": "c3", "payload": {"kind": "validator_reject", "code": "geofence"}},
+    {"type": "motion_check", "ts": "2026-11-05T12:33:06+00:00", "command_id": "c4", "payload": {"geofence_ok": false, "ok": false}},
+    {"type": "anomaly", "ts": "2026-11-05T12:33:06+00:00", "command_id": "c4", "payload": {"kind": "validator_reject", "code": "geofence"}},
+    {"type": "motion_check", "ts": "2026-11-05T12:36:06+00:00", "payload": {"geofence_ok": true, "kinematics_ok": true, "ok": true}},
+    {"type": "anomaly", "ts": "2026-11-05T12:34:06+00:00", "command_id": "c5", "payload": {"kind": "validator_reject", "code": "deprecated"}},
+    {"type": "anomaly", "ts": "2026-11-05T12:37:06+00:00", "payload": {"kind": "kinematics_reject", "code": "kinematics"}},
+    {"type": "anomaly", "ts": "2026-11-05T12:38:06+00:00", "payload": {"kind": "step_failed", "skill": "solleva"}},
+    {"type": "safety_trigger", "ts": "2026-11-05T12:40:00+00:00", "payload": {"trigger": "parola", "latency_ms": 120, "features": {}}},
+    {"type": "safety_trigger", "ts": "2026-11-05T12:41:00+00:00", "payload": {"trigger": "parola", "latency_ms": 180, "features": {}}},
+    {"type": "safety_trigger", "ts": "2026-11-05T12:42:00+00:00", "payload": {"trigger": "botta", "latency_ms": 40, "features": {}}},
+    {"type": "stop", "ts": "2026-11-05T12:40:00+00:00", "payload": {"source": "safety_trigger"}},
+    {"type": "stop", "ts": "2026-11-05T09:00:00+00:00", "payload": {"source": "tasto"}}
+  ],
+  "routine_runs": [
+    {"id": "rr1", "routine_id": "etichetta", "routine_version": 2, "created_at": "2026-11-05T12:29:00+00:00"}
+  ],
+  "proposals": [
+    {"id": "p1", "status": "approved", "created_at": "2026-11-05T12:50:00+00:00"},
+    {"id": "p2", "status": "rejected", "created_at": "2026-11-05T12:51:00+00:00"}
+  ]
+}
