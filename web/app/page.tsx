@@ -72,6 +72,7 @@ export default function Home() {
             <a href="#per-chi" className="hover:text-[#0f1419]">Per chi</a>
             <a href="#video" className="hover:text-[#0f1419]">Video</a>
             <a href="#fiducia" className="hover:text-[#0f1419]">Sicurezza</a>
+            <a href="#security-stack" className="hover:text-[#0f1419]">Security stack</a>
             <a href="#numeri" className="hover:text-[#0f1419]">Numeri</a>
             <a href="#pilota" className="hover:text-[#0f1419]">Pilota</a>
           </nav>
@@ -163,6 +164,38 @@ export default function Home() {
               <p className="text-[15px] text-red-900">L&apos;arresto vocale e acustico è uno stop in più. Non sostituisce l&apos;e-stop fisico, la rilevazione di collisione del controller né la valutazione del rischio della cella. Accensione, freni e allarmi si gestiscono dal pendant.</p>
               <Link href={LEDGER_URL} prefetch={false} className="shrink-0 rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-800 hover:bg-red-100">Registro del codice →</Link>
             </div>
+          </div>
+        </section>
+
+
+        {/* Security stack */}
+        <section id="security-stack" className="mx-auto max-w-7xl px-4 py-24 sm:px-6">
+          <Eyebrow>Security stack del sistema di sicurezza</Eyebrow>
+          <h2 className="mt-4 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">Ogni modifica attraversa sei controlli. Basta un no per fermarla.</h2>
+          <p className="mt-5 max-w-2xl text-lg text-[#4b5563]">Quando l&apos;operatore corregge un movimento a voce, Gergo non riscrive il codice da solo: propone una modifica allo script Python, e la modifica deve superare persone, regole e un agente di revisione prima di arrivare al braccio.</p>
+          <ol className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {[
+              { n: "1", who: "Persona", h: "Prova e «è giusto»", t: "L'operatore prova il movimento sul braccio, lo corregge a voce e conferma che ora si muove come deve. Ogni passo eseguito resta nel registro." },
+              { n: "2", who: "Codice", h: "Solo dati, dentro i limiti", t: "Un controllo deterministico verifica che lo script sia solo dati: niente import, chiamate o coordinate; ogni passo entro 10 cm, lo spostamento totale plausibile." },
+              { n: "3", who: "Agente AI", h: "Revisione di sicurezza", t: "Un agente rilegge lo script con una checklist: senso fisico della sequenza, provenienza, istruzioni nascoste nei testi. Se ha dubbi, lo manda a una persona." },
+              { n: "4", who: "Persona", h: "Revisione della Pull Request", t: "La modifica arriva come Pull Request con l'esito di ogni gate. La unisce solo chi è responsabile del bridge." },
+              { n: "5", who: "CI", h: "Lo stesso controllo, di nuovo", t: "Su GitHub lo script viene letto senza mai eseguirlo: se non è un letterale nei limiti, la PR resta rossa." },
+              { n: "6", who: "Bridge", h: "Rivalida prima di muovere", t: "In esecuzione il bridge rifà geofence, cinematica e conferma. L'arresto vocale e acustico e l'e-stop fisico restano sempre attivi." },
+            ].map((g) => (
+              <li key={g.n} className="relative rounded-2xl border border-[#e3e6ea] bg-white p-6">
+                <span className="absolute right-5 top-5 font-mono text-3xl font-semibold text-[#e3e6ea]">{g.n}</span>
+                <p className={`font-mono text-[11px] uppercase tracking-[0.18em] ${g.who === "Persona" ? "text-[#0f766e]" : g.who === "Agente AI" ? "text-[#a21caf]" : "text-[#1d3fd6]"}`}>{g.who}</p>
+                <h3 className="mt-2 text-xl font-semibold">{g.h}</h3>
+                <p className="mt-2 text-[15px] leading-relaxed text-[#4b5563]">{g.t}</p>
+              </li>
+            ))}
+          </ol>
+          <div className="mt-8 grid gap-5 rounded-2xl bg-[#0f1419] p-8 text-white md:grid-cols-[1fr_1.3fr]">
+            <div>
+              <p className="font-mono text-xs uppercase tracking-[0.22em] text-[#ff9a4d]">Dal registro a un dataset</p>
+              <h3 className="mt-3 text-2xl font-semibold leading-snug">Ogni modifica diventa un caso di verifica.</h3>
+            </div>
+            <p className="text-white/75">Frase dell&apos;operatore, prova sul braccio, script generato, esito di ogni gate e decisione finale: tutto finisce in un dataset esportabile. È la base di un workflow di verifica di sicurezza e qualità degli script, oggi per i comandi vocali e domani per gli input da visione e videocamera.</p>
           </div>
         </section>
 
