@@ -13,6 +13,8 @@ export interface VoiceHandlers {
   onActivity?: (a: Activity) => void;
   onLevel?: (rms: number) => void; // 0..1, livello del microfono
   onReply?: (text: string) => void; // ciò che Grok sta dicendo (trascrizione dell'audio in uscita)
+  /** Walkie-talkie (default): l'audio parte solo mentre si tiene premuto; al rilascio il turno si chiude. */
+  pushToTalk?: boolean;
 }
 
 export type Activity = "ascolto" | "parli" | "penso" | "risponde";
@@ -49,6 +51,10 @@ export class VoiceSession {
   private speechStoppedAt: number | null = null;
   private transcript = "";
   private pendingOutputs = 0;
+  private talking = false;
+  private pressedAt = 0;
+  private flush: (() => void) | null = null;
+  get ptt() { return this.h.pushToTalk !== false; }
   private reply = "";
   private idleTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -77,20 +83,25 @@ export class VoiceSession {
     const src = this.ctx.createMediaStreamSource(this.stream);
     const node = new AudioWorkletNode(this.ctx, "pcm-capture");
     let buf: Float32Array[] = [], n = 0;
+    const sendBuf = () => {
+      if (!n) return;
+      const all = new Float32Array(n); let o = 0;
+      for (const c of buf) { all.set(c, o); o += c.length; }
+      buf = []; n = 0;
+      this.send({ type: "input_audio_buffer.append", audio: f32ToB64(all) });
+    };
+    this.flush = sendBuf;
     node.port.onmessage = (e: MessageEvent<Float32Array>) => {
+      if (this.ptt && !this.talking) { if (this.h.onLevel) this.h.onLevel(0); return; } // microfono "chiuso": niente audio inviato
       buf.push(e.data); n += e.data.length;
       if (this.h.onLevel) {
         let sum = 0; for (let k = 0; k < e.data.length; k++) sum += e.data[k] * e.data[k];
         this.h.onLevel(Math.min(1, Math.sqrt(sum / e.data.length) * 6));
       }
-      if (n >= RATE / 10) { // ~100 ms per pacchetto
-        const all = new Float32Array(n); let o = 0;
-        for (const c of buf) { all.set(c, o); o += c.length; }
-        buf = []; n = 0;
-        this.send({ type: "input_audio_buffer.append", audio: f32ToB64(all) });
-      }
+      if (n >= RATE / 10) sendBuf(); // ~100 ms per pacchetto
     };
     src.connect(node);
+    if (this.ptt) this.stream.getAudioTracks().forEach((t) => (t.enabled = false));
 
     const model = encodeURIComponent(tok.model ?? "grok-voice-3.0");
     this.ws = new WebSocket(`wss://api.x.ai/v1/realtime?model=${model}`, [`xai-client-secret.${tok.token}`]);
@@ -100,7 +111,7 @@ export class VoiceSession {
         session: {
           instructions: VOICE_INSTRUCTIONS,
           voice: "eve",
-          turn_detection: { type: "server_vad" },
+          turn_detection: this.ptt ? null : { type: "server_vad" },
           tools: VOICE_TOOLS,
           audio: {
             input: { format: { type: "audio/pcm", rate: RATE }, transcription: { language_hint: "it" } },
@@ -188,6 +199,40 @@ export class VoiceSession {
         break;
     }
   }
+
+  /** Walkie-talkie: si preme → microfono aperto. Restituisce false se la sessione non è pronta. */
+  pressStart(): boolean {
+    if (!this.ptt || this.ws?.readyState !== WebSocket.OPEN || this.talking) return false;
+    this.stopPlayback();
+    this.send({ type: "input_audio_buffer.clear" });
+    this.transcript = "";
+    this.talking = true;
+    this.pressedAt = performance.now();
+    this.stream?.getAudioTracks().forEach((t) => (t.enabled = true));
+    this.activity("parli");
+    this.h.onSpeechStarted?.();
+    return true;
+  }
+
+  /** Walkie-talkie: si rilascia → microfono chiuso, il turno va a Grok. Sotto i 300 ms si scarta (tocco accidentale). */
+  pressEnd() {
+    if (!this.talking) return;
+    this.flush?.();
+    this.talking = false;
+    this.stream?.getAudioTracks().forEach((t) => (t.enabled = false));
+    this.h.onLevel?.(0);
+    if (performance.now() - this.pressedAt < 300) {
+      this.send({ type: "input_audio_buffer.clear" });
+      this.activity("ascolto");
+      return;
+    }
+    this.speechStoppedAt = performance.now();
+    this.send({ type: "input_audio_buffer.commit" });
+    this.send({ type: "response.create" });
+    this.activity("penso");
+  }
+
+  get isTalking() { return this.talking; }
 
   /** Fa dire a Grok una frase scritta dal codice (es. una proposta del miner). */
   say(text: string) {

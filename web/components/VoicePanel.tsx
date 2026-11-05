@@ -19,7 +19,7 @@ const ALLOWED: Record<string, string[]> = {
 
 const LABEL: Record<Activity | "spenta" | "connessione" | "errore", string> = {
   spenta: "Voce spenta", connessione: "Mi collego…", errore: "Voce non disponibile",
-  ascolto: "Ti ascolto", parli: "Stai parlando", penso: "Ci penso", risponde: "Ti rispondo",
+  ascolto: "Microfono chiuso", parli: "Ti ascolto", penso: "Ci penso", risponde: "Ti rispondo",
 };
 const RING: Record<string, string> = {
   spenta: "from-white/10 to-white/5", connessione: "from-sky-500/40 to-sky-900/20", errore: "from-red-600/50 to-red-900/30",
@@ -83,6 +83,18 @@ export function VoicePanel({ announce, big = false, pendingFrase, local }: { ann
     sess.current = s;
     try { await s.start(); } catch (e) { push({ who: "sistema", text: (e as Error).message }); setState("errore"); }
   };
+  const [holding, setHolding] = useState(false);
+  const press = () => { if (sess.current?.pressStart()) setHolding(true); };
+  const release = () => { if (sess.current?.isTalking) sess.current.pressEnd(); setHolding(false); };
+  useEffect(() => {
+    // Tasto V tenuto premuto = parla (la barra spaziatrice resta lo STOP).
+    const isField = (t: EventTarget | null) => ["INPUT", "TEXTAREA", "SELECT"].includes((t as HTMLElement)?.tagName);
+    const down = (e: KeyboardEvent) => { if (e.code === "KeyV" && !e.repeat && !isField(e.target)) { e.preventDefault(); press(); } };
+    const up = (e: KeyboardEvent) => { if (e.code === "KeyV") { e.preventDefault(); release(); } };
+    const blur = () => release();
+    window.addEventListener("keydown", down); window.addEventListener("keyup", up); window.addEventListener("blur", blur);
+    return () => { window.removeEventListener("keydown", down); window.removeEventListener("keyup", up); window.removeEventListener("blur", blur); };
+  });  
   const stopVoice = () => { sess.current?.close(); sess.current = null; setState("spenta"); setAct(null); setLevel(0); };
 
   useEffect(() => { if (reply && act !== "risponde" && act !== "penso") push({ who: "gergo", text: reply }); }, [act]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -106,7 +118,7 @@ export function VoicePanel({ announce, big = false, pendingFrase, local }: { ann
           className={`relative ${size} rounded-full bg-gradient-to-br ${RING[key] ?? RING.spenta} shadow-[0_0_60px_-10px] shadow-sky-500/30 transition-all duration-300`}
           style={{ transform: `scale(${1 + (on && act === "parli" ? level * 0.25 : 0)})` }}
         >
-          {on && <span className="absolute inset-0 animate-ping rounded-full bg-white/5" />}
+          {holding && <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/20" />}
           <span className="absolute inset-3 rounded-full bg-[#0b0d10]/80 backdrop-blur" />
           <span className="relative flex h-full flex-col items-center justify-center gap-1">
             <svg viewBox="0 0 24 24" className="h-9 w-9 fill-white/90"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-2.08A7 7 0 0 0 19 12h-2Z" /></svg>
@@ -119,7 +131,19 @@ export function VoicePanel({ announce, big = false, pendingFrase, local }: { ann
               style={{ height: `${on ? Math.max(8, Math.min(100, level * 100 * (0.5 + Math.abs(Math.sin(k * 1.7 + Date.now() / 300))))) : 8}%` }} />
           ))}
         </div>
-        <p className="min-h-[1.5rem] text-center text-lg italic text-white/90">{said ? `«${said}»` : on ? "Di' per esempio: «scendi di 10 centimetri»" : "Tocca il microfono per parlare"}</p>
+        {on && (
+          <button
+            onPointerDown={(e) => { e.preventDefault(); (e.target as HTMLElement).setPointerCapture?.(e.pointerId); press(); }}
+            onPointerUp={release} onPointerCancel={release} onLostPointerCapture={release}
+            onContextMenu={(e) => e.preventDefault()}
+            className={`w-full select-none touch-none rounded-xl py-4 text-lg font-bold transition-colors ${holding ? "bg-emerald-500 text-black shadow-[0_0_30px_-5px] shadow-emerald-400" : "bg-white/10 text-white hover:bg-white/15"}`}
+            aria-pressed={holding}
+          >
+            {holding ? "● Parla ora… rilascia per inviare" : "Tieni premuto per parlare (o tasto V)"}
+          </button>
+        )}
+        <p className="min-h-[1.5rem] text-center text-lg italic text-white/90">{said ? `«${said}»` : on ? "Tieni premuto e di' per esempio: «scendi di 10 centimetri»" : "Tocca il microfono per accendere la voce"}</p>
+        {on && <p className="text-center text-[11px] text-white/40">Il microfono trasmette solo mentre tieni premuto. Premere durante un movimento lo mette in pausa.</p>}
         {reply && <p className="text-center text-sm text-fuchsia-200/90">Gergo: {reply}</p>}
       </div>
 

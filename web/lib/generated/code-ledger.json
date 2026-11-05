@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-05T14:57:24.529Z",
-  "source_commit": "fcccb7c4b34153e945f52d1ebcae568c2be459c4",
+  "generated_at": "2026-11-05T15:31:22.655Z",
+  "source_commit": "dc175bb92e639d1d6f7cdce5db21fd01f6d4ce61",
   "unavailable": false,
   "files": [
     {
@@ -75,16 +75,16 @@
     },
     {
       "path": "bridge/adapters/sim.py",
-      "bytes": 4874,
-      "lines": 119,
-      "sha256": "e9af925adb02f5054376a1ba08571e82ec247f0834e9f9a670f13abdd0a9f80c",
+      "bytes": 5375,
+      "lines": 130,
+      "sha256": "f60d1671b209a456a134cb6797207eb25528395ffa31faac450c6faef7ea3180",
       "test": false,
       "safety_critical": true,
       "last_commit": {
-        "sha": "54753c328d73771ec9b88d012700b129e2e57f5f",
-        "date": "2026-11-05T11:50:08+00:00",
+        "sha": "324c69eacc1906e9fdce5f3da188bb9872e7131f",
+        "date": "2026-11-05T15:01:10+00:00",
         "author": "Claude",
-        "subject": "BRIDGE: main loop, SimArm with poses and sposta, dry-run elite, PostgREST store, guard gating"
+        "subject": "SimArm: start pose from GERGO_SIM_START_MM so sposta in sim runs inside the taught CS63 box"
       }
     },
     {
@@ -145,16 +145,16 @@
     },
     {
       "path": "bridge/main.py",
-      "bytes": 14634,
-      "lines": 340,
-      "sha256": "99b9fbbe7c78719ad014d5a751bc59eb3b26dd48a474951e15f33e915f98c6dd",
+      "bytes": 15279,
+      "lines": 354,
+      "sha256": "8d3632e0670626709e4f03f570ba5126277e1d3de2d249be894084fd305d3990",
       "test": false,
       "safety_critical": true,
       "last_commit": {
-        "sha": "f868fc22063d6149c4eaf8fddcb9186c73f30d52",
-        "date": "2026-11-05T14:13:00+00:00",
+        "sha": "167c45d1eed55f6f7dc42305fc7dfbc7b2b34675",
+        "date": "2026-11-05T14:55:52+00:00",
         "author": "Claude",
-        "subject": "Bridge: --mode elite builds EliteCsAdapter from env, no silent dry-run fallback; sanity check"
+        "subject": "Voice-to-robot chain: bridge sets sim_ok after a successful sim step; human ontology confirmation"
       }
     },
     {
@@ -173,16 +173,16 @@
     },
     {
       "path": "bridge/store.py",
-      "bytes": 8960,
-      "lines": 212,
-      "sha256": "c04ac19065ea2ab2ad8811d0dc9cbf8b0e167446933224d4c0c1487f22052647",
+      "bytes": 9802,
+      "lines": 227,
+      "sha256": "f9e400569e69bd51f759a2cfff220ab55d88750a6b7374061f29b66e5062dcc0",
       "test": false,
       "safety_critical": false,
       "last_commit": {
-        "sha": "7d079013ab90f59e7b11b2ca3be2f98f6fc1777c",
-        "date": "2026-11-05T11:51:51+00:00",
-        "author": "Claude",
-        "subject": "BRIDGE: composer for routine runs (one command at a time, attendi_operatore, cycle_time_ms, stop)"
+        "sha": "2f0476f9a1a3a02ed4402d003ba69fdaa23fc231",
+        "date": "2026-11-05T16:18:30+01:00",
+        "author": "Federico Bottino",
+        "subject": "BRIDGE: read commands with the contract columns only, so console commands pass the validator"
       }
     },
     {
@@ -257,16 +257,16 @@
     },
     {
       "path": "bridge/tests/test_main.py",
-      "bytes": 5921,
-      "lines": 152,
-      "sha256": "d4fd44e78cf18679c07b238942e77173a3b452d1d8396e9a0639a00ebfb13d2f",
+      "bytes": 7717,
+      "lines": 188,
+      "sha256": "81cf5b5348ee53ef5c076f30fda13263e31a0e5137c43555bb3674c5a40f36fd",
       "test": true,
       "safety_critical": false,
       "last_commit": {
-        "sha": "f868fc22063d6149c4eaf8fddcb9186c73f30d52",
-        "date": "2026-11-05T14:13:00+00:00",
+        "sha": "324c69eacc1906e9fdce5f3da188bb9872e7131f",
+        "date": "2026-11-05T15:01:10+00:00",
         "author": "Claude",
-        "subject": "Bridge: --mode elite builds EliteCsAdapter from env, no silent dry-run fallback; sanity check"
+        "subject": "SimArm: start pose from GERGO_SIM_START_MM so sposta in sim runs inside the taught CS63 box"
       }
     },
     {
@@ -481,16 +481,16 @@
     },
     {
       "path": "safety/audio_guard.py",
-      "bytes": 34308,
-      "lines": 785,
-      "sha256": "34237dfd2d757550cd275f7486cde9515971b4bfc17da6014bead80d7232196b",
+      "bytes": 37860,
+      "lines": 842,
+      "sha256": "b537411104d50b6da5d41cdab614e708df71419966066beaa8e52a56810034ec",
       "test": false,
       "safety_critical": true,
       "last_commit": {
-        "sha": "f8ac86138820689bf6d774bef4247581e9a19d47",
-        "date": "2026-11-05T15:44:21+01:00",
+        "sha": "dc175bb92e639d1d6f7cdce5db21fd01f6d4ce61",
+        "date": "2026-11-05T16:25:52+01:00",
         "author": "Federico Bottino",
-        "subject": "BRACCIO: CS63 orientation is RPY, not rotvec; audio_guard watchdog starts after the mic opens"
+        "subject": "SAFETY: voice-command words in the Vosk grammar as non-triggers; every voice command was stopping the arm"
       }
     },
     {
@@ -816,7 +816,7 @@
       "value": "{\"parola\": 1, \"botta\": 1, \"urlo\": 2, \"sfregamento\": 3}",
       "source_comment": null,
       "file": "safety/audio_guard.py",
-      "line": 55,
+      "line": 63,
       "category": "arresto acustico",
       "note": "Priorità dei tipi di evento sonoro (1 = più alta)."
     },
@@ -825,7 +825,7 @@
       "value": "15.0",
       "source_comment": null,
       "file": "safety/audio_guard.py",
-      "line": 174,
+      "line": 182,
       "category": "arresto acustico",
       "note": "Salita di energia che identifica un colpo (dB)."
     },
@@ -834,7 +834,7 @@
       "value": "3.5",
       "source_comment": null,
       "file": "safety/audio_guard.py",
-      "line": 175,
+      "line": 183,
       "category": "arresto acustico",
       "note": "Fattore di cresta minimo (picco/RMS) per un colpo."
     },
@@ -843,7 +843,7 @@
       "value": "15.0",
       "source_comment": null,
       "file": "safety/audio_guard.py",
-      "line": 176,
+      "line": 184,
       "category": "arresto acustico",
       "note": "Livello minimo sopra il rumore di fondo per un colpo (dB)."
     },
@@ -852,7 +852,7 @@
       "value": "20.0",
       "source_comment": null,
       "file": "safety/audio_guard.py",
-      "line": 177,
+      "line": 185,
       "category": "arresto acustico",
       "note": "Livello sopra il riferimento per riconoscere un urlo (dB)."
     },
@@ -861,7 +861,7 @@
       "value": "100.0",
       "source_comment": null,
       "file": "safety/audio_guard.py",
-      "line": 178,
+      "line": 186,
       "category": "arresto acustico",
       "note": "Durata minima di un urlo (ms)."
     },
@@ -870,7 +870,7 @@
       "value": "1200.0",
       "source_comment": null,
       "file": "safety/audio_guard.py",
-      "line": 179,
+      "line": 187,
       "category": "arresto acustico",
       "note": "Centroide spettrale minimo di un urlo (Hz)."
     },
@@ -879,7 +879,7 @@
       "value": "10.0",
       "source_comment": null,
       "file": "safety/audio_guard.py",
-      "line": 180,
+      "line": 188,
       "category": "arresto acustico",
       "note": "Energia in alta frequenza sopra il profilo di moto per uno sfregamento (dB)."
     },
@@ -888,7 +888,7 @@
       "value": "300.0",
       "source_comment": null,
       "file": "safety/audio_guard.py",
-      "line": 182,
+      "line": 190,
       "category": "arresto acustico",
       "note": "Durata minima di uno sfregamento (ms)."
     },
@@ -897,7 +897,7 @@
       "value": "1.0",
       "source_comment": null,
       "file": "safety/audio_guard.py",
-      "line": 184,
+      "line": 192,
       "category": "arresto acustico",
       "note": "Tempo minimo tra due arresti consecutivi (s)."
     },
@@ -906,7 +906,7 @@
       "value": "0.25",
       "source_comment": null,
       "file": "safety/audio_guard.py",
-      "line": 527,
+      "line": 567,
       "category": "arresto acustico",
       "note": "Intervallo del battito della guardia acustica (s)."
     },
@@ -915,7 +915,7 @@
       "value": "0.5",
       "source_comment": null,
       "file": "safety/audio_guard.py",
-      "line": 528,
+      "line": 568,
       "category": "arresto acustico",
       "note": "Senza audio per questo tempo la guardia va in failsafe."
     }

@@ -52,12 +52,16 @@ export function Probe() {
   return (
     <main className="mx-auto max-w-4xl space-y-4 p-6">
       <h1 className="text-2xl font-bold">Prova della voce (P0)</h1>
-      <p className="text-sm text-white/60">Kill criterion: almeno 8 frasi su 10 con la function call giusta e latenza mediana ≤ 2,5 s, altrimenti push-to-talk. I tool sono finti: nessun comando arriva al bridge.</p>
+      <p className="text-sm text-white/60">Walkie-talkie: tieni premuto il pulsante verde mentre dici la frase, poi rilascia; la latenza si misura dal rilascio alla function call. Kill criterion: almeno 8 frasi su 10 con la function call giusta e latenza mediana ≤ 2,5 s, altrimenti push-to-talk. I tool sono finti: nessun comando arriva al bridge.</p>
       <div className="flex items-center gap-3">
         <button onClick={start} disabled={state === "in ascolto" || state === "connessione"} className="rounded bg-sky-600 px-4 py-2 font-semibold disabled:opacity-40">Avvia</button>
         <button onClick={() => { sess.current?.close(); setState("ferma"); }} className="rounded border border-white/20 px-4 py-2">Chiudi</button>
         <button onClick={() => { setRows([]); idx.current = 0; }} className="rounded border border-white/20 px-4 py-2">Ricomincia</button>
         <span className="text-sm">stato: {state}</span>
+        {state === "in ascolto" && (
+          <button onPointerDown={(e) => { e.preventDefault(); sess.current?.pressStart(); }} onPointerUp={() => sess.current?.pressEnd()} onPointerCancel={() => sess.current?.pressEnd()} onPointerLeave={() => sess.current?.pressEnd()}
+            className="select-none touch-none rounded bg-emerald-600 px-4 py-2 font-semibold active:bg-emerald-400">Tieni premuto e di&apos; la frase</button>
+        )}
       </div>
       {!done && (
         <div className="rounded-lg border border-amber-400/40 p-4 text-xl">

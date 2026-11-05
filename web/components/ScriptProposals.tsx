@@ -32,7 +32,7 @@ export function ScriptProposals({ live, refresh }: { live: LiveData; refresh: ()
     <section className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
       <div className="mb-2 flex items-center gap-2">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-white/50">Proposte di modifica agli script</h2>
-        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- è un download, non una pagina */}
+        { }
         <a href="/api/tools/dataset" download className="ml-auto text-[11px] text-sky-300 underline">dataset (JSONL)</a>
         <a href="/console/codice" className="text-[11px] text-sky-300 underline">registro del codice</a>
       </div>
