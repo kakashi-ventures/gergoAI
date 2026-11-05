@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Dot, Panel } from "@/components/Panel";
 import { SafetyPanel } from "@/components/SafetyPanel";
 import { StopButton } from "@/components/StopButton";
@@ -27,6 +27,20 @@ export function Console() {
   const [msg, setMsg] = useState("");
   const types = useMemo(() => ["tutti", ...Array.from(new Set(live.events.map((e) => e.type)))], [live.events]);
   const events = filter === "tutti" ? live.events : live.events.filter((e) => e.type === filter);
+  // Pattern miner dopo ogni ciclo concluso (event step_end con cycle: true).
+  const [announce, setAnnounce] = useState<{ id: number; text: string } | null>(null);
+  const lastCycle = useRef<string | null>(null);
+  const lastCycleId = live.source === "db" ? (live.events.find((e) => e.cycle)?.id ?? null) : null;
+  useEffect(() => {
+    if (!lastCycleId || lastCycleId === lastCycle.current) return;
+    const first = lastCycle.current === null;
+    lastCycle.current = lastCycleId;
+    if (first) return;
+    void fetch("/api/tools/mina", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" })
+      .then((r) => r.json())
+      .then((j: { nuove?: string[] }) => { if (j.nuove?.length) setAnnounce({ id: Date.now(), text: j.nuove[0] }); live.refresh(); })
+      .catch(() => {});
+  }, [lastCycleId, live]);
   const act = async (name: string, body: Record<string, unknown> = {}, domanda?: string) => {
     if (domanda && !window.confirm(domanda)) return;
     setMsg(await tool(name, body));
@@ -68,7 +82,7 @@ export function Console() {
         </div>
 
         <div className="space-y-4">
-          <VoicePanel />
+          <VoicePanel announce={announce} />
           <Panel title="Comando in attesa" className={live.pending ? "border-amber-400/40" : ""}>
             {live.pending ? (
               <>
@@ -119,7 +133,11 @@ export function Console() {
             {live.proposal ? (
               <>
                 <p className="text-sm">{live.proposal.summary}</p>
-                <p className="mt-1 font-mono text-xs text-white/50">{live.proposal.rule} · prima {live.proposal.before != null ? `${(live.proposal.before / 1000).toFixed(1)} s` : "—"} · dopo {live.proposal.after ?? "—"}</p>
+                <p className="mt-1 font-mono text-xs text-white/50">{live.proposal.rule} · prima {live.proposal.before != null ? `${(live.proposal.before / 1000).toFixed(1)} s` : "—"} · dopo {live.proposal.after != null ? `${(live.proposal.after / 1000).toFixed(1)} s` : "—"}</p>
+                <div className="mt-2 flex gap-2">
+                  <button onClick={() => act("approva_proposta", { approva: true }, "Approvi la nuova versione della routine?")} className="rounded bg-emerald-700 px-3 py-1 text-sm">Approva</button>
+                  <button onClick={() => act("approva_proposta", { approva: false })} className="rounded border border-white/20 px-3 py-1 text-sm">Rifiuta</button>
+                </div>
               </>
             ) : (
               <p className="text-sm text-white/40">Nessuna proposta in attesa.</p>

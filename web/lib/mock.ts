@@ -21,6 +21,7 @@ export interface EventRow {
   duration_ms?: number;
   ok?: boolean;
   step?: number;
+  cycle?: boolean;
 }
 
 export interface SafetyState {

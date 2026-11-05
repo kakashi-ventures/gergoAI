@@ -288,3 +288,41 @@ export async function approvaProposta(approva: boolean, by: string): Promise<Too
   await event("approval", { oggetto: "proposta", id: p.id, esito: "approvata", routine: ch.routine, from_version: ch.from_version, to_version: ch.to_version });
   return { ok: true, frase: `Fatto: «${ch.routine}» versione ${ch.to_version} (${ch.diff}). Misuro il prossimo ciclo.` };
 }
+
+/** Esegue il pattern miner sugli ultimi eventi; scrive observations e, se possibile, proposal + routine draft. */
+export async function mina(): Promise<ToolResult & { nuove: string[] }> {
+  const { mine } = await import("../miner");
+  const s = db();
+  const [evs, runs, routines, obs, props] = await Promise.all([
+    must(s.from("events").select("id,ts,type,routine_run_id,step,payload").order("ts", { ascending: false }).limit(400)),
+    must(s.from("routine_runs").select("id,routine_name,routine_version").order("created_at", { ascending: false }).limit(100)),
+    must(s.from("routines").select("name,version,status,steps")),
+    must(s.from("observations").select("rule,evidence").order("created_at", { ascending: false }).limit(200)),
+    must(s.from("proposals").select("id,status,change,after")),
+  ]);
+  const seen = new Set(obs.map((o: { rule: string; evidence: string[] }) => `${o.rule}|${o.evidence?.[0]}`));
+  const nuove: string[] = [];
+  for (const f of mine(evs, runs, routines)) {
+    if (seen.has(`${f.rule}|${f.evidence[0]}`)) continue;
+    if (f.proposal && props.some((p: { change: { routine: string; from_version: number } }) => p.change.routine === f.proposal!.routine && p.change.from_version === f.proposal!.from_version)) continue;
+    const [o] = await must(s.from("observations").insert({ kind: f.kind, rule: f.rule, evidence: f.evidence, summary: f.summary }).select("id"));
+    await event("proposal", { observation_id: o.id, rule: f.rule, text: f.summary });
+    if (f.proposal) {
+      const max = Math.max(0, ...routines.filter((r: { name: string }) => r.name === f.proposal!.routine).map((r: { version: number }) => r.version));
+      const to = max + 1;
+      await must(s.from("routines").delete().eq("name", f.proposal.routine).eq("status", "draft"));
+      await must(s.from("routines").insert({ name: f.proposal.routine, version: to, parent_version: f.proposal.from_version, edited_from_version: f.proposal.from_version, steps: f.proposal.steps, taught_by_voice: false, source_utterance: `proposta: ${f.proposal.diff}`, status: "draft" }));
+      const [st] = await must(s.from("v_cycle_stats").select("avg_cycle_time_ms").eq("routine_name", f.proposal.routine).eq("routine_version", f.proposal.from_version).limit(1));
+      await must(s.from("proposals").insert({ observation_id: o.id, change: { routine: f.proposal.routine, from_version: f.proposal.from_version, to_version: to, diff: f.proposal.diff }, status: "pending", metric: "cycle_time_ms", before: st?.avg_cycle_time_ms ?? null }));
+    }
+    seen.add(`${f.rule}|${f.evidence[0]}`);
+    nuove.push(f.summary);
+  }
+  // "after": tempo medio della nuova versione appena ha almeno un ciclo
+  for (const p of props.filter((x: { status: string; after: number | null }) => x.status === "approved" && x.after == null)) {
+    const ch = p.change as { routine: string; to_version: number };
+    const [st] = await must(s.from("v_cycle_stats").select("cycles,avg_cycle_time_ms").eq("routine_name", ch.routine).eq("routine_version", ch.to_version).limit(1));
+    if (st && st.cycles > 0) await must(s.from("proposals").update({ after: st.avg_cycle_time_ms }).eq("id", p.id));
+  }
+  return { ok: true, frase: nuove[0] ?? "", nuove };
+}

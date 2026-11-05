@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { VoiceSession } from "@/lib/voice/client";
 import { Panel } from "./Panel";
 
@@ -14,12 +14,15 @@ const ALLOWED: Record<string, string[]> = {
   fatto: [], segnala: ["text"], resoconto: [], approva_proposta: ["approva"],
 };
 
-export function VoicePanel() {
+export function VoicePanel({ announce }: { announce?: { id: number; text: string } | null }) {
   const [state, setState] = useState("spenta");
   const [said, setSaid] = useState("");
   const [last, setLast] = useState<string>("");
   const sess = useRef<VoiceSession | null>(null);
   const movingUntil = useRef(0);
+  useEffect(() => {
+    if (announce && state === "in ascolto") sess.current?.say(announce.text);
+  }, [announce, state]);
 
   const call = async (name: string, args: Record<string, unknown>) => {
     const r = await fetch(`/api/tools/${name}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(args) });

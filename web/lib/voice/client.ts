@@ -155,6 +155,12 @@ export class VoiceSession {
     }
   }
 
+  /** Fa dire a Grok una frase scritta dal codice (es. una proposta del miner). */
+  say(text: string) {
+    this.send({ type: "conversation.item.create", item: { type: "message", role: "user", content: [{ type: "input_text", text: `[sistema, non è l'operatore] Di' all'operatore esattamente questa frase e aspetta la risposta: «${text}»` }] } });
+    this.send({ type: "response.create" });
+  }
+
   close() {
     this.stopPlayback();
     this.ws?.close();

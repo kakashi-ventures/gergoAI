@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { RoutineStep, SkillName, SpostaParams } from "@/lib/contracts";
-import { annulla, approvaProposta, conferma, confermaSkill, definisciRoutine, deprecaSkill, eseguiRoutine, fatto, proponi, resoconto, salvaAngolo, salvaRoutine, segnala, stop, type ToolResult } from "@/lib/server/tools";
+import { annulla, approvaProposta, conferma, confermaSkill, definisciRoutine, deprecaSkill, eseguiRoutine, fatto, mina, proponi, resoconto, salvaAngolo, salvaRoutine, segnala, stop, type ToolResult } from "@/lib/server/tools";
 import type { Vec3 } from "@/lib/validator";
 
 export const runtime = "nodejs";
@@ -25,6 +25,7 @@ const Inputs = {
   fatto: z.strictObject({}),
   segnala: z.strictObject({ text: z.string().min(1).max(200) }),
   resoconto: z.strictObject({}),
+  mina: z.strictObject({}),
   approva_proposta: z.strictObject({ approva: z.boolean(), by: z.string().max(60).default("operatore") }),
   conferma_skill: z.strictObject({ name: SkillName, by: z.string().min(1).max(60).default("operatore") }),
   depreca_skill: z.strictObject({ name: SkillName, motivo: z.string().min(3).max(300), by: z.string().min(1).max(60).default("operatore") }),
@@ -62,6 +63,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ name: s
       case "fatto": r = await fatto(); break;
       case "segnala": r = await segnala(a.text as string); break;
       case "resoconto": r = await resoconto(); break;
+      case "mina": r = await mina(); break;
       case "approva_proposta": r = await approvaProposta(a.approva as boolean, a.by as string); break;
       case "salva_angolo": {
         const cookie = req.headers.get("cookie")?.match(/gergo_corner=([^;]+)/)?.[1];

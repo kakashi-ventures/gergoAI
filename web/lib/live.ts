@@ -44,6 +44,7 @@ function eventText(type: string, p: Record<string, unknown>): string {
   if (type === "speed_change") return `${p.da_mm_s} → ${p.a_mm_s} mm/s`;
   if (type === "interpretation") return String(p.readback ?? `${p.skill} ${JSON.stringify(p.params ?? {})}`);
   if (type === "anomaly") return String(p.reason ?? p.code ?? "anomalia");
+  if (type === "step_end" && p.cycle === true) return `ciclo «${p.routine}» v${p.version} · ${(Number(p.cycle_time_ms) / 1000).toFixed(1)} s`;
   if (type === "step_start" || type === "step_end") return String(p.skill ?? p.text ?? "");
   return Object.keys(p).length ? JSON.stringify(p).slice(0, 120) : "";
 }
@@ -64,7 +65,7 @@ async function load(s: SupabaseClient): Promise<LiveData> {
     q<Record<string, unknown>[]>(s.from("routines").select("name,version,status,source_utterance,parent_version").order("name").order("version", { ascending: false }).limit(10)).catch(() => []),
     q<Record<string, unknown>[]>(s.from("commands").select("id,skill,readback,status").eq("status", "queued").order("created_at", { ascending: false }).limit(1)),
     q<Record<string, unknown>[]>(s.from("events").select("id,ts,type,payload,step").order("ts", { ascending: false }).limit(60)),
-    q<Record<string, unknown>[]>(s.from("proposals").select("id,status,change,before,after,observation_id").eq("status", "pending").order("created_at", { ascending: false }).limit(1)).catch(() => []),
+    q<Record<string, unknown>[]>(s.from("proposals").select("id,status,change,before,after,observation_id,observations(summary,rule)").eq("status", "pending").order("created_at", { ascending: false }).limit(1)).catch(() => []),
     q<Record<string, unknown>[]>(s.from("v_shift_summary").select("*").limit(1)).catch(() => []),
   ]);
   const b = bridge[0] ?? {}, g = guard[0] ?? {};
@@ -91,9 +92,9 @@ async function load(s: SupabaseClient): Promise<LiveData> {
     pending: cmds[0] ? { id: String(cmds[0].id), skill: String(cmds[0].skill), frase: String(cmds[0].readback ?? cmds[0].skill) } : null,
     events: evs.map((e) => {
       const p = (e.payload ?? {}) as Record<string, unknown>;
-      return { id: String(e.id), ts: String(e.ts), type: String(e.type), text: eventText(String(e.type), p), duration_ms: p.duration_ms as number | undefined, ok: p.ok as boolean | undefined, step: e.step as number | undefined };
+      return { id: String(e.id), ts: String(e.ts), type: String(e.type), text: eventText(String(e.type), p), duration_ms: p.duration_ms as number | undefined, ok: p.ok as boolean | undefined, step: e.step as number | undefined, cycle: p.cycle === true };
     }),
-    proposal: props[0] ? { id: String(props[0].id), summary: String((props[0].change as { diff?: string })?.diff ?? ""), rule: "", before: (props[0].before as number) ?? null, after: (props[0].after as number) ?? null } : null,
+    proposal: props[0] ? { id: String(props[0].id), summary: String((props[0].observations as { summary?: string } | null)?.summary ?? (props[0].change as { diff?: string })?.diff ?? ""), rule: String((props[0].observations as { rule?: string } | null)?.rule ?? ""), before: (props[0].before as number) ?? null, after: (props[0].after as number) ?? null } : null,
     resoconto: summary[0]
       ? { cicli: pick("cycles_done"), tempo_medio_ms: pick("avg_cycle_time_ms"), correzioni: pick("corrections"), stop: pick("stops"), anomalie: pick("anomalies"), "senza conferma": pick("commands_unconfirmed_executed"), "fuori area": pick("motion_rejected_geofence") }
       : {},
