@@ -57,13 +57,16 @@ BRACCIO ──(serie CS/EC entro 13:15, al 1° slot)─────────�
 | Cantiere | Ora | Fatto | Prossimo | Bloccato da |
 |---|---|---|---|---|
 | FONDAMENTA | — | — | progetto Supabase, migration, env | — |
-| BRIDGE | — | — | contratti `/shared` con `sposta` → tag `contracts-v1` | — |
+| BRIDGE | 12:46 | `contracts-v1` = commit `1448eac` (`/shared`: schemi, fixtures, `contracts.md`; pydantic in `bridge/contracts.py`, 40 test verdi) | migration `1xxx_`, `RobotAdapter`, validator con geofence | tag git: il push dei tag dal cloud dà 403, va pushato a mano |
 | CONSOLE | — | — | layout console, prova della voce | contratti |
 | BRACCIO | — | — | client 8055, mock, `motion`, `audio_guard` | serie del braccio (slot) |
 
 ## Richieste tra cantieri
 
 Formato: `- [ora] DA → A: cosa serve, perché` · chi la risolve la marca `✔ ora + commit`.
+
+- [12:46] BRIDGE → CONSOLE, BRACCIO: **contracts-v1 pronto** su `main` al commit `1448eac`. Leggete `shared/contracts.md`; schemi in `shared/schemas/*.json`, fixtures in `shared/fixtures/{valid,invalid}/*.json` (formato `{model, data, why}`: zod deve dare lo stesso esito di pydantic). Le regole cross-field (params per skill, `sposta` senza coordinate) sono nella tabella di `contracts.md`.
+- [12:46] BRIDGE → umano: il tag `contracts-v1` non si può pushare da qui (403). Da un laptop: `git fetch origin && git tag contracts-v1 1448eac && git push origin contracts-v1`.
 
 ---
 
