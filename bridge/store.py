@@ -151,13 +151,28 @@ class SupabaseStore(Store):
         if prefer:
             headers["Prefer"] = prefer
         data = json.dumps(body).encode() if body is not None else None
-        req = urllib.request.Request(self.url + path, data=data, method=method, headers=headers)
+        # One persistent HTTPS connection per thread (poll loop and heartbeat thread). A new urllib connection per
+        # request meant a TLS handshake several times a second, and on the venue network those timed out: measured
+        # 05/11, ~20 s between the console confirmation and the bridge picking up the command.
+        import http.client
+        import threading
+        from urllib.parse import urlsplit
+        local = self.__dict__.setdefault("_local", threading.local())
+        u = urlsplit(self.url)
+        conn = getattr(local, "conn", None)
+        if conn is None:
+            conn = local.conn = http.client.HTTPSConnection(u.hostname, u.port or 443, timeout=self.timeout)
         try:
-            with urllib.request.urlopen(req, timeout=self.timeout) as r:
-                raw = r.read()
-                return json.loads(raw) if raw else None
-        except urllib.error.HTTPError as e:
-            raise RuntimeError(f"supabase {method} {path}: {e.code} {e.read()[:300]!r}") from None
+            conn.request(method, u.path + path, body=data, headers=headers)
+            r = conn.getresponse()
+            raw = r.read()
+        except Exception:
+            conn.close()
+            local.conn = None
+            raise
+        if r.status >= 400:
+            raise RuntimeError(f"supabase {method} {path}: {r.status} {raw[:300]!r}")
+        return json.loads(raw) if raw else None
 
     def confirmed_commands(self):
         return self._req("GET", f"/commands?select={COMMAND_COLUMNS}&status=eq.confirmed&order=confirmed_at.asc&limit=20") or []

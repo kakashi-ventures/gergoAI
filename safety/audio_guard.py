@@ -536,11 +536,28 @@ class SupabaseSink:
         return cls(url, key, bridge_id) if url and key else None
 
     def _post(self, path: str, body: Any, prefer: str) -> None:
-        req = urllib.request.Request(self.base + path, data=json.dumps(body).encode(), method="POST", headers={
-            "apikey": self.key, "Authorization": f"Bearer {self.key}",
-            "Content-Type": "application/json", "Prefer": prefer})
-        with urllib.request.urlopen(req, timeout=self.timeout) as r:
+        # One persistent HTTPS connection per thread (events and heartbeats run on different threads). With a new
+        # urllib connection per heartbeat, the TLS handshake timed out on the venue network and guard_status aged
+        # 0.2–5 s, so the console saw the guard as dead. On any error the connection is dropped and rebuilt.
+        import http.client
+        from urllib.parse import urlsplit
+        local = self.__dict__.setdefault("_local", threading.local())
+        u = urlsplit(self.base)
+        conn = getattr(local, "conn", None)
+        if conn is None:
+            conn = local.conn = http.client.HTTPSConnection(u.hostname, u.port or 443, timeout=self.timeout)
+        try:
+            conn.request("POST", u.path + path, body=json.dumps(body).encode(), headers={
+                "apikey": self.key, "Authorization": f"Bearer {self.key}",
+                "Content-Type": "application/json", "Prefer": prefer})
+            r = conn.getresponse()
             r.read()
+            if r.status >= 400:
+                raise OSError(f"supabase {r.status}")
+        except Exception:
+            conn.close()
+            local.conn = None
+            raise
 
     def insert_event(self, payload: dict) -> None:
         self._post("/events", {"type": "safety_trigger", "payload": payload}, "return=minimal")
