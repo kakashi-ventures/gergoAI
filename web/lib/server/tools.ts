@@ -146,3 +146,27 @@ export async function salvaAngolo(primo: Vec3 | null): Promise<ToolResult & { an
 }
 
 export const SpostaInput = SpostaParams;
+
+/** Conferma di una skill dalla console: solo se sim_ok (vincolo anche nel DB). Scrive un event "approval". */
+export async function confermaSkill(name: string, by: string): Promise<ToolResult> {
+  const s = db();
+  const ont = await must(s.from("ontology_versions").select("version").order("version", { ascending: false }).limit(1));
+  const v = ont[0]?.version;
+  const [k] = await must(s.from("skills").select("name,status,sim_ok").eq("ontology_version", v ?? -1).eq("name", name).limit(1));
+  if (!k) return { ok: false, frase: `La skill ${name} non c'è.` };
+  if (!k.sim_ok) return { ok: false, frase: `Prima di confermare ${name} deve girare bene in simulazione.` };
+  if (k.status !== "draft") return { ok: false, frase: `La skill ${name} è ${k.status}.` };
+  await must(s.from("skills").update({ status: "confirmed", confirmed_by: by, confirmed_at: new Date().toISOString(), updated_at: new Date().toISOString() }).eq("ontology_version", v).eq("name", name));
+  await event("approval", { oggetto: "skill", name, by, ontology_version: v });
+  return { ok: true, frase: `Skill ${name} confermata.` };
+}
+
+export async function deprecaSkill(name: string, motivo: string, by: string): Promise<ToolResult> {
+  const s = db();
+  const ont = await must(s.from("ontology_versions").select("version").order("version", { ascending: false }).limit(1));
+  const v = ont[0]?.version;
+  const rows = await must(s.from("skills").update({ status: "deprecated", deprecated_reason: motivo, updated_at: new Date().toISOString() }).eq("ontology_version", v ?? -1).eq("name", name).neq("status", "deprecated").select("name"));
+  if (!rows.length) return { ok: false, frase: `La skill ${name} non c'è o è già deprecata.` };
+  await event("approval", { oggetto: "skill", azione: "depreca", name, motivo, by, ontology_version: v });
+  return { ok: true, frase: `Skill ${name} deprecata.` };
+}

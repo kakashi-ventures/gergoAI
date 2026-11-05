@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { SkillName, SpostaParams } from "@/lib/contracts";
-import { annulla, conferma, proponi, salvaAngolo, stop, type ToolResult } from "@/lib/server/tools";
+import { annulla, conferma, confermaSkill, deprecaSkill, proponi, salvaAngolo, stop, type ToolResult } from "@/lib/server/tools";
 import type { Vec3 } from "@/lib/validator";
 
 export const runtime = "nodejs";
@@ -19,6 +19,8 @@ const Inputs = {
   annulla: z.strictObject({}),
   stop: z.strictObject({ source: z.string().max(40).optional() }),
   salva_angolo: z.strictObject({}),
+  conferma_skill: z.strictObject({ name: SkillName, by: z.string().min(1).max(60).default("operatore") }),
+  depreca_skill: z.strictObject({ name: SkillName, motivo: z.string().min(3).max(300), by: z.string().min(1).max(60).default("operatore") }),
 } as const;
 
 type Name = keyof typeof Inputs;
@@ -45,6 +47,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ name: s
       case "conferma": r = await conferma(a.command_id as string | undefined); break;
       case "annulla": r = await annulla(); break;
       case "stop": r = await stop((a.source as string) ?? "console"); break;
+      case "conferma_skill": r = await confermaSkill(a.name as string, a.by as string); break;
+      case "depreca_skill": r = await deprecaSkill(a.name as string, a.motivo as string, a.by as string); break;
       case "salva_angolo": {
         const cookie = req.headers.get("cookie")?.match(/gergo_corner=([^;]+)/)?.[1];
         const primo = cookie ? (JSON.parse(decodeURIComponent(cookie)) as Vec3) : null;
