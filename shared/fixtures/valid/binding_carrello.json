@@ -1,0 +1,9 @@
+{
+  "model": "Binding",
+  "data": {
+    "expression": "il carrello",
+    "means": {
+      "place": "USCITA"
+    }
+  }
+}

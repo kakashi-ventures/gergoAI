@@ -1,0 +1,7 @@
+{
+  "model": "SessionState",
+  "data": {
+    "velocita_mm_s": 50,
+    "tool": "forchetta"
+  }
+}

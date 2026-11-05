@@ -1,0 +1,11 @@
+{
+  "model": "Tool",
+  "why": "tcp a 2 assi",
+  "data": {
+    "nome": "punta",
+    "tcp_atteso_mm": [
+      0,
+      0
+    ]
+  }
+}

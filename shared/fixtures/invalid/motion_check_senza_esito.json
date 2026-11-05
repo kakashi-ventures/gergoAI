@@ -1,0 +1,16 @@
+{
+  "model": "Event",
+  "why": "manca geofence_ok/ok",
+  "data": {
+    "type": "motion_check",
+    "payload": {
+      "command_id": "c",
+      "delta_mm": [
+        0,
+        0,
+        1
+      ],
+      "velocita_mm_s": 50
+    }
+  }
+}

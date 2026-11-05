@@ -1,0 +1,12 @@
+{
+  "model": "Command",
+  "data": {
+    "id": "c1",
+    "skill": "solleva",
+    "params": {
+      "place": "INGRESSO"
+    },
+    "status": "confirmed",
+    "confirmed_at": "2026-11-05T12:50:00Z"
+  }
+}

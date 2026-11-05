@@ -1,0 +1,15 @@
+{
+  "model": "Command",
+  "why": "alternative",
+  "data": {
+    "id": "x5",
+    "skill": "sposta",
+    "params": {
+      "direzione": "su",
+      "quantita": 1,
+      "unita": "cm",
+      "intensita": "tanto"
+    },
+    "status": "queued"
+  }
+}

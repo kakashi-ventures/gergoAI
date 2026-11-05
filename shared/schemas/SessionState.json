@@ -1,0 +1,28 @@
+{
+  "$id": "gergo/SessionState.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "tool": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Tool"
+    },
+    "velocita_mm_s": {
+      "default": 50.0,
+      "maximum": 100.0,
+      "minimum": 10.0,
+      "title": "Velocita Mm S",
+      "type": "number"
+    }
+  },
+  "title": "SessionState",
+  "type": "object"
+}

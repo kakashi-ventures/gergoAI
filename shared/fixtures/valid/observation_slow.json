@@ -1,0 +1,12 @@
+{
+  "model": "Observation",
+  "data": {
+    "kind": "anomaly",
+    "rule": "slow_step",
+    "evidence": [
+      "e1",
+      "e2"
+    ],
+    "summary": "applica è lenta"
+  }
+}

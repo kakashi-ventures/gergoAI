@@ -1,0 +1,11 @@
+{
+  "model": "Event",
+  "data": {
+    "type": "step_end",
+    "command_id": "c1",
+    "payload": {
+      "duration_ms": 2100,
+      "ok": true
+    }
+  }
+}

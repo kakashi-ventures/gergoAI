@@ -1,0 +1,7 @@
+{
+  "model": "SessionState",
+  "why": "oltre 100 mm/s",
+  "data": {
+    "velocita_mm_s": 250
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "model": "Command",
+  "why": "direzione fuori enum",
+  "data": {
+    "id": "x3",
+    "skill": "sposta",
+    "params": {
+      "direzione": "diagonale"
+    },
+    "status": "queued"
+  }
+}

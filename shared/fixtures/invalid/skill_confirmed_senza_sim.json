@@ -1,0 +1,12 @@
+{
+  "model": "Skill",
+  "why": "confirmed senza sim_ok",
+  "data": {
+    "name": "applica",
+    "kind": "primitive",
+    "status": "confirmed",
+    "confirmed_by": "f",
+    "confirmed_at": "2026-11-05T12:50:00Z",
+    "sim_ok": false
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "$id": "gergo/BridgeStatus.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "adapter": {
+      "title": "Adapter",
+      "type": "string"
+    },
+    "bridge_id": {
+      "title": "Bridge Id",
+      "type": "string"
+    },
+    "guard_alive": {
+      "default": false,
+      "title": "Guard Alive",
+      "type": "boolean"
+    },
+    "last_command_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Last Command Id"
+    },
+    "mode": {
+      "enum": [
+        "sim",
+        "elite"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "ontology_version": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Ontology Version"
+    },
+    "ts": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Ts"
+    },
+    "velocita_mm_s": {
+      "default": 50.0,
+      "title": "Velocita Mm S",
+      "type": "number"
+    }
+  },
+  "required": [
+    "bridge_id",
+    "mode",
+    "adapter"
+  ],
+  "title": "BridgeStatus",
+  "type": "object"
+}

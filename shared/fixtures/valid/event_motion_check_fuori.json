@@ -1,0 +1,30 @@
+{
+  "model": "Event",
+  "data": {
+    "type": "motion_check",
+    "command_id": "c7",
+    "payload": {
+      "command_id": "c7",
+      "delta_mm": [
+        0,
+        0,
+        -100
+      ],
+      "pose_mm": [
+        100,
+        0,
+        80
+      ],
+      "target_mm": [
+        100,
+        0,
+        -20
+      ],
+      "geofence_ok": false,
+      "fuori_di_mm": 50,
+      "velocita_mm_s": 50,
+      "ok": false,
+      "reason": "arriverei fuori dall'area di lavoro di 5 cm"
+    }
+  }
+}

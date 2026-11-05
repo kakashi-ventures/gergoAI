@@ -1,0 +1,11 @@
+{
+  "model": "Event",
+  "why": "trigger fuori enum",
+  "data": {
+    "type": "safety_trigger",
+    "payload": {
+      "trigger": "applauso",
+      "latency_ms": 10
+    }
+  }
+}

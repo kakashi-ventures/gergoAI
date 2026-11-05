@@ -1,0 +1,8 @@
+{
+  "model": "SpostaParams",
+  "data": {
+    "direzione": "avanti",
+    "quantita": 15,
+    "unita": "mm"
+  }
+}

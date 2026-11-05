@@ -1,0 +1,14 @@
+{
+  "model": "Command",
+  "data": {
+    "id": "c3",
+    "skill": "sposta",
+    "params": {
+      "direzione": "destra",
+      "quantita": null,
+      "unita": null,
+      "intensita": "un_po"
+    },
+    "status": "queued"
+  }
+}

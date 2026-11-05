@@ -1,0 +1,169 @@
+{
+  "$defs": {
+    "PlaceName": {
+      "enum": [
+        "INGRESSO",
+        "STAZIONE",
+        "USCITA",
+        "SCARTI",
+        "HOME"
+      ],
+      "title": "PlaceName",
+      "type": "string"
+    },
+    "RoutineStep": {
+      "additionalProperties": false,
+      "properties": {
+        "params": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Params"
+        },
+        "place": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PlaceName"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "prompt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Prompt"
+        },
+        "skill": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SkillName"
+            },
+            {
+              "const": "attendi_operatore",
+              "type": "string"
+            }
+          ],
+          "title": "Skill"
+        }
+      },
+      "required": [
+        "skill"
+      ],
+      "title": "RoutineStep",
+      "type": "object"
+    },
+    "SkillName": {
+      "enum": [
+        "solleva",
+        "deposita",
+        "porta",
+        "applica",
+        "home",
+        "stop",
+        "sposta",
+        "piu_piano",
+        "piu_veloce"
+      ],
+      "title": "SkillName",
+      "type": "string"
+    }
+  },
+  "$id": "gergo/Routine.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "edited_from_version": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Edited From Version"
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "parent_version": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Parent Version"
+    },
+    "source_utterance": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Utterance"
+    },
+    "status": {
+      "default": "draft",
+      "enum": [
+        "draft",
+        "active",
+        "deprecated"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "steps": {
+      "items": {
+        "$ref": "#/$defs/RoutineStep"
+      },
+      "minItems": 1,
+      "title": "Steps",
+      "type": "array"
+    },
+    "taught_by_voice": {
+      "default": false,
+      "title": "Taught By Voice",
+      "type": "boolean"
+    },
+    "version": {
+      "minimum": 1,
+      "title": "Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "name",
+    "version",
+    "steps"
+  ],
+  "title": "Routine",
+  "type": "object"
+}

@@ -1,0 +1,15 @@
+{
+  "model": "Command",
+  "data": {
+    "id": "c2",
+    "skill": "sposta",
+    "params": {
+      "direzione": "giu",
+      "quantita": 10,
+      "unita": "cm",
+      "intensita": null
+    },
+    "status": "queued",
+    "readback": "Scendo di 10 centimetri a 50 millimetri al secondo. Confermi?"
+  }
+}

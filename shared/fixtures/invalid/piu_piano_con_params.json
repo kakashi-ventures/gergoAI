@@ -1,0 +1,12 @@
+{
+  "model": "Command",
+  "why": "numeri non ammessi",
+  "data": {
+    "id": "x10",
+    "skill": "piu_piano",
+    "params": {
+      "velocita": 5
+    },
+    "status": "queued"
+  }
+}

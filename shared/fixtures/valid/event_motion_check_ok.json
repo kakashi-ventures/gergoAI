@@ -1,0 +1,29 @@
+{
+  "model": "Event",
+  "data": {
+    "type": "motion_check",
+    "command_id": "c2",
+    "payload": {
+      "command_id": "c2",
+      "delta_mm": [
+        0,
+        0,
+        -100
+      ],
+      "pose_mm": [
+        100,
+        0,
+        250
+      ],
+      "target_mm": [
+        100,
+        0,
+        150
+      ],
+      "geofence_ok": true,
+      "kinematics_ok": true,
+      "velocita_mm_s": 50,
+      "ok": true
+    }
+  }
+}

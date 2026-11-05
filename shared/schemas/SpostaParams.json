@@ -1,0 +1,83 @@
+{
+  "$defs": {
+    "Direzione": {
+      "enum": [
+        "su",
+        "giu",
+        "avanti",
+        "indietro",
+        "destra",
+        "sinistra"
+      ],
+      "title": "Direzione",
+      "type": "string"
+    },
+    "Intensita": {
+      "enum": [
+        "poco",
+        "un_po",
+        "tanto"
+      ],
+      "title": "Intensita",
+      "type": "string"
+    },
+    "Unita": {
+      "enum": [
+        "mm",
+        "cm"
+      ],
+      "title": "Unita",
+      "type": "string"
+    }
+  },
+  "$id": "gergo/SpostaParams.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Intento di spostamento relativo. MAI coordinate: solo enum e una quantità.",
+  "properties": {
+    "direzione": {
+      "$ref": "#/$defs/Direzione"
+    },
+    "intensita": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Intensita"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "quantita": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "maximum": 1000,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Quantita"
+    },
+    "unita": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Unita"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "direzione"
+  ],
+  "title": "SpostaParams",
+  "type": "object"
+}

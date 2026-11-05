@@ -1,0 +1,11 @@
+{
+  "model": "Command",
+  "data": {
+    "id": "c4",
+    "skill": "sposta",
+    "params": {
+      "direzione": "su"
+    },
+    "status": "queued"
+  }
+}

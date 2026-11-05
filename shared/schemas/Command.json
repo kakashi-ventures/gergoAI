@@ -1,0 +1,118 @@
+{
+  "$defs": {
+    "SkillName": {
+      "enum": [
+        "solleva",
+        "deposita",
+        "porta",
+        "applica",
+        "home",
+        "stop",
+        "sposta",
+        "piu_piano",
+        "piu_veloce"
+      ],
+      "title": "SkillName",
+      "type": "string"
+    }
+  },
+  "$id": "gergo/Command.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "confirmed_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Confirmed At"
+    },
+    "created_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Created At"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "params": {
+      "additionalProperties": true,
+      "title": "Params",
+      "type": "object"
+    },
+    "readback": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "frase di rilettura scritta dal codice",
+      "title": "Readback"
+    },
+    "routine_run_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Routine Run Id"
+    },
+    "skill": {
+      "$ref": "#/$defs/SkillName"
+    },
+    "status": {
+      "default": "queued",
+      "enum": [
+        "queued",
+        "confirmed",
+        "running",
+        "done",
+        "failed",
+        "cancelled"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "step": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Step"
+    }
+  },
+  "required": [
+    "id",
+    "skill"
+  ],
+  "title": "Command",
+  "type": "object"
+}

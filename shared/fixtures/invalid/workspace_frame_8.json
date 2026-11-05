@@ -1,0 +1,17 @@
+{
+  "model": "Workspace",
+  "why": "frame fuori 0-7",
+  "data": {
+    "frame": 8,
+    "min_mm": [
+      0,
+      0,
+      0
+    ],
+    "max_mm": [
+      1,
+      1,
+      1
+    ]
+  }
+}

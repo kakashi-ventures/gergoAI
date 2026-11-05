@@ -1,0 +1,13 @@
+{
+  "model": "Event",
+  "data": {
+    "type": "safety_trigger",
+    "payload": {
+      "trigger": "parola",
+      "latency_ms": 180,
+      "features": {
+        "word": "stop"
+      }
+    }
+  }
+}

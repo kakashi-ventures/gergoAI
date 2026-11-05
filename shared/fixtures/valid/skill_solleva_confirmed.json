@@ -1,0 +1,12 @@
+{
+  "model": "Skill",
+  "data": {
+    "name": "solleva",
+    "kind": "primitive",
+    "jbi": "solleva_INGRESSO",
+    "status": "confirmed",
+    "confirmed_by": "federico",
+    "confirmed_at": "2026-11-05T12:50:00Z",
+    "sim_ok": true
+  }
+}

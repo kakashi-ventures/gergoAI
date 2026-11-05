@@ -1,0 +1,15 @@
+{
+  "model": "Command",
+  "why": "coordinate nei params",
+  "data": {
+    "id": "x1",
+    "skill": "sposta",
+    "params": {
+      "direzione": "giu",
+      "x": 120,
+      "y": 0,
+      "z": 50
+    },
+    "status": "queued"
+  }
+}

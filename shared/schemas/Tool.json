@@ -1,0 +1,28 @@
+{
+  "$id": "gergo/Tool.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "nome": {
+      "minLength": 1,
+      "title": "Nome",
+      "type": "string"
+    },
+    "tcp_atteso_mm": {
+      "description": "offset x, y, z del TCP dalla flangia in mm",
+      "items": {
+        "type": "number"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "title": "Tcp Atteso Mm",
+      "type": "array"
+    }
+  },
+  "required": [
+    "nome",
+    "tcp_atteso_mm"
+  ],
+  "title": "Tool",
+  "type": "object"
+}

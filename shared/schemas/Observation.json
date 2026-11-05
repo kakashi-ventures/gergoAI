@@ -1,0 +1,59 @@
+{
+  "$id": "gergo/Observation.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "evidence": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Evidence",
+      "type": "array"
+    },
+    "id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Id"
+    },
+    "kind": {
+      "enum": [
+        "anomaly",
+        "pattern"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "rule": {
+      "enum": [
+        "slow_step",
+        "repeated_failure",
+        "repeated_correction",
+        "repeated_sequence",
+        "redundant_step",
+        "safety_pattern"
+      ],
+      "title": "Rule",
+      "type": "string"
+    },
+    "summary": {
+      "title": "Summary",
+      "type": "string"
+    }
+  },
+  "required": [
+    "kind",
+    "rule",
+    "evidence",
+    "summary"
+  ],
+  "title": "Observation",
+  "type": "object"
+}

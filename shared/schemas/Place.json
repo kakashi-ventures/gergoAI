@@ -1,0 +1,40 @@
+{
+  "$defs": {
+    "PlaceName": {
+      "enum": [
+        "INGRESSO",
+        "STAZIONE",
+        "USCITA",
+        "SCARTI",
+        "HOME"
+      ],
+      "title": "PlaceName",
+      "type": "string"
+    }
+  },
+  "$id": "gergo/Place.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "label": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Label"
+    },
+    "name": {
+      "$ref": "#/$defs/PlaceName"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Place",
+  "type": "object"
+}

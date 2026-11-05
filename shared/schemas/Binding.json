@@ -1,0 +1,63 @@
+{
+  "$id": "gergo/Binding.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "alpha": {
+      "default": 1,
+      "minimum": 0,
+      "title": "Alpha",
+      "type": "number"
+    },
+    "beta": {
+      "default": 1,
+      "minimum": 0,
+      "title": "Beta",
+      "type": "number"
+    },
+    "expression": {
+      "minLength": 1,
+      "title": "Expression",
+      "type": "string"
+    },
+    "last_used": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Last Used"
+    },
+    "means": {
+      "additionalProperties": true,
+      "title": "Means",
+      "type": "object"
+    },
+    "regime": {
+      "default": "WORKING",
+      "enum": [
+        "WORKING",
+        "CANONICAL"
+      ],
+      "title": "Regime",
+      "type": "string"
+    },
+    "uses": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Uses",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "expression",
+    "means"
+  ],
+  "title": "Binding",
+  "type": "object"
+}

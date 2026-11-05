@@ -1,0 +1,13 @@
+{
+  "model": "Command",
+  "why": "quantita senza unita",
+  "data": {
+    "id": "x4",
+    "skill": "sposta",
+    "params": {
+      "direzione": "su",
+      "quantita": 10
+    },
+    "status": "queued"
+  }
+}

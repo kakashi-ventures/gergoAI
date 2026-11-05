@@ -1,0 +1,11 @@
+{
+  "model": "Tool",
+  "data": {
+    "nome": "forchetta",
+    "tcp_atteso_mm": [
+      0,
+      0,
+      200
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "model": "Command",
+  "why": "skill fuori whitelist",
+  "data": {
+    "id": "x8",
+    "skill": "moveByLine",
+    "params": {},
+    "status": "queued"
+  }
+}

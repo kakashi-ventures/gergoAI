@@ -1,0 +1,17 @@
+{
+  "model": "Workspace",
+  "why": "min >= max",
+  "data": {
+    "frame": 1,
+    "min_mm": [
+      0,
+      0,
+      400
+    ],
+    "max_mm": [
+      300,
+      300,
+      30
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "model": "Command",
+  "why": "luogo fuori ontologia",
+  "data": {
+    "id": "x9",
+    "skill": "solleva",
+    "params": {
+      "place": "CUCINA"
+    },
+    "status": "queued"
+  }
+}

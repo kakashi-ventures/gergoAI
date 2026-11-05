@@ -1,0 +1,12 @@
+{
+  "model": "Proposal",
+  "data": {
+    "observation_id": "o1",
+    "change": {
+      "routine": "frontale",
+      "from_version": 1,
+      "to_version": 2,
+      "diff": "rimuovi home tra i cicli"
+    }
+  }
+}

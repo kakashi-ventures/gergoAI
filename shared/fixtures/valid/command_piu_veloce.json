@@ -1,0 +1,9 @@
+{
+  "model": "Command",
+  "data": {
+    "id": "c6",
+    "skill": "piu_veloce",
+    "params": {},
+    "status": "queued"
+  }
+}

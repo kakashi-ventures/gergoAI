@@ -1,0 +1,19 @@
+{
+  "model": "Command",
+  "why": "posa nei params",
+  "data": {
+    "id": "x2",
+    "skill": "sposta",
+    "params": {
+      "target_pose": [
+        1,
+        2,
+        3,
+        0,
+        0,
+        0
+      ]
+    },
+    "status": "queued"
+  }
+}

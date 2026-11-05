@@ -1,0 +1,14 @@
+{
+  "model": "Command",
+  "why": "negativa",
+  "data": {
+    "id": "x6",
+    "skill": "sposta",
+    "params": {
+      "direzione": "su",
+      "quantita": -5,
+      "unita": "cm"
+    },
+    "status": "queued"
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "$defs": {
+    "SkillName": {
+      "enum": [
+        "solleva",
+        "deposita",
+        "porta",
+        "applica",
+        "home",
+        "stop",
+        "sposta",
+        "piu_piano",
+        "piu_veloce"
+      ],
+      "title": "SkillName",
+      "type": "string"
+    },
+    "SkillStatus": {
+      "enum": [
+        "draft",
+        "confirmed",
+        "deprecated"
+      ],
+      "title": "SkillStatus",
+      "type": "string"
+    }
+  },
+  "$id": "gergo/Skill.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "confirmed_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Confirmed At"
+    },
+    "confirmed_by": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Confirmed By"
+    },
+    "effects": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Effects",
+      "type": "array"
+    },
+    "jbi": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "nome del file JBI sul controller EC",
+      "title": "Jbi"
+    },
+    "kind": {
+      "enum": [
+        "primitive",
+        "composite",
+        "motion",
+        "session"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "name": {
+      "$ref": "#/$defs/SkillName"
+    },
+    "params_schema": {
+      "additionalProperties": true,
+      "title": "Params Schema",
+      "type": "object"
+    },
+    "preconditions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Preconditions",
+      "type": "array"
+    },
+    "real_ok": {
+      "default": false,
+      "title": "Real Ok",
+      "type": "boolean"
+    },
+    "sim_ok": {
+      "default": false,
+      "title": "Sim Ok",
+      "type": "boolean"
+    },
+    "status": {
+      "$ref": "#/$defs/SkillStatus",
+      "default": "draft"
+    }
+  },
+  "required": [
+    "name",
+    "kind"
+  ],
+  "title": "Skill",
+  "type": "object"
+}

@@ -1,0 +1,123 @@
+{
+  "$id": "gergo/MotionCheckPayload.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "command_id": {
+      "title": "Command Id",
+      "type": "string"
+    },
+    "delta_mm": {
+      "items": {
+        "type": "number"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "title": "Delta Mm",
+      "type": "array"
+    },
+    "fuori_di_mm": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Fuori Di Mm"
+    },
+    "geofence_ok": {
+      "title": "Geofence Ok",
+      "type": "boolean"
+    },
+    "kinematics_ok": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Kinematics Ok"
+    },
+    "kinematics_reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Kinematics Reason"
+    },
+    "ok": {
+      "title": "Ok",
+      "type": "boolean"
+    },
+    "pose_mm": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Pose Mm"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reason"
+    },
+    "target_mm": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Target Mm"
+    },
+    "velocita_mm_s": {
+      "title": "Velocita Mm S",
+      "type": "number"
+    }
+  },
+  "required": [
+    "command_id",
+    "delta_mm",
+    "geofence_ok",
+    "velocita_mm_s",
+    "ok"
+  ],
+  "title": "MotionCheckPayload",
+  "type": "object"
+}

@@ -1,0 +1,8 @@
+{
+  "model": "Skill",
+  "data": {
+    "name": "sposta",
+    "kind": "motion",
+    "status": "draft"
+  }
+}

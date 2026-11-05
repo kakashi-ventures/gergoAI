@@ -1,0 +1,39 @@
+{
+  "$id": "gergo/Workspace.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "frame": {
+      "description": "coordinate_num del frame utente (EC 0–7)",
+      "maximum": 7,
+      "minimum": 0,
+      "title": "Frame",
+      "type": "integer"
+    },
+    "max_mm": {
+      "items": {
+        "type": "number"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "title": "Max Mm",
+      "type": "array"
+    },
+    "min_mm": {
+      "items": {
+        "type": "number"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "title": "Min Mm",
+      "type": "array"
+    }
+  },
+  "required": [
+    "frame",
+    "min_mm",
+    "max_mm"
+  ],
+  "title": "Workspace",
+  "type": "object"
+}

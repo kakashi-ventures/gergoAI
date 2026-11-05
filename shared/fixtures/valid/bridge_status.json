@@ -1,0 +1,9 @@
+{
+  "model": "BridgeStatus",
+  "data": {
+    "bridge_id": "pavia-postazione-1",
+    "mode": "sim",
+    "adapter": "sim",
+    "guard_alive": true
+  }
+}

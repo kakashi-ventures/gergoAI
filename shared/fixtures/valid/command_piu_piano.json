@@ -1,0 +1,10 @@
+{
+  "model": "Command",
+  "data": {
+    "id": "c5",
+    "skill": "piu_piano",
+    "params": {},
+    "status": "confirmed",
+    "confirmed_at": "2026-11-05T12:50:00Z"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "model": "Routine",
+  "data": {
+    "name": "frontale",
+    "version": 1,
+    "steps": [
+      {
+        "skill": "solleva",
+        "place": "INGRESSO"
+      },
+      {
+        "skill": "porta",
+        "place": "STAZIONE"
+      },
+      {
+        "skill": "attendi_operatore",
+        "prompt": "metti l'etichetta frontale"
+      },
+      {
+        "skill": "applica"
+      },
+      {
+        "skill": "deposita",
+        "place": "USCITA"
+      }
+    ],
+    "taught_by_voice": true,
+    "status": "active"
+  }
+}

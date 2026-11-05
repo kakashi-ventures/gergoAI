@@ -1,0 +1,34 @@
+{
+  "$id": "gergo/SafetyTriggerPayload.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "features": {
+      "additionalProperties": true,
+      "title": "Features",
+      "type": "object"
+    },
+    "latency_ms": {
+      "minimum": 0,
+      "title": "Latency Ms",
+      "type": "number"
+    },
+    "trigger": {
+      "enum": [
+        "parola",
+        "botta",
+        "urlo",
+        "sfregamento",
+        "heartbeat"
+      ],
+      "title": "Trigger",
+      "type": "string"
+    }
+  },
+  "required": [
+    "trigger",
+    "latency_ms"
+  ],
+  "title": "SafetyTriggerPayload",
+  "type": "object"
+}

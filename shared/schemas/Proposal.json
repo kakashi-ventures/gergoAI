@@ -1,0 +1,103 @@
+{
+  "$defs": {
+    "ProposalChange": {
+      "additionalProperties": false,
+      "properties": {
+        "diff": {
+          "title": "Diff",
+          "type": "string"
+        },
+        "from_version": {
+          "title": "From Version",
+          "type": "integer"
+        },
+        "routine": {
+          "title": "Routine",
+          "type": "string"
+        },
+        "to_version": {
+          "title": "To Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "routine",
+        "from_version",
+        "to_version",
+        "diff"
+      ],
+      "title": "ProposalChange",
+      "type": "object"
+    }
+  },
+  "$id": "gergo/Proposal.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "after": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "After"
+    },
+    "before": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Before"
+    },
+    "change": {
+      "$ref": "#/$defs/ProposalChange"
+    },
+    "id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Id"
+    },
+    "metric": {
+      "default": "cycle_time_ms",
+      "title": "Metric",
+      "type": "string"
+    },
+    "observation_id": {
+      "title": "Observation Id",
+      "type": "string"
+    },
+    "status": {
+      "default": "pending",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected",
+        "reverted"
+      ],
+      "title": "Status",
+      "type": "string"
+    }
+  },
+  "required": [
+    "observation_id",
+    "change"
+  ],
+  "title": "Proposal",
+  "type": "object"
+}

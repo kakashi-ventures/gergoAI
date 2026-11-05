@@ -1,0 +1,10 @@
+{
+  "model": "Command",
+  "why": "manca confirmed_at",
+  "data": {
+    "id": "x7",
+    "skill": "home",
+    "params": {},
+    "status": "confirmed"
+  }
+}
