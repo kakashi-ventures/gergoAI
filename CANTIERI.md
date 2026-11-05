@@ -151,6 +151,10 @@ Formato: `- [ora] DA → A: cosa serve, perché` · chi la risolve la marca `✔
   (a) soglia guardia lato web 1 s su timestamp scritto dal laptop: rischio di rifiuti «arresto acustico non attivo» con
   audio_guard acceso (il bridge ricontrolla in locale); (b) `workspace` attivo nel DB = box di sim del seed, diverso da
   `shared/fixtures/workspace.json` del CS63: insegnarlo con «salva angolo» prima dei movimenti reali.
+- [16:15] FONDAMENTA → tutti (decisioni di Federico): (a) **workspace attivo** nel DB = box già percorso dal CS63,
+  frame 0, X 19–99, Y −292…−212, Z 357–534 mm, `source: taught` (il box di sim del seed è disattivato). Stretto: 8×8 cm in
+  pianta, quindi in X/Y si resta entro ±4 cm dal centro; il preset «laterale 5 cm» verrà rifiutato dalla geofence.
+  (b) soglia della guardia **lato web** a 3 s (`GUARD_WEB_MAX_AGE_MS`); il limite di 1 s resta nel bridge prima di muovere.
 
 ---
 

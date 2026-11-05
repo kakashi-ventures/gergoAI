@@ -15,6 +15,8 @@ async function event(type: string, payload: Record<string, unknown>, command_id?
   await must(db().from("events").insert({ type, payload, command_id: command_id ?? null }));
 }
 
+export const GUARD_WEB_MAX_AGE_MS = 3000;
+
 export async function loadContext(phase: "propose" | "execute"): Promise<Context & { ontology_version: number | null }> {
   const s = db();
   const ont = await must(s.from("ontology_versions").select("version,status").order("version", { ascending: false }).limit(1));
@@ -28,7 +30,11 @@ export async function loadContext(phase: "propose" | "execute"): Promise<Context
   ]);
   const b = bridge[0] as { velocita_mm_s?: number; station?: { fork_loaded?: boolean; at?: string }; pose_mm?: number[]; mode?: "sim" | "elite" } | undefined;
   const g = guard[0] as { alive?: boolean; last_heartbeat_at?: string } | undefined;
-  const guardFresh = !!g?.alive && !!g.last_heartbeat_at && Date.now() - new Date(g.last_heartbeat_at).getTime() < 1000;
+  // Soglia lato web 3 s (decisione di Federico, 05/11 16:15): qui l'età include l'intervallo di heartbeat
+  // (250 ms), la latenza laptop→Supabase e Vercel→Supabase e lo sfasamento tra l'orologio del laptop, che scrive
+  // last_heartbeat_at, e quello di Vercel. Il vincolo di MOTION_SAFETY.md §3 (heartbeat assente da > 1 s → nessun
+  // movimento) resta nel bridge, che ricontrolla in locale (guard_ok, GUARD_GRACE_S = 1) subito prima di muovere.
+  const guardFresh = !!g?.alive && !!g.last_heartbeat_at && Date.now() - new Date(g.last_heartbeat_at).getTime() < GUARD_WEB_MAX_AGE_MS;
   // In sim la guardia la dà il SimArm del bridge (bridge_status.guard_alive), se il bridge è vivo. In elite conta solo audio_guard.
   const bb = bridge[0] as { guard_alive?: boolean; last_heartbeat_at?: string } | undefined;
   const simGuard = b?.mode === "sim" && !!bb?.guard_alive && !!bb.last_heartbeat_at && Date.now() - new Date(bb.last_heartbeat_at).getTime() < 5000;
